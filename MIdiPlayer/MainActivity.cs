@@ -1,4 +1,4 @@
-﻿using System;
+﻿
 using Android.App;
 using Android.Media;
 using Android.OS;
@@ -7,6 +7,9 @@ using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace MIdiPlayer {
 
@@ -17,6 +20,13 @@ namespace MIdiPlayer {
         // Fields
 
         MediaPlayer mediaPlayer = null;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Constructor
+
+        public MainActivity() {
+            mediaPlayer = new MediaPlayer();
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
@@ -51,7 +61,22 @@ namespace MIdiPlayer {
             Android.Support.V7.Widget.Toolbar toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
 
-            // todo
+            var _di = new DirectoryInfo($"/storage/emulated/0/Music/MIDI"); // TODO: 選択出来るように、SDカードを取得するには？
+
+            // MIDIファイルの一覧を取得
+            var _filePathList = _di.GetFiles()
+                .Where(x => x.Name.EndsWith(".MID") || x.Name.EndsWith(".mid"))
+                .OrderBy(x => x.CreationTime)
+                .ToList();
+
+            // MIDIファイル再生
+            mediaPlayer.SetDataSource(_filePathList[0].FullName);
+            mediaPlayer.Prepare();
+            mediaPlayer.Start();
+        }
+
+        protected override void OnStop() {
+            mediaPlayer.Stop();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
