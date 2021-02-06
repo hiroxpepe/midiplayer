@@ -11,7 +11,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace MIdiPlayer {
+namespace MidiPlayer {
 
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
     public class MainActivity : AppCompatActivity {
@@ -25,7 +25,6 @@ namespace MIdiPlayer {
         // Constructor
 
         public MainActivity() {
-            mediaPlayer = new MediaPlayer();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,22 +60,25 @@ namespace MIdiPlayer {
             Android.Support.V7.Widget.Toolbar toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
 
-            var _di = new DirectoryInfo($"/storage/emulated/0/Music/MIDI"); // TODO: 選択出来るように、SDカードを取得するには？
-
             // MIDIファイルの一覧を取得
+            var _di = new DirectoryInfo($"/storage/emulated/0/Music/MIDI"); // TODO: 選択出来るように、SDカードを取得するには？
             var _filePathList = _di.GetFiles()
                 .Where(x => x.Name.EndsWith(".MID") || x.Name.EndsWith(".mid"))
                 .OrderBy(x => x.CreationTime)
                 .ToList();
 
             // MIDIファイル再生
+            mediaPlayer = new MediaPlayer();
             mediaPlayer.SetDataSource(_filePathList[0].FullName);
             mediaPlayer.Prepare();
+            mediaPlayer.Looping = true;
             mediaPlayer.Start();
         }
 
         protected override void OnStop() {
             mediaPlayer.Stop();
+            mediaPlayer.Release();
+            mediaPlayer = null;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
