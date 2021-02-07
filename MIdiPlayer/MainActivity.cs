@@ -2,11 +2,13 @@
 using Android.App;
 using Android.Media;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Runtime;
+using Android.Support.V7.App;
 using Android.Widget;
-using System.IO;
-using System.Linq;
+using System;
+using System.Threading.Tasks;
+using Plugin.FilePicker;
+using Plugin.FilePicker.Abstractions;
 
 namespace MidiPlayer {
 
@@ -15,6 +17,8 @@ namespace MidiPlayer {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
+
+        string filePath;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
@@ -30,12 +34,17 @@ namespace MidiPlayer {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
-        public void OnOpenButton_Click(object sender, System.EventArgs e) {
+        public async void OnOpenButton_Click(object sender, System.EventArgs e) {
             Log.Info("openButton clicked.");
+            var _result = await loadTarget();
         }
 
         public void OnStartButton_Click(object sender, System.EventArgs e) {
             Log.Info("startButton clicked.");
+            if (!filePath.HasValue()) {
+                return;
+            }
+            Player.Target = filePath;
             Player.Start();
         }
 
@@ -54,15 +63,6 @@ namespace MidiPlayer {
             SetContentView(Resource.Layout.activity_main);
 
             initializeComponent();
-
-            // MIDIファイルの一覧を取得
-            var _di = new DirectoryInfo($"/storage/emulated/0/Music/MIDI"); // TODO: 選択出来るように、SDカードを取得するには？
-            var _filePathList = _di.GetFiles()
-                .Where(x => x.Name.EndsWith(".MID") || x.Name.EndsWith(".mid"))
-                .OrderBy(x => x.CreationTime)
-                .ToList();
-
-            Player.Target = _filePathList[0].FullName;
         }
 
         protected override void OnStop() {
@@ -72,6 +72,21 @@ namespace MidiPlayer {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb]
+
+        async Task<bool> loadTarget() {
+            try {
+                FileData _fileData = await CrossFilePicker.Current.PickFile();
+                if (_fileData is null) {
+                    return false; // user canceled file picking
+                }
+                filePath = _fileData.FilePath; // TODO: 拡張子判定
+                Log.Info($"File name chosen: {_fileData.FileName}");
+                return true;
+            } catch (Exception ex) {
+                Log.Error($"Exception choosing file: {ex.ToString()}");
+                return false;
+            }
+        }
 
         /// <summary>
         /// コンポーネントを初期化します
@@ -128,11 +143,26 @@ namespace MidiPlayer {
             }
 
             public static void Stop() {
+                if (mediaPlayer is null) {
+                    return;
+                }
                 mediaPlayer.Stop();
                 mediaPlayer.Release();
                 mediaPlayer = null;
                 Log.Info("stop.");
             }
+        }
+    }
+
+    /// <summary>
+    /// 共通拡張メソッド
+    /// </summary>
+    public static class Extensions {
+        /// <summary>
+        /// 文字列が null または 空文字("")ではない場合 TRUE を返します
+        /// </summary>
+        public static bool HasValue(this string source) {
+            return !(source is null || source.Equals(""));
         }
     }
 }
