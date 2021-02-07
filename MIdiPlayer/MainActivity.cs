@@ -6,6 +6,7 @@ using Android.Runtime;
 using Android.Support.V7.App;
 using Android.Widget;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Plugin.FilePicker;
 using Plugin.FilePicker.Abstractions;
@@ -37,6 +38,7 @@ namespace MidiPlayer {
         public async void OnOpenButton_Click(object sender, System.EventArgs e) {
             Log.Info("openButton clicked.");
             var _result = await loadTarget();
+            this.Title = $"MidiPlayer: {filePath.Split("/").ToList().Last()}";
         }
 
         public void OnStartButton_Click(object sender, System.EventArgs e) {
@@ -81,10 +83,9 @@ namespace MidiPlayer {
                 }
                 filePath = _fileData.FilePath;
                 var _fileName = _fileData.FileName;
-                if (!_fileName.Contains(".MID") || !_fileName.Contains(".mid")) {
+                if (!(_fileName.Contains(".MID") || _fileName.Contains(".mid"))) {
                     return false;
                 }
-                Title = $"MidiPlayer: {_fileName}";
                 Log.Info($"File name chosen: {_fileName}");
                 return true;
             } catch (Exception ex) {
