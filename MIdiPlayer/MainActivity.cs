@@ -4,6 +4,7 @@ using Android.Media;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Runtime;
+using Android.Widget;
 using System.IO;
 using System.Linq;
 
@@ -29,6 +30,20 @@ namespace MidiPlayer {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
+        public void OnOpenButton_Click(object sender, System.EventArgs e) {
+            Log.Info("openButton clicked.");
+        }
+
+        public void OnStartButton_Click(object sender, System.EventArgs e) {
+            Log.Info("startButton clicked.");
+            Player.Start();
+        }
+
+        public void OnStopButton_Click(object sender, System.EventArgs e) {
+            Log.Info("stopButton clicked.");
+            Player.Stop();
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // protected Methods [verb]
 
@@ -38,6 +53,8 @@ namespace MidiPlayer {
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
 
+            initializeComponent();
+
             // MIDIファイルの一覧を取得
             var _di = new DirectoryInfo($"/storage/emulated/0/Music/MIDI"); // TODO: 選択出来るように、SDカードを取得するには？
             var _filePathList = _di.GetFiles()
@@ -46,12 +63,28 @@ namespace MidiPlayer {
                 .ToList();
 
             Player.Target = _filePathList[0].FullName;
-            Player.Start();
         }
 
         protected override void OnStop() {
             base.OnStop();
             Player.Stop();
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // private Methods [verb]
+
+        /// <summary>
+        /// コンポーネントを初期化します
+        /// </summary>
+        void initializeComponent() {
+            Button _openButton = FindViewById<Button>(Resource.Id.openButton);
+            _openButton.Click += OnOpenButton_Click;
+
+            Button _startButton = FindViewById<Button>(Resource.Id.startButton);
+            _startButton.Click += OnStartButton_Click;
+
+            Button _stopButton = FindViewById<Button>(Resource.Id.stopButton);
+            _stopButton.Click += OnStopButton_Click;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
