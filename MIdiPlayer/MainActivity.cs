@@ -4,7 +4,6 @@ using Android.Media;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Runtime;
-using Android.Widget;
 using System.IO;
 using System.Linq;
 
@@ -15,8 +14,6 @@ namespace MidiPlayer {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
-
-        MediaPlayer mediaPlayer = null;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
@@ -29,7 +26,6 @@ namespace MidiPlayer {
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults) {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
@@ -49,18 +45,61 @@ namespace MidiPlayer {
                 .OrderBy(x => x.CreationTime)
                 .ToList();
 
-            // MIDIファイル再生
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.SetDataSource(_filePathList[0].FullName);
-            mediaPlayer.Prepare();
-            mediaPlayer.Looping = true;
-            mediaPlayer.Start();
+            Player.Target = _filePathList[0].FullName;
+            Player.Start();
         }
 
         protected override void OnStop() {
-            mediaPlayer.Stop();
-            mediaPlayer.Release();
-            mediaPlayer = null;
+            base.OnStop();
+            Player.Stop();
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // inner Classes
+
+        class Player {
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Fields
+
+            static string target;
+
+            static MediaPlayer mediaPlayer = null;
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Constructor
+
+            static Player() {
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Properties [noun, adjective] 
+
+            public static string Target {
+                set => target = value;
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // public Methods [verb]
+
+            /// <summary>
+            /// MIDIファイル再生
+            /// </summary>
+            public static void Start() {
+                mediaPlayer = new MediaPlayer();
+                mediaPlayer.SetDataSource(target);
+                mediaPlayer.Prepare();
+                mediaPlayer.Looping = true;
+                mediaPlayer.Start();
+                Log.Info("start.");
+            }
+
+            public static void Stop() {
+                mediaPlayer.Stop();
+                mediaPlayer.Release();
+                mediaPlayer = null;
+                Log.Info("stop.");
+            }
         }
     }
 }
