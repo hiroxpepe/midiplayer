@@ -79,8 +79,13 @@ namespace MidiPlayer {
                 if (_fileData is null) {
                     return false; // user canceled file picking
                 }
-                filePath = _fileData.FilePath; // TODO: 拡張子判定
-                Log.Info($"File name chosen: {_fileData.FileName}");
+                filePath = _fileData.FilePath;
+                var _fileName = _fileData.FileName;
+                if (!_fileName.Contains(".MID") || !_fileName.Contains(".mid")) {
+                    return false;
+                }
+                Title = $"MidiPlayer: {_fileName}";
+                Log.Info($"File name chosen: {_fileName}");
                 return true;
             } catch (Exception ex) {
                 Log.Error($"Exception choosing file: {ex.ToString()}");
