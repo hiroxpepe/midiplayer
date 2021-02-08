@@ -1,5 +1,6 @@
 ﻿
 using Android.App;
+using Android.Content.PM;
 using Android.Media;
 using Android.OS;
 using Android.Runtime;
@@ -8,6 +9,7 @@ using Android.Widget;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 using Plugin.FilePicker;
 using Plugin.FilePicker.Abstractions;
 
@@ -30,29 +32,9 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults) {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults) {
+            Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-
-        public async void OnOpenButton_Click(object sender, System.EventArgs e) {
-            Log.Info("openButton clicked.");
-            var _result = await loadTarget();
-            this.Title = $"MidiPlayer: {filePath.Split("/").ToList().Last()}";
-        }
-
-        public void OnStartButton_Click(object sender, System.EventArgs e) {
-            Log.Info("startButton clicked.");
-            if (!filePath.HasValue()) {
-                return;
-            }
-            Player.Target = filePath;
-            Player.Start();
-        }
-
-        public void OnStopButton_Click(object sender, System.EventArgs e) {
-            Log.Info("stopButton clicked.");
-            Player.Stop();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +42,7 @@ namespace MidiPlayer {
 
         protected override void OnCreate(Bundle savedInstanceState) {
             base.OnCreate(savedInstanceState);
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+            Platform.Init(this, savedInstanceState);
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
 
@@ -94,18 +76,38 @@ namespace MidiPlayer {
             }
         }
 
+        async void onOpenButton_Click(object sender, EventArgs e) {
+            Log.Info("openButton clicked.");
+            var _result = await loadTarget();
+            this.Title = $"MidiPlayer: {filePath.Split("/").ToList().Last()}";
+        }
+
+        void onStartButton_Click(object sender, EventArgs e) {
+            Log.Info("startButton clicked.");
+            if (!filePath.HasValue()) {
+                return;
+            }
+            Player.Target = filePath;
+            Player.Start();
+        }
+
+        void onStopButton_Click(object sender, EventArgs e) {
+            Log.Info("stopButton clicked.");
+            Player.Stop();
+        }
+
         /// <summary>
         /// コンポーネントを初期化します
         /// </summary>
         void initializeComponent() {
             Button _openButton = FindViewById<Button>(Resource.Id.openButton);
-            _openButton.Click += OnOpenButton_Click;
+            _openButton.Click += onOpenButton_Click;
 
             Button _startButton = FindViewById<Button>(Resource.Id.startButton);
-            _startButton.Click += OnStartButton_Click;
+            _startButton.Click += onStartButton_Click;
 
             Button _stopButton = FindViewById<Button>(Resource.Id.stopButton);
-            _stopButton.Click += OnStopButton_Click;
+            _stopButton.Click += onStopButton_Click;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
