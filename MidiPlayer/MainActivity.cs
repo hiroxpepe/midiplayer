@@ -1,14 +1,12 @@
 ﻿
 using Android.App;
 using Android.Content.PM;
-using Android.Media;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.V7.App;
 using Android.Widget;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Plugin.FilePicker;
@@ -18,6 +16,7 @@ using NativeFuncs;
 using fluid_settings_t_ptr = System.IntPtr;
 using fluid_synth_t_ptr = System.IntPtr;
 using fluid_audio_driver_t_ptr = System.IntPtr;
+using fluid_player_t_ptr = System.IntPtr;
 
 namespace MidiPlayer {
 
@@ -55,13 +54,11 @@ namespace MidiPlayer {
             SetContentView(Resource.Layout.activity_main);
 
             initializeComponent();
-
-            helloFluidsynth();
         }
 
         protected override void OnStop() {
             base.OnStop();
-            Player.Stop();
+            Synth.Final();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,24 +83,38 @@ namespace MidiPlayer {
             }
         }
 
+        async Task<int> playSong() {
+            try {
+                await Task.Run(() => {
+                    Synth.Start();
+                });
+                return 0;
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+                return -1;
+            }
+        }
+
         async void onOpenButton_Click(object sender, EventArgs e) {
             Log.Info("openButton clicked.");
             var _result = await loadTarget();
             this.Title = $"MidiPlayer: {filePath.Split("/").ToList().Last()}";
+
+            Synth.FilePath = filePath;
+            Synth.Init();
         }
 
-        void onStartButton_Click(object sender, EventArgs e) {
+        async void onStartButton_Click(object sender, EventArgs e) {
             Log.Info("startButton clicked.");
             if (!filePath.HasValue()) {
                 return;
             }
-            Player.Target = filePath;
-            Player.Start();
+            await playSong();
         }
 
         void onStopButton_Click(object sender, EventArgs e) {
             Log.Info("stopButton clicked.");
-            Player.Stop();
+            Synth.Stop();
         }
 
         /// <summary>
@@ -120,82 +131,96 @@ namespace MidiPlayer {
             _stopButton.Click += onStopButton_Click;
         }
 
-        void helloFluidsynth() {
-            fluid_settings_t_ptr _setting = IntPtr.Zero;
-            fluid_synth_t_ptr _synth = IntPtr.Zero;
-            fluid_audio_driver_t_ptr _adriver = IntPtr.Zero;
-            try {
-                _setting = Fluidsynth.new_fluid_settings();
-                _synth = Fluidsynth.new_fluid_synth(_setting);
-                _adriver = Fluidsynth.new_fluid_audio_driver(_setting, _synth);
-                int _sfont_id = Fluidsynth.fluid_synth_sfload(_synth, soundFontPath, true);
-                if (_sfont_id == -1) {
-                    return; // TODO:
-                }
-                /* Do useful things here */
-                for (int _i = 0; _i < 12; _i++) {
-                    int _key = 60 + _i; // Generate a key
-                    Fluidsynth.fluid_synth_noteon(_synth, 0, _key, 120); // Play a note
-                    Thread.Sleep(500); // Sleep for 0.5 second
-                    Fluidsynth.fluid_synth_noteoff(_synth, 0, _key); // Stop the note
-                }
-            } catch (Exception ex) {
-                // TODO:
-            } finally {
-                Fluidsynth.delete_fluid_audio_driver(_adriver);
-                Fluidsynth.delete_fluid_synth(_synth);
-                Fluidsynth.delete_fluid_settings(_setting);
-            }
-        }
-
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
 
-        class Player {
+        class Synth {
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields
 
-            static string target;
+            static fluid_settings_t_ptr setting = IntPtr.Zero;
 
-            static MediaPlayer mediaPlayer = null;
+            static fluid_synth_t_ptr synth = IntPtr.Zero;
 
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            // Constructor
+            static fluid_player_t_ptr player = IntPtr.Zero;
 
-            static Player() {
-            }
+            static fluid_audio_driver_t_ptr adriver = IntPtr.Zero;
+
+            static bool ready = false;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjective] 
 
-            public static string Target {
-                set => target = value;
+            public static string FilePath {
+                get; set;
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // public Methods [verb]
 
-            /// <summary>
-            /// MIDIファイル再生
-            /// </summary>
+            public static void Init() {
+                try {
+                    setting = Fluidsynth.new_fluid_settings();
+                    synth = Fluidsynth.new_fluid_synth(setting);
+                    player = Fluidsynth.new_fluid_player(synth);
+                    int _sfont_id = Fluidsynth.fluid_synth_sfload(synth, soundFontPath, true);
+                    if (_sfont_id == Fluidsynth.FLUID_FAILED) {
+                        Log.Error("failed to load the sound font.");
+                        return;
+                    } else {
+                        Log.Info("loaded the the sound font.");
+                    }
+                    int _result = Fluidsynth.fluid_player_add(player, FilePath);
+                    if (_result == Fluidsynth.FLUID_FAILED) {
+                        Log.Error("failed to load the midi file.");
+                        return;
+                    } else {
+                        Log.Info("loaded the the midi file.");
+                    }
+                    ready = true;
+                    Log.Info("init :)");
+                } catch (Exception ex) {
+                    Log.Error(ex.Message);
+                }
+            }
+
             public static void Start() {
-                mediaPlayer = new MediaPlayer();
-                mediaPlayer.SetDataSource(target);
-                mediaPlayer.Prepare();
-                mediaPlayer.Looping = true;
-                mediaPlayer.Start();
-                Log.Info("start.");
+                try {
+                    if (!ready) {
+                        Init();
+                    }
+                    adriver = Fluidsynth.new_fluid_audio_driver(setting, synth); // start the synthesizer thread
+                    Fluidsynth.fluid_player_play(player); // play the midi files, if any
+                    Fluidsynth.fluid_player_join(player); // wait for playback termination
+                    Log.Info("start :)");
+                } catch (Exception ex) {
+                    Log.Error(ex.Message);
+                }
             }
 
             public static void Stop() {
-                if (mediaPlayer is null) {
-                    return;
+                try {
+                    Fluidsynth.fluid_player_stop(player);
+                    Final();
+                    Log.Info("stop :|");
+                } catch (Exception ex) {
+                    Log.Error(ex.Message);
                 }
-                mediaPlayer.Stop();
-                mediaPlayer.Release();
-                mediaPlayer = null;
-                Log.Info("stop.");
+            }
+
+            public static void Final() {
+                try {
+                    Fluidsynth.delete_fluid_audio_driver(adriver);
+                    Fluidsynth.delete_fluid_player(player);
+                    Fluidsynth.delete_fluid_synth(synth);
+                    Fluidsynth.delete_fluid_settings(setting);
+                    Log.Info("final :|");
+                } catch (Exception ex) {
+                    Log.Error(ex.Message);
+                } finally {
+                    ready = false;
+                }
             }
         }
     }
