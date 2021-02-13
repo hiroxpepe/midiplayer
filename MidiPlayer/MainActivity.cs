@@ -8,10 +8,16 @@ using Android.Support.V7.App;
 using Android.Widget;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Plugin.FilePicker;
 using Plugin.FilePicker.Abstractions;
+
+using NativeFuncs;
+using fluid_settings_t_ptr = System.IntPtr;
+using fluid_synth_t_ptr = System.IntPtr;
+using fluid_audio_driver_t_ptr = System.IntPtr;
 
 namespace MidiPlayer {
 
@@ -20,6 +26,8 @@ namespace MidiPlayer {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
+
+        const string soundFontPath = "/storage/emulated/0/Music/SoundFont/GeneralUser GS v1.47.sf2";
 
         string filePath;
 
@@ -47,6 +55,8 @@ namespace MidiPlayer {
             SetContentView(Resource.Layout.activity_main);
 
             initializeComponent();
+
+            helloFluidsynth();
         }
 
         protected override void OnStop() {
@@ -108,6 +118,34 @@ namespace MidiPlayer {
 
             Button _stopButton = FindViewById<Button>(Resource.Id.stopButton);
             _stopButton.Click += onStopButton_Click;
+        }
+
+        void helloFluidsynth() {
+            fluid_settings_t_ptr _setting = IntPtr.Zero;
+            fluid_synth_t_ptr _synth = IntPtr.Zero;
+            fluid_audio_driver_t_ptr _adriver = IntPtr.Zero;
+            try {
+                _setting = Fluidsynth.new_fluid_settings();
+                _synth = Fluidsynth.new_fluid_synth(_setting);
+                _adriver = Fluidsynth.new_fluid_audio_driver(_setting, _synth);
+                int _sfont_id = Fluidsynth.fluid_synth_sfload(_synth, soundFontPath, true);
+                if (_sfont_id == -1) {
+                    return; // TODO:
+                }
+                /* Do useful things here */
+                for (int _i = 0; _i < 12; _i++) {
+                    int _key = 60 + _i; // Generate a key
+                    Fluidsynth.fluid_synth_noteon(_synth, 0, _key, 120); // Play a note
+                    Thread.Sleep(500); // Sleep for 0.5 second
+                    Fluidsynth.fluid_synth_noteoff(_synth, 0, _key); // Stop the note
+                }
+            } catch (Exception ex) {
+                // TODO:
+            } finally {
+                Fluidsynth.delete_fluid_audio_driver(_adriver);
+                Fluidsynth.delete_fluid_synth(_synth);
+                Fluidsynth.delete_fluid_settings(_setting);
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
