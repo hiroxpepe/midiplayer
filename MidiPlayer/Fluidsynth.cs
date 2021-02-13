@@ -3,12 +3,17 @@ using System.Runtime.InteropServices;
 using fluid_settings_t_ptr = System.IntPtr;
 using fluid_synth_t_ptr = System.IntPtr;
 using fluid_audio_driver_t_ptr = System.IntPtr;
+using fluid_player_t_ptr = System.IntPtr;
 
 namespace NativeFuncs {
 
     internal static class Fluidsynth {
 
         const UnmanagedType LP_Str = UnmanagedType.LPStr;
+
+        internal const int FLUID_OK = 0;
+
+        internal const int FLUID_FAILED = -1;
 
         [DllImport("libfluidsynth.so")]
         internal static extern fluid_settings_t_ptr new_fluid_settings();
@@ -36,5 +41,23 @@ namespace NativeFuncs {
 
         [DllImport("libfluidsynth.so")]
         internal static extern int fluid_synth_noteoff(fluid_synth_t_ptr synth, int chan, int key);
+
+        [DllImport("libfluidsynth.so")]
+        internal static extern fluid_player_t_ptr new_fluid_player(fluid_synth_t_ptr synth);
+
+        [DllImport("libfluidsynth.so")]
+        internal static extern int delete_fluid_player(fluid_player_t_ptr player);
+
+        [DllImport("libfluidsynth.so")]
+        internal static extern int fluid_player_add(fluid_player_t_ptr player, [MarshalAs(LP_Str)] string midifile);
+
+        [DllImport("libfluidsynth.so")]
+        internal static extern int fluid_player_play(fluid_player_t_ptr player);
+
+        [DllImport("libfluidsynth.so")]
+        internal static extern int fluid_player_join(fluid_player_t_ptr player);
+
+        [DllImport("libfluidsynth.so")]
+        internal static extern int fluid_player_stop(fluid_player_t_ptr player);
     }
 }
