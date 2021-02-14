@@ -13,10 +13,11 @@ using Plugin.FilePicker;
 using Plugin.FilePicker.Abstractions;
 
 using NativeFuncs;
-using fluid_settings_t_ptr = System.IntPtr;
-using fluid_synth_t_ptr = System.IntPtr;
-using fluid_audio_driver_t_ptr = System.IntPtr;
-using fluid_player_t_ptr = System.IntPtr;
+using fluid_settings_t = System.IntPtr;
+using fluid_synth_t = System.IntPtr;
+using fluid_audio_driver_t = System.IntPtr;
+using fluid_player_t = System.IntPtr;
+using fluid_midi_event_t = System.IntPtr;
 
 namespace MidiPlayer {
 
@@ -164,15 +165,22 @@ namespace MidiPlayer {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields
 
-            static fluid_settings_t_ptr setting = IntPtr.Zero;
+            static fluid_settings_t setting = IntPtr.Zero;
 
-            static fluid_synth_t_ptr synth = IntPtr.Zero;
+            static fluid_synth_t synth = IntPtr.Zero;
 
-            static fluid_player_t_ptr player = IntPtr.Zero;
+            static fluid_player_t player = IntPtr.Zero;
 
-            static fluid_audio_driver_t_ptr adriver = IntPtr.Zero;
+            static fluid_audio_driver_t adriver = IntPtr.Zero;
 
             static bool ready = false;
+
+            static int cont = 0;
+            static unsafe Fluidsynth.handle_midi_event_func_t event_callback = (void* data, fluid_midi_event_t midi_event) => {
+                Log.Info(cont.ToString());
+                cont++;
+                return Fluidsynth.fluid_synth_handle_midi_event(synth, midi_event);
+            };
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjective] 
@@ -188,7 +196,7 @@ namespace MidiPlayer {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // public Methods [verb]
 
-            public static void Init() {
+            public unsafe static void Init() {
                 try {
                     setting = Fluidsynth.new_fluid_settings();
                     synth = Fluidsynth.new_fluid_synth(setting);
@@ -197,6 +205,7 @@ namespace MidiPlayer {
                         Log.Error("not a sound font.");
                         return;
                     }
+                    Fluidsynth.fluid_player_set_playback_callback(player, event_callback, null);
                     int _sfont_id = Fluidsynth.fluid_synth_sfload(synth, soundFontPath, true);
                     if (_sfont_id == Fluidsynth.FLUID_FAILED) {
                         Log.Error("failed to load the sound font.");
