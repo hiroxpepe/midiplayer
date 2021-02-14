@@ -13,6 +13,7 @@ using Plugin.FilePicker;
 using Plugin.FilePicker.Abstractions;
 
 using NativeFuncs;
+using void_ptr = System.IntPtr;
 using fluid_settings_t = System.IntPtr;
 using fluid_synth_t = System.IntPtr;
 using fluid_audio_driver_t = System.IntPtr;
@@ -176,7 +177,7 @@ namespace MidiPlayer {
             static bool ready = false;
 
             static int cont = 0;
-            static unsafe Fluidsynth.handle_midi_event_func_t event_callback = (void* data, fluid_midi_event_t midi_event) => {
+            static Fluidsynth.handle_midi_event_func_t event_callback = (void_ptr data, fluid_midi_event_t midi_event) => {
                 Log.Info(cont.ToString());
                 cont++;
                 return Fluidsynth.fluid_synth_handle_midi_event(synth, midi_event);
@@ -196,7 +197,7 @@ namespace MidiPlayer {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // public Methods [verb]
 
-            public unsafe static void Init() {
+            public static void Init() {
                 try {
                     setting = Fluidsynth.new_fluid_settings();
                     synth = Fluidsynth.new_fluid_synth(setting);
@@ -205,13 +206,13 @@ namespace MidiPlayer {
                         Log.Error("not a sound font.");
                         return;
                     }
-                    Fluidsynth.fluid_player_set_playback_callback(player, event_callback, null);
+                    Fluidsynth.fluid_player_set_playback_callback(player, event_callback, synth);
                     int _sfont_id = Fluidsynth.fluid_synth_sfload(synth, soundFontPath, true);
                     if (_sfont_id == Fluidsynth.FLUID_FAILED) {
                         Log.Error("failed to load the sound font.");
                         return;
                     } else {
-                        Log.Info("loaded the the sound font.");
+                        Log.Info("loaded the sound font.");
                     }
                     if (Fluidsynth.fluid_is_midifile(FilePath) != 1) {
                         Log.Error("not a midi file.");
@@ -222,7 +223,7 @@ namespace MidiPlayer {
                         Log.Error("failed to load the midi file.");
                         return;
                     } else {
-                        Log.Info("loaded the the midi file.");
+                        Log.Info("loaded the midi file.");
                     }
                     ready = true;
                     Log.Info("init :)");

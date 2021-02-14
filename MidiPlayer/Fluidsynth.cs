@@ -1,6 +1,6 @@
 ﻿
-using System;
 using System.Runtime.InteropServices;
+using void_ptr = System.IntPtr;
 using fluid_settings_t = System.IntPtr;
 using fluid_synth_t = System.IntPtr;
 using fluid_audio_driver_t = System.IntPtr;
@@ -9,7 +9,7 @@ using fluid_midi_event_t = System.IntPtr;
 
 namespace NativeFuncs {
 
-    internal static unsafe class Fluidsynth {
+    internal static class Fluidsynth {
 
         const UnmanagedType LP_Str = UnmanagedType.LPStr;
 
@@ -68,12 +68,12 @@ namespace NativeFuncs {
         [DllImport("libfluidsynth.so")]
         internal static extern int fluid_player_stop(fluid_player_t player);
 
-        internal delegate int handle_midi_event_func_t(void* data, fluid_midi_event_t midi_event);
+        internal delegate int handle_midi_event_func_t(void_ptr data, fluid_midi_event_t midi_event);
 
         [DllImport("libfluidsynth.so")]
-        internal static extern int fluid_player_set_playback_callback(fluid_player_t player, handle_midi_event_func_t handler, void* handler_data);
+        internal static extern int fluid_player_set_playback_callback(fluid_player_t player, handle_midi_event_func_t handler, void_ptr handler_data);
 
         [DllImport("libfluidsynth.so")]
-        internal static extern int fluid_synth_handle_midi_event(IntPtr data, fluid_midi_event_t midi_event);
+        internal static extern int fluid_synth_handle_midi_event(void_ptr data, fluid_midi_event_t midi_event);
     }
 }
