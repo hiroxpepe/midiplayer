@@ -57,10 +57,26 @@ namespace MidiPlayer {
             initializeComponent();
         }
 
+        protected override void OnStart() {
+            base.OnStart();
+        }
+
+        protected override void OnResume() {
+            base.OnResume();
+        }
+
+        protected override void OnPause() {
+            base.OnPause();
+        }
+
         protected override void OnStop() {
             base.OnStop();
+        }
+
+        protected override void OnDestroy() {
+            base.OnDestroy();
             try {
-                Synth.Final();
+                Synth.Stop();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
@@ -78,12 +94,13 @@ namespace MidiPlayer {
                 filePath = _fileData.FilePath;
                 var _fileName = _fileData.FileName;
                 if (!(_fileName.Contains(".MID") || _fileName.Contains(".mid"))) {
+                    Log.Warn("not a midi file.");
                     return false;
                 }
-                Log.Info($"File name chosen: {_fileName}");
+                Log.Info($"select the midi file: {_fileName}");
                 return true;
             } catch (Exception ex) {
-                Log.Error($"Exception choosing file: {ex.ToString()}");
+                Log.Error(ex.Message);
                 return false;
             }
         }
@@ -247,17 +264,20 @@ namespace MidiPlayer {
 
             public static void Stop() {
                 try {
-                    if (player != IntPtr.Zero) {
+                    if (!player.IsZero()) {
                         Fluidsynth.fluid_player_stop(player);
                     }
-                    Final();
+                    final();
                     Log.Info("stop :|");
                 } catch (Exception ex) {
                     Log.Error(ex.Message);
                 }
             }
 
-            public static void Final() {
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // private Methods [verb]
+
+            static void final() {
                 try {
                     Fluidsynth.delete_fluid_audio_driver(adriver);
                     Fluidsynth.delete_fluid_player(player);
@@ -286,6 +306,13 @@ namespace MidiPlayer {
         /// </summary>
         public static bool HasValue(this string source) {
             return !(source is null || source.Equals(""));
+        }
+
+        /// <summary>
+        /// IntPtr が IntPtr.Zero の場合 TRUE を返します
+        /// </summary>
+        public static bool IsZero(this IntPtr source) {
+            return source == IntPtr.Zero;
         }
     }
 }
