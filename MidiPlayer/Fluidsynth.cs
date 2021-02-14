@@ -37,6 +37,9 @@ namespace NativeFuncs {
         internal static extern int fluid_synth_sfload(fluid_synth_t_ptr synth, [MarshalAs(LP_Str)] string filename, bool reset_presets);
 
         [DllImport("libfluidsynth.so")]
+        internal static extern int fluid_is_soundfont([MarshalAs(LP_Str)] string filename); // 1 or 0
+
+        [DllImport("libfluidsynth.so")]
         internal static extern int fluid_synth_noteon(fluid_synth_t_ptr synth, int chan, int key, int vel);
 
         [DllImport("libfluidsynth.so")]
@@ -50,6 +53,9 @@ namespace NativeFuncs {
 
         [DllImport("libfluidsynth.so")]
         internal static extern int fluid_player_add(fluid_player_t_ptr player, [MarshalAs(LP_Str)] string midifile);
+
+        [DllImport("libfluidsynth.so")]
+        internal static extern int fluid_is_midifile([MarshalAs(LP_Str)] string filename); // 1 or 0
 
         [DllImport("libfluidsynth.so")]
         internal static extern int fluid_player_play(fluid_player_t_ptr player);

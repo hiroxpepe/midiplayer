@@ -52,13 +52,16 @@ namespace MidiPlayer {
             Platform.Init(this, savedInstanceState);
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
-
             initializeComponent();
         }
 
         protected override void OnStop() {
             base.OnStop();
-            Synth.Final();
+            try {
+                Synth.Final();
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,36 +88,58 @@ namespace MidiPlayer {
 
         async Task<int> playSong() {
             try {
-                await Task.Run(() => {
-                    Synth.Start();
-                });
-                return 0;
+                await Task.Run(() => Synth.Start());
+                return 1;
             } catch (Exception ex) {
                 Log.Error(ex.Message);
-                return -1;
+                return 0;
+            }
+        }
+
+        async Task<int> stopSong() {
+            try {
+                await Task.Run(() => Synth.Stop());
+                return 1;
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+                return 0;
             }
         }
 
         async void onOpenButton_Click(object sender, EventArgs e) {
             Log.Info("openButton clicked.");
-            var _result = await loadTarget();
-            this.Title = $"MidiPlayer: {filePath.Split("/").ToList().Last()}";
-
-            Synth.FilePath = filePath;
-            Synth.Init();
+            try {
+                if (Synth.Playing) {
+                    await stopSong();
+                }
+                var _result = await loadTarget();
+                Title = $"MidiPlayer: {filePath.Split("/").ToList().Last()}";
+                Synth.FilePath = filePath;
+                Synth.Init();
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
         }
 
         async void onStartButton_Click(object sender, EventArgs e) {
             Log.Info("startButton clicked.");
-            if (!filePath.HasValue()) {
-                return;
+            try {
+                if (!filePath.HasValue()) {
+                    return;
+                }
+                await playSong();
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
             }
-            await playSong();
         }
 
-        void onStopButton_Click(object sender, EventArgs e) {
+        async void onStopButton_Click(object sender, EventArgs e) {
             Log.Info("stopButton clicked.");
-            Synth.Stop();
+            try {
+                await stopSong();
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
         }
 
         /// <summary>
@@ -156,6 +181,10 @@ namespace MidiPlayer {
                 get; set;
             }
 
+            public static bool Playing {
+                get => ready;
+            }
+
             ///////////////////////////////////////////////////////////////////////////////////////////
             // public Methods [verb]
 
@@ -164,12 +193,20 @@ namespace MidiPlayer {
                     setting = Fluidsynth.new_fluid_settings();
                     synth = Fluidsynth.new_fluid_synth(setting);
                     player = Fluidsynth.new_fluid_player(synth);
+                    if (Fluidsynth.fluid_is_soundfont(soundFontPath) != 1) {
+                        Log.Error("not a sound font.");
+                        return;
+                    }
                     int _sfont_id = Fluidsynth.fluid_synth_sfload(synth, soundFontPath, true);
                     if (_sfont_id == Fluidsynth.FLUID_FAILED) {
                         Log.Error("failed to load the sound font.");
                         return;
                     } else {
                         Log.Info("loaded the the sound font.");
+                    }
+                    if (Fluidsynth.fluid_is_midifile(FilePath) != 1) {
+                        Log.Error("not a midi file.");
+                        return;
                     }
                     int _result = Fluidsynth.fluid_player_add(player, FilePath);
                     if (_result == Fluidsynth.FLUID_FAILED) {
@@ -192,7 +229,6 @@ namespace MidiPlayer {
                     }
                     adriver = Fluidsynth.new_fluid_audio_driver(setting, synth); // start the synthesizer thread
                     Fluidsynth.fluid_player_play(player); // play the midi files, if any
-                    Fluidsynth.fluid_player_join(player); // wait for playback termination
                     Log.Info("start :)");
                 } catch (Exception ex) {
                     Log.Error(ex.Message);
@@ -201,7 +237,9 @@ namespace MidiPlayer {
 
             public static void Stop() {
                 try {
-                    Fluidsynth.fluid_player_stop(player);
+                    if (player != IntPtr.Zero) {
+                        Fluidsynth.fluid_player_stop(player);
+                    }
                     Final();
                     Log.Info("stop :|");
                 } catch (Exception ex) {
@@ -215,6 +253,10 @@ namespace MidiPlayer {
                     Fluidsynth.delete_fluid_player(player);
                     Fluidsynth.delete_fluid_synth(synth);
                     Fluidsynth.delete_fluid_settings(setting);
+                    adriver = IntPtr.Zero;
+                    player = IntPtr.Zero;
+                    synth = IntPtr.Zero;
+                    setting = IntPtr.Zero;
                     Log.Info("final :|");
                 } catch (Exception ex) {
                     Log.Error(ex.Message);
