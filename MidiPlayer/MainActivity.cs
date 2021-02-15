@@ -22,15 +22,15 @@ using fluid_midi_event_t = System.IntPtr;
 
 namespace MidiPlayer {
 
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/Base.Theme.MaterialComponents.Light.DarkActionBar.Bridge", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ScreenOrientation = ScreenOrientation.Landscape)]
     public class MainActivity : AppCompatActivity {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
 
-        const string soundFontPath = "/storage/emulated/0/Music/SoundFont/GeneralUser GS v1.47.sf2";
+        string soundFontPath = "undefined";
 
-        string filePath;
+        string midiFilePath = "undefined";
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
@@ -85,13 +85,33 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb]
 
-        async Task<bool> loadTarget() {
+        async Task<bool> loadSoundFont() {
             try {
                 FileData _fileData = await CrossFilePicker.Current.PickFile();
                 if (_fileData is null) {
                     return false; // user canceled file picking
                 }
-                filePath = _fileData.FilePath;
+                soundFontPath = _fileData.FilePath;
+                var _fileName = _fileData.FileName;
+                if (!(_fileName.Contains(".SF2") || _fileName.Contains(".sf2"))) {
+                    Log.Warn("not a sound font.");
+                    return false;
+                }
+                Log.Info($"select the sound font: {_fileName}");
+                return true;
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+                return false;
+            }
+        }
+
+        async Task<bool> loadMidiFile() {
+            try {
+                FileData _fileData = await CrossFilePicker.Current.PickFile();
+                if (_fileData is null) {
+                    return false; // user canceled file picking
+                }
+                midiFilePath = _fileData.FilePath;
                 var _fileName = _fileData.FileName;
                 if (!(_fileName.Contains(".MID") || _fileName.Contains(".mid"))) {
                     Log.Warn("not a midi file.");
@@ -125,15 +145,30 @@ namespace MidiPlayer {
             }
         }
 
-        async void onOpenButton_Click(object sender, EventArgs e) {
-            Log.Info("openButton clicked.");
+        async void onLoadSoundFontButton_Click(object sender, EventArgs e) {
+            Log.Info("loadSoundFontButton clicked.");
             try {
                 if (Synth.Playing) {
                     await stopSong();
                 }
-                var _result = await loadTarget();
-                Title = $"MidiPlayer: {filePath.Split("/").ToList().Last()}";
-                Synth.FilePath = filePath;
+                var _result = await loadSoundFont();
+                Title = $"MidiPlayer: {midiFilePath.Split("/").ToList().Last()} {soundFontPath.Split("/").ToList().Last()}";
+                Synth.SoundFontPath = soundFontPath;
+                Synth.Init();
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
+        }
+
+        async void onLoadMidiButton_Click(object sender, EventArgs e) {
+            Log.Info("loadMidiButton clicked.");
+            try {
+                if (Synth.Playing) {
+                    await stopSong();
+                }
+                var _result = await loadMidiFile();
+                Title = $"MidiPlayer: {midiFilePath.Split("/").ToList().Last()} {soundFontPath.Split("/").ToList().Last()}";
+                Synth.MidiFilePath = midiFilePath;
                 Synth.Init();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -143,7 +178,7 @@ namespace MidiPlayer {
         async void onStartButton_Click(object sender, EventArgs e) {
             Log.Info("startButton clicked.");
             try {
-                if (!filePath.HasValue()) {
+                if (!midiFilePath.HasValue()) {
                     return;
                 }
                 await playSong();
@@ -162,11 +197,14 @@ namespace MidiPlayer {
         }
 
         /// <summary>
-        /// コンポーネントを初期化します
+        /// initialize the component.
         /// </summary>
         void initializeComponent() {
-            Button _openButton = FindViewById<Button>(Resource.Id.openButton);
-            _openButton.Click += onOpenButton_Click;
+            Button _loadSoundFontButton = FindViewById<Button>(Resource.Id.loadSoundFontButton);
+            _loadSoundFontButton.Click += onLoadSoundFontButton_Click;
+
+            Button _loadMidiButton = FindViewById<Button>(Resource.Id.loadMidiButton);
+            _loadMidiButton.Click += onLoadMidiButton_Click;
 
             Button _startButton = FindViewById<Button>(Resource.Id.startButton);
             _startButton.Click += onStartButton_Click;
@@ -203,7 +241,11 @@ namespace MidiPlayer {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjective] 
 
-            public static string FilePath {
+            public static string SoundFontPath {
+                get; set;
+            }
+
+            public static string MidiFilePath {
                 get; set;
             }
 
@@ -216,26 +258,30 @@ namespace MidiPlayer {
 
             public static void Init() {
                 try {
+                    if (!SoundFontPath.HasValue() || !MidiFilePath.HasValue()) {
+                        Log.Warn("no sound font or no midi file.");
+                        return;
+                    }
                     setting = Fluidsynth.new_fluid_settings();
                     synth = Fluidsynth.new_fluid_synth(setting);
                     player = Fluidsynth.new_fluid_player(synth);
-                    if (Fluidsynth.fluid_is_soundfont(soundFontPath) != 1) {
+                    if (Fluidsynth.fluid_is_soundfont(SoundFontPath) != 1) {
                         Log.Error("not a sound font.");
                         return;
                     }
                     Fluidsynth.fluid_player_set_playback_callback(player, event_callback, synth);
-                    int _sfont_id = Fluidsynth.fluid_synth_sfload(synth, soundFontPath, true);
+                    int _sfont_id = Fluidsynth.fluid_synth_sfload(synth, SoundFontPath, true);
                     if (_sfont_id == Fluidsynth.FLUID_FAILED) {
                         Log.Error("failed to load the sound font.");
                         return;
                     } else {
                         Log.Info("loaded the sound font.");
                     }
-                    if (Fluidsynth.fluid_is_midifile(FilePath) != 1) {
+                    if (Fluidsynth.fluid_is_midifile(MidiFilePath) != 1) {
                         Log.Error("not a midi file.");
                         return;
                     }
-                    int _result = Fluidsynth.fluid_player_add(player, FilePath);
+                    int _result = Fluidsynth.fluid_player_add(player, MidiFilePath);
                     if (_result == Fluidsynth.FLUID_FAILED) {
                         Log.Error("failed to load the midi file.");
                         return;
@@ -298,18 +344,18 @@ namespace MidiPlayer {
     }
 
     /// <summary>
-    /// 共通拡張メソッド
+    /// common extension method
     /// </summary>
     public static class Extensions {
         /// <summary>
-        /// 文字列が null または 空文字("")ではない場合 TRUE を返します
+        /// returns TRUE if the string is not null or an empty string "".
         /// </summary>
         public static bool HasValue(this string source) {
             return !(source is null || source.Equals(""));
         }
 
         /// <summary>
-        /// IntPtr が IntPtr.Zero の場合 TRUE を返します
+        /// returns TRUE if IntPtr is IntPtr.Zero.
         /// </summary>
         public static bool IsZero(this IntPtr source) {
             return source == IntPtr.Zero;
