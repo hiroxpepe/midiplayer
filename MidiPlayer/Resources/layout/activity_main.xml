@@ -1,27 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="15dp"
+    android:background="@color/background_material_dark">
     <Button
-        android:id="@+id/openButton"
+        android:id="@+id/loadSoundFontButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Open"
+        android:text="SoundFont"
+    />
+    <Button
+        android:id="@+id/loadMidiButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MidiFile"
+        android:layout_toRightOf="@id/loadSoundFontButton"
     />
     <Button
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start"
-        android:layout_below="@id/openButton"
+        android:layout_toRightOf="@id/loadMidiButton"
      />
     <Button
         android:id="@+id/stopButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Stop"
-        android:layout_below="@id/startButton"
+        android:layout_toRightOf="@id/startButton"
      />
 </RelativeLayout>

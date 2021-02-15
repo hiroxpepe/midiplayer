@@ -3,8 +3,8 @@ using NLog;
 
 namespace MidiPlayer {
     /// <summary>
-    /// ログ用ファサードクラス
-    /// NOTE: NLog を使用
+    /// Facade class for log
+    /// NOTE: using NLog
     /// </summary>
     public static class Log {
 
