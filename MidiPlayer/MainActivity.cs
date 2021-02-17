@@ -6,7 +6,7 @@ using Android.Runtime;
 using Android.Support.V7.App;
 using Android.Widget;
 using System;
-using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Plugin.FilePicker;
@@ -92,6 +92,7 @@ namespace MidiPlayer {
                     return false; // user canceled file picking
                 }
                 soundFontPath = _fileData.FilePath;
+                Env.SoundFontDir = soundFontPath.ToDirectoryName();
                 var _fileName = _fileData.FileName;
                 if (!(_fileName.Contains(".SF2") || _fileName.Contains(".sf2"))) {
                     Log.Warn("not a sound font.");
@@ -112,6 +113,7 @@ namespace MidiPlayer {
                     return false; // user canceled file picking
                 }
                 midiFilePath = _fileData.FilePath;
+                Env.MidiFileDir = midiFilePath.ToDirectoryName();
                 var _fileName = _fileData.FileName;
                 if (!(_fileName.Contains(".MID") || _fileName.Contains(".mid"))) {
                     Log.Warn("not a midi file.");
@@ -154,7 +156,7 @@ namespace MidiPlayer {
                     await stopSong();
                 }
                 var _result = await loadSoundFont();
-                Title = $"MidiPlayer: {midiFilePath.Split("/").ToList().Last()} {soundFontPath.Split("/").ToList().Last()}";
+                Title = $"MidiPlayer: {midiFilePath.ToFileName()} {soundFontPath.ToFileName()}";
                 Synth.SoundFontPath = soundFontPath;
                 Synth.Init();
             } catch (Exception ex) {
@@ -169,7 +171,7 @@ namespace MidiPlayer {
                     await stopSong();
                 }
                 var _result = await loadMidiFile();
-                Title = $"MidiPlayer: {midiFilePath.Split("/").ToList().Last()} {soundFontPath.Split("/").ToList().Last()}";
+                Title = $"MidiPlayer: {midiFilePath.ToFileName()} {soundFontPath.ToFileName()}";
                 Synth.MidiFilePath = midiFilePath;
                 Synth.Init();
             } catch (Exception ex) {
@@ -353,6 +355,29 @@ namespace MidiPlayer {
                 }
             }
         }
+
+        class Env {
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Fields
+
+            static string soundFontDir = "";
+
+            static string midiFileDir = "";
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Properties [noun, adjective] 
+
+            public static string SoundFontDir {
+                get => soundFontDir;
+                set => soundFontDir = value;
+            }
+
+            public static string MidiFileDir {
+                get => midiFileDir;
+                set => midiFileDir = value;
+            }
+        }
     }
 
     /// <summary>
@@ -360,6 +385,23 @@ namespace MidiPlayer {
     /// </summary>
     public static class Extensions {
 
+        /// <summary>
+        /// to directory name
+        /// </summary>
+        public static string ToDirectoryName(this string source) {
+            return Path.GetDirectoryName(source);
+        }
+
+        /// <summary>
+        /// to file name
+        /// </summary>
+        public static string ToFileName(this string source) {
+            return Path.GetFileName(source);
+        }
+
+        /// <summary>
+        /// bytes to megabytes.
+        /// </summary>
         public static long ToMegabytes(this long source) {
             return source / (1024 * 1024);
         }
