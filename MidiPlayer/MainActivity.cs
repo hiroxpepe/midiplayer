@@ -128,6 +128,7 @@ namespace MidiPlayer {
         async Task<int> playSong() {
             try {
                 await Task.Run(() => Synth.Start());
+                logMemoryInto();
                 return 1;
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -138,6 +139,7 @@ namespace MidiPlayer {
         async Task<int> stopSong() {
             try {
                 await Task.Run(() => Synth.Stop());
+                logMemoryInto();
                 return 1;
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -211,6 +213,16 @@ namespace MidiPlayer {
 
             Button _stopButton = FindViewById<Button>(Resource.Id.stopButton);
             _stopButton.Click += onStopButton_Click;
+        }
+
+        void logMemoryInto() {
+            var maxMemory = Java.Lang.Runtime.GetRuntime().MaxMemory();
+            var freeMemory = Java.Lang.Runtime.GetRuntime().FreeMemory();
+            var totalMemory = Java.Lang.Runtime.GetRuntime().TotalMemory();
+            Log.Info($"maxMemory: {maxMemory.ToMegabytes()}MB");
+            Log.Info($"freeMemory: {freeMemory.ToMegabytes()}MB");
+            Log.Info($"totalMemory: {totalMemory.ToMegabytes()}MB");
+            // TODO: Mono runtime.
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -347,6 +359,11 @@ namespace MidiPlayer {
     /// common extension method
     /// </summary>
     public static class Extensions {
+
+        public static long ToMegabytes(this long source) {
+            return source / (1024 * 1024);
+        }
+
         /// <summary>
         /// returns TRUE if the string is not null or an empty string "".
         /// </summary>
