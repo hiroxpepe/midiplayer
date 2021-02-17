@@ -218,12 +218,12 @@ namespace MidiPlayer {
         }
 
         void logMemoryInto() {
-            var maxMemory = Java.Lang.Runtime.GetRuntime().MaxMemory();
-            var freeMemory = Java.Lang.Runtime.GetRuntime().FreeMemory();
-            var totalMemory = Java.Lang.Runtime.GetRuntime().TotalMemory();
-            Log.Info($"maxMemory: {maxMemory.ToMegabytes()}MB");
-            Log.Info($"freeMemory: {freeMemory.ToMegabytes()}MB");
-            Log.Info($"totalMemory: {totalMemory.ToMegabytes()}MB");
+            var _maxMemory = Java.Lang.Runtime.GetRuntime().MaxMemory();
+            var _freeMemory = Java.Lang.Runtime.GetRuntime().FreeMemory();
+            var _totalMemory = Java.Lang.Runtime.GetRuntime().TotalMemory();
+            Log.Info($"maxMemory: {_maxMemory.ToMegabytes()}MB");
+            Log.Info($"freeMemory: {_freeMemory.ToMegabytes()}MB");
+            Log.Info($"totalMemory: {_totalMemory.ToMegabytes()}MB");
             // TODO: Mono runtime.
         }
 
