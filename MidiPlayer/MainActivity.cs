@@ -108,7 +108,7 @@ namespace MidiPlayer {
 
         async Task<bool> loadMidiFile() {
             try {
-                FileData _fileData = await CrossFilePicker.Current.PickFile();
+                FileData _fileData = await CrossFilePicker.Current.PickFile(new string[] { "audio/midi" });
                 if (_fileData is null) {
                     return false; // user canceled file picking
                 }
