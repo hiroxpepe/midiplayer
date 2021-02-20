@@ -68,12 +68,12 @@ namespace NativeFuncs {
         [DllImport("libfluidsynth.so")]
         internal static extern int fluid_player_stop(fluid_player_t player);
 
-        internal delegate int handle_midi_event_func_t(void_ptr data, fluid_midi_event_t midi_event);
+        internal delegate int handle_midi_event_func_t(void_ptr data, fluid_midi_event_t evt);
 
         [DllImport("libfluidsynth.so")]
         internal static extern int fluid_player_set_playback_callback(fluid_player_t player, handle_midi_event_func_t handler, void_ptr handler_data);
 
         [DllImport("libfluidsynth.so")]
-        internal static extern int fluid_synth_handle_midi_event(void_ptr data, fluid_midi_event_t midi_event);
+        internal static extern int fluid_synth_handle_midi_event(void_ptr data, fluid_midi_event_t evt);
     }
 }

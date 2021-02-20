@@ -1,16 +1,19 @@
 ﻿
+using Android;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Provider;
 using Android.Runtime;
+using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Widget;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
-using Plugin.FilePicker;
-using Plugin.FilePicker.Abstractions;
 
 using NativeFuncs;
 using void_ptr = System.IntPtr;
@@ -51,9 +54,11 @@ namespace MidiPlayer {
 
         protected override void OnCreate(Bundle savedInstanceState) {
             base.OnCreate(savedInstanceState);
+            requestPermissions();
             Platform.Init(this, savedInstanceState);
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
+
             initializeComponent();
         }
 
@@ -82,48 +87,43 @@ namespace MidiPlayer {
             }
         }
 
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data) {
+            switch (requestCode) {
+                case (int) BaseDir.SoundFont:
+                    soundFontPath = getActualPathBy(data);
+                    if (!(soundFontPath.Contains(".SF2") || soundFontPath.Contains(".sf2"))) {
+                        Log.Warn("not a sound font.");
+                        break;
+                    }
+                    Log.Info($"selected: {soundFontPath}");
+                    Synth.SoundFontPath = soundFontPath;
+                    Env.SoundFontDir = soundFontPath.ToDirectoryName();
+                    break;
+                case (int) BaseDir.MidiFile:
+                    midiFilePath = getActualPathBy(data);
+                    if (!(midiFilePath.Contains(".MID") || midiFilePath.Contains(".mid"))) {
+                        Log.Warn("not a midi file.");
+                        break;
+                    }
+                    Log.Info($"selected: {midiFilePath}");
+                    Synth.MidiFilePath = midiFilePath;
+                    Env.MidiFileDir = midiFilePath.ToDirectoryName();
+                    break;
+                default:
+                    break;
+            }
+            Title = $"MidiPlayer: {midiFilePath.ToFileName()} {soundFontPath.ToFileName()}";
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb]
 
-        async Task<bool> loadSoundFont() {
-            try {
-                FileData _fileData = await CrossFilePicker.Current.PickFile();
-                if (_fileData is null) {
-                    return false; // user canceled file picking
-                }
-                soundFontPath = _fileData.FilePath;
-                Env.SoundFontDir = soundFontPath.ToDirectoryName();
-                var _fileName = _fileData.FileName;
-                if (!(_fileName.Contains(".SF2") || _fileName.Contains(".sf2"))) {
-                    Log.Warn("not a sound font.");
-                    return false;
-                }
-                Log.Info($"select the sound font: {_fileName}");
-                return true;
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-                return false;
+        void requestPermissions() {
+            if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != (int) Permission.Granted) {
+                ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadExternalStorage }, 0);
             }
-        }
-
-        async Task<bool> loadMidiFile() {
-            try {
-                FileData _fileData = await CrossFilePicker.Current.PickFile(new string[] { "audio/midi" });
-                if (_fileData is null) {
-                    return false; // user canceled file picking
-                }
-                midiFilePath = _fileData.FilePath;
-                Env.MidiFileDir = midiFilePath.ToDirectoryName();
-                var _fileName = _fileData.FileName;
-                if (!(_fileName.Contains(".MID") || _fileName.Contains(".mid"))) {
-                    Log.Warn("not a midi file.");
-                    return false;
-                }
-                Log.Info($"select the midi file: {_fileName}");
-                return true;
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-                return false;
+            if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != (int) Permission.Granted) {
+                ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.WriteExternalStorage }, 0);
             }
         }
 
@@ -155,10 +155,14 @@ namespace MidiPlayer {
                 if (Synth.Playing) {
                     await stopSong();
                 }
-                var _result = await loadSoundFont();
-                Title = $"MidiPlayer: {midiFilePath.ToFileName()} {soundFontPath.ToFileName()}";
-                Synth.SoundFontPath = soundFontPath;
-                Synth.Init();
+                Intent _intent = new Intent(Intent.ActionOpenDocument);
+                Android.Net.Uri _uri = Android.Net.Uri.Parse($"content://com.android.externalstorage.documents/document/primary%3A{Env.SoundFontDir}");
+                _intent.SetData(_uri);
+                _intent.SetType("*/*");
+                _intent.PutExtra("android.provider.extra.INITIAL_URI", _uri);
+                _intent.PutExtra("android.content.extra.SHOW_ADVANCED", true);
+                _intent.AddCategory(Intent.CategoryOpenable);
+                StartActivityForResult(_intent, (int) BaseDir.SoundFont);
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
@@ -170,10 +174,14 @@ namespace MidiPlayer {
                 if (Synth.Playing) {
                     await stopSong();
                 }
-                var _result = await loadMidiFile();
-                Title = $"MidiPlayer: {midiFilePath.ToFileName()} {soundFontPath.ToFileName()}";
-                Synth.MidiFilePath = midiFilePath;
-                Synth.Init();
+                Intent _intent = new Intent(Intent.ActionOpenDocument);
+                Android.Net.Uri _uri = Android.Net.Uri.Parse($"content://com.android.externalstorage.documents/document/primary%3A{Env.MidiFileDir}");
+                _intent.SetData(_uri);
+                _intent.SetType("*/*");
+                _intent.PutExtra("android.provider.extra.INITIAL_URI", _uri);
+                _intent.PutExtra("android.content.extra.SHOW_ADVANCED", true);
+                _intent.AddCategory(Intent.CategoryOpenable);
+                StartActivityForResult(_intent, (int) BaseDir.MidiFile);
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
@@ -217,7 +225,20 @@ namespace MidiPlayer {
             _stopButton.Click += onStopButton_Click;
         }
 
-        void logMemoryInto() {
+        static string getActualPathBy(Intent data) {
+            var _uri = data.Data;
+            string _docId = DocumentsContract.GetDocumentId(_uri);
+            char[] _charArray = { ':' };
+            string[] _stringArray = _docId.Split(_charArray);
+            string _type = _stringArray[0]; // primary
+            string _path = "";
+            if ("primary".Equals(_type, StringComparison.OrdinalIgnoreCase)) {
+                _path = Android.OS.Environment.ExternalStorageDirectory + "/" + _stringArray[1];
+            }
+            return _path;
+        }
+
+        static void logMemoryInto() {
             var _maxMemory = Java.Lang.Runtime.GetRuntime().MaxMemory();
             var _freeMemory = Java.Lang.Runtime.GetRuntime().FreeMemory();
             var _totalMemory = Java.Lang.Runtime.GetRuntime().TotalMemory();
@@ -246,10 +267,10 @@ namespace MidiPlayer {
             static bool ready = false;
 
             static int cont = 0;
-            static Fluidsynth.handle_midi_event_func_t event_callback = (void_ptr data, fluid_midi_event_t midi_event) => {
+            static Fluidsynth.handle_midi_event_func_t event_callback = (void_ptr data, fluid_midi_event_t evt) => {
                 Log.Info(cont.ToString());
                 cont++;
-                return Fluidsynth.fluid_synth_handle_midi_event(synth, midi_event);
+                return Fluidsynth.fluid_synth_handle_midi_event(synth, evt);
             };
 
             ///////////////////////////////////////////////////////////////////////////////////////////
@@ -279,6 +300,7 @@ namespace MidiPlayer {
                     setting = Fluidsynth.new_fluid_settings();
                     synth = Fluidsynth.new_fluid_synth(setting);
                     player = Fluidsynth.new_fluid_player(synth);
+                    Log.Info($"try to load the sound font: {SoundFontPath}");
                     if (Fluidsynth.fluid_is_soundfont(SoundFontPath) != 1) {
                         Log.Error("not a sound font.");
                         return;
@@ -289,8 +311,9 @@ namespace MidiPlayer {
                         Log.Error("failed to load the sound font.");
                         return;
                     } else {
-                        Log.Info("loaded the sound font.");
+                        Log.Info($"loaded the sound font: {SoundFontPath}");
                     }
+                    Log.Info($"try to load the midi file: {MidiFilePath}");
                     if (Fluidsynth.fluid_is_midifile(MidiFilePath) != 1) {
                         Log.Error("not a midi file.");
                         return;
@@ -300,7 +323,7 @@ namespace MidiPlayer {
                         Log.Error("failed to load the midi file.");
                         return;
                     } else {
-                        Log.Info("loaded the midi file.");
+                        Log.Info($"loaded the midi file: {MidiFilePath}");
                     }
                     ready = true;
                     Log.Info("init :)");
@@ -361,23 +384,28 @@ namespace MidiPlayer {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields
 
-            static string soundFontDir = "";
+            static string soundFontDir = "Music";
 
-            static string midiFileDir = "";
+            static string midiFileDir = "Music";
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjective] 
 
             public static string SoundFontDir {
-                get => soundFontDir;
-                set => soundFontDir = value;
+                get => soundFontDir.Replace("/", "%2F");
+                set => soundFontDir = value.Replace("/storage/emulated/0/", "");
             }
 
             public static string MidiFileDir {
-                get => midiFileDir;
-                set => midiFileDir = value;
+                get => midiFileDir.Replace("/", "%2F");
+                set => midiFileDir = value.Replace("/storage/emulated/0/", "");
             }
         }
+    }
+
+    public enum BaseDir {
+        SoundFont = 128,
+        MidiFile = 256,
     }
 
     /// <summary>
