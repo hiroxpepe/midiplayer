@@ -10,8 +10,8 @@ using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
 using Android.Widget;
+
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
@@ -243,74 +243,5 @@ namespace MidiPlayer {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
-
-        class Env {
-
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            // Fields
-
-            static string soundFontDir = "Music";
-
-            static string midiFileDir = "Music";
-
-            ///////////////////////////////////////////////////////////////////////////////////////////
-            // Properties [noun, adjective] 
-
-            public static string SoundFontDir {
-                get => soundFontDir.Replace("/", "%2F");
-                set => soundFontDir = value.Replace("/storage/emulated/0/", "");
-            }
-
-            public static string MidiFileDir {
-                get => midiFileDir.Replace("/", "%2F");
-                set => midiFileDir = value.Replace("/storage/emulated/0/", "");
-            }
-        }
-    }
-
-    public enum BaseDir {
-        SoundFont = 128,
-        MidiFile = 256,
-    }
-
-    /// <summary>
-    /// common extension method
-    /// </summary>
-    public static class Extensions {
-
-        /// <summary>
-        /// to directory name
-        /// </summary>
-        public static string ToDirectoryName(this string source) {
-            return Path.GetDirectoryName(source);
-        }
-
-        /// <summary>
-        /// to file name
-        /// </summary>
-        public static string ToFileName(this string source) {
-            return Path.GetFileName(source);
-        }
-
-        /// <summary>
-        /// bytes to megabytes.
-        /// </summary>
-        public static long ToMegabytes(this long source) {
-            return source / (1024 * 1024);
-        }
-
-        /// <summary>
-        /// returns TRUE if the string is not null or an empty string "".
-        /// </summary>
-        public static bool HasValue(this string source) {
-            return !(source is null || source.Equals(""));
-        }
-
-        /// <summary>
-        /// returns TRUE if IntPtr is IntPtr.Zero.
-        /// </summary>
-        public static bool IsZero(this IntPtr source) {
-            return source == IntPtr.Zero;
-        }
     }
 }

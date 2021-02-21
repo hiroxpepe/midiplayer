@@ -67,6 +67,9 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums.cs" />
+    <Compile Include="Env.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Fluidsynth.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="MainActivity.cs" />
