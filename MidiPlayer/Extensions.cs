@@ -6,7 +6,7 @@ namespace MidiPlayer {
     /// <summary>
     /// common extension method
     /// </summary>
-    internal static class Extensions {
+    public static class Extensions {
 
         /// <summary>
         /// to directory name

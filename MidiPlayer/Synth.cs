@@ -11,7 +11,7 @@ using fluid_midi_event_t = System.IntPtr;
 
 namespace MidiPlayer {
 
-    internal class Synth {
+    public class Synth {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
