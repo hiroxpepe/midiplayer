@@ -1,6 +1,6 @@
 ﻿
 namespace MidiPlayer {
-    internal enum BaseDir {
+    public enum BaseDir {
         SoundFont = 128,
         MidiFile = 256,
     }
