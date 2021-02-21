@@ -1,5 +1,8 @@
 ﻿
 namespace MidiPlayer {
+    /// <summary>
+    /// environment value for app
+    /// </summary>
     public class Env {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,13 +16,29 @@ namespace MidiPlayer {
         // Properties [noun, adjective] 
 
         public static string SoundFontDir {
-            get => soundFontDir.Replace("/", "%2F");
-            set => soundFontDir = value.Replace("/storage/emulated/0/", "");
+            get {
+                if (!Conf.Value.Synth.SoundFontDir.Equals("undefined")) {
+                    soundFontDir = Conf.Value.Synth.SoundFontDir;
+                }
+                return soundFontDir.Replace("/", "%2F");
+            }
+            set {
+                soundFontDir = value.Replace("/storage/emulated/0/", "");
+                Conf.Value.Synth.SoundFontDir = soundFontDir;
+            }
         }
 
         public static string MidiFileDir {
-            get => midiFileDir.Replace("/", "%2F");
-            set => midiFileDir = value.Replace("/storage/emulated/0/", "");
+            get {
+                if (!Conf.Value.Synth.MidiFileDir.Equals("undefined")) {
+                    midiFileDir = Conf.Value.Synth.MidiFileDir;
+                }
+                return midiFileDir.Replace("/", "%2F");
+            }
+            set {
+                midiFileDir = value.Replace("/storage/emulated/0/", "");
+                Conf.Value.Synth.MidiFileDir = midiFileDir;
+            }
         }
     }
 }
