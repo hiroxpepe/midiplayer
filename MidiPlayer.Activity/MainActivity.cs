@@ -53,6 +53,11 @@ namespace MidiPlayer.Activity {
 
             initializeComponent();
             Conf.Load();
+
+            Synth.OnEnd += () => {
+                Synth.Stop();
+                Synth.Start();
+            };
         }
 
         protected override void OnStart() {

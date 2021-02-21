@@ -33,6 +33,8 @@ namespace MidiPlayer {
             return Fluidsynth.fluid_synth_handle_midi_event(synth, evt);
         };
 
+        static Action onEnd;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjective] 
 
@@ -46,6 +48,11 @@ namespace MidiPlayer {
 
         public static bool Playing {
             get => ready;
+        }
+
+        public static Action OnEnd {
+            get => onEnd;
+            set => onEnd += value;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +107,9 @@ namespace MidiPlayer {
                 adriver = Fluidsynth.new_fluid_audio_driver(setting, synth); // start the synthesizer thread
                 Fluidsynth.fluid_player_play(player); // play the midi files, if any
                 Log.Info("start :)");
+                Fluidsynth.fluid_player_join(player);
+                Log.Info("end :D");
+                onEnd();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
