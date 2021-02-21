@@ -15,8 +15,6 @@ using System;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
-using MidiPlayer;
-
 namespace MidiPlayer.Activity {
 
     [Activity(Label = "@string/app_name", Theme = "@style/Base.Theme.MaterialComponents.Light.DarkActionBar.Bridge", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ScreenOrientation = ScreenOrientation.Landscape)]
