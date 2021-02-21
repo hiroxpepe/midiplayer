@@ -43,10 +43,12 @@
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conf.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="Extensions.cs" />

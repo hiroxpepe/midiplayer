@@ -1,12 +1,20 @@
 ﻿
 using System;
 using System.IO;
+using System.Text;
 
 namespace MidiPlayer {
     /// <summary>
     /// common extension method
     /// </summary>
     public static class Extensions {
+
+        /// <summary>
+        /// to memory stream
+        /// </summary>
+        public static MemoryStream ToMemoryStream(this string source) {
+            return new MemoryStream(Encoding.UTF8.GetBytes(source));
+        }
 
         /// <summary>
         /// to directory name

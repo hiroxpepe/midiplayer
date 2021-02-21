@@ -52,11 +52,11 @@ namespace MidiPlayer.Activity {
             SetContentView(Resource.Layout.activity_main);
 
             initializeComponent();
+            Conf.Load();
         }
 
         protected override void OnStart() {
             base.OnStart();
-            // var _mainDir = FileSystem.AppDataDirectory; // "/data/user/0/com.studio.meowtoon.midiplayer/files"
         }
 
         protected override void OnResume() {
@@ -69,14 +69,16 @@ namespace MidiPlayer.Activity {
 
         protected override void OnStop() {
             base.OnStop();
+            Conf.Save();
         }
 
         protected override void OnDestroy() {
-            base.OnDestroy();
             try {
                 Synth.Stop();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
+            } finally {
+                base.OnDestroy();
             }
         }
 
