@@ -14,7 +14,7 @@ namespace MidiPlayer {
     public class Synth {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // static Fields
 
         static fluid_settings_t setting = IntPtr.Zero;
 
@@ -26,17 +26,21 @@ namespace MidiPlayer {
 
         static bool ready = false;
 
+        static bool stopping = false;
+
         static int cont = 0;
         static Fluidsynth.handle_midi_event_func_t event_callback = (void_ptr data, fluid_midi_event_t evt) => {
-            Log.Info(cont.ToString());
+            //Log.Info(cont.ToString());
             cont++;
             return Fluidsynth.fluid_synth_handle_midi_event(synth, evt);
         };
 
+        static Action onStart;
+
         static Action onEnd;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Properties [noun, adjective] 
+        // static Properties [noun, adjective] 
 
         public static string SoundFontPath {
             get; set;
@@ -50,13 +54,18 @@ namespace MidiPlayer {
             get => ready;
         }
 
+        public static Action OnStart {
+            get => onStart;
+            set => onStart += value;
+        }
+
         public static Action OnEnd {
             get => onEnd;
             set => onEnd += value;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public Methods [verb]
+        // public static Methods [verb]
 
         public static void Init() {
             try {
@@ -107,9 +116,12 @@ namespace MidiPlayer {
                 adriver = Fluidsynth.new_fluid_audio_driver(setting, synth); // start the synthesizer thread
                 Fluidsynth.fluid_player_play(player); // play the midi files, if any
                 Log.Info("start :)");
+                onStart();
                 Fluidsynth.fluid_player_join(player);
                 Log.Info("end :D");
-                onEnd();
+                if (stopping == false) {
+                    onEnd();
+                }
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
@@ -118,6 +130,7 @@ namespace MidiPlayer {
         public static void Stop() {
             try {
                 if (!player.IsZero()) {
+                    stopping = true;
                     Fluidsynth.fluid_player_stop(player);
                 }
                 final();
@@ -128,7 +141,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        // private static Methods [verb]
 
         static void final() {
             try {
@@ -145,6 +158,7 @@ namespace MidiPlayer {
                 Log.Error(ex.Message);
             } finally {
                 ready = false;
+                stopping = false;
             }
         }
     }

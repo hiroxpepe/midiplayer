@@ -53,6 +53,7 @@
     <Compile Include="Env.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="PlayList.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
