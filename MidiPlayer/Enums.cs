@@ -4,8 +4,9 @@ namespace MidiPlayer {
     /// common enums for app
     /// </summary>
 
-    public enum BaseDir {
+    public enum Request {
         SoundFont = 128,
         MidiFile = 256,
+        AddPlayList = 384,
     }
 }
