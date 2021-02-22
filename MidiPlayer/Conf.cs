@@ -10,12 +10,15 @@ namespace MidiPlayer {
     /// </summary>
     public class Conf {
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // static Fields
+
         static readonly string APP_CONF_FILE_PATH = "storage/emulated/0/Android/data/com.studio.meowtoon.midiplayer/files/app_conf.json";
 
         static Json json = null;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Properties [noun, adjective] 
+        // static Properties [noun, adjective] 
 
         public static bool Ready {
             get => !(json is null);
@@ -43,6 +46,7 @@ namespace MidiPlayer {
                 _synth.SoundFontDir = "undefined";
                 _synth.MidiFileDir = "undefined";
                 App _app = new App();
+                _app.PlayList = null;
                 _app.Synth = _synth;
                 json = new Json();
                 json.App = _app;
@@ -85,6 +89,10 @@ namespace MidiPlayer {
         public class App {
             [DataMember(Name = "synth")]
             public Synth Synth {
+                get; set;
+            }
+            [DataMember(Name = "play_list")]
+            public string[] PlayList {
                 get; set;
             }
         }

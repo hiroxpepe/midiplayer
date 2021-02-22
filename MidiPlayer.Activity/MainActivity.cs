@@ -27,10 +27,13 @@ namespace MidiPlayer.Activity {
 
         string midiFilePath = "undefined";
 
+        PlayList playList;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
         public MainActivity() {
+            playList = new PlayList();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,9 +57,23 @@ namespace MidiPlayer.Activity {
             initializeComponent();
             Conf.Load();
 
+            Synth.OnStart += () => {
+                Log.Info("OnStart called.");
+                MainThread.BeginInvokeOnMainThread(() => {
+                    Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
+                });
+            };
+
             Synth.OnEnd += () => {
-                Synth.Stop();
-                Synth.Start();
+                Log.Info("OnEnd called.");
+                if (!playList.Ready) {
+                    stopSong();
+                    playSong();
+                } else {
+                    stopSong();
+                    Synth.MidiFilePath = playList.Next;
+                    playSong();
+                }
             };
         }
 
@@ -74,12 +91,13 @@ namespace MidiPlayer.Activity {
 
         protected override void OnStop() {
             base.OnStop();
+            Conf.Value.PlayList = playList.List;
             Conf.Save();
         }
 
         protected override void OnDestroy() {
             try {
-                Synth.Stop();
+                stopSong();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             } finally {
@@ -89,7 +107,7 @@ namespace MidiPlayer.Activity {
 
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data) {
             switch (requestCode) {
-                case (int) BaseDir.SoundFont:
+                case (int) Request.SoundFont:
                     soundFontPath = getActualPathBy(data);
                     if (!(soundFontPath.Contains(".SF2") || soundFontPath.Contains(".sf2"))) {
                         Log.Warn("not a sound font.");
@@ -98,8 +116,9 @@ namespace MidiPlayer.Activity {
                     Log.Info($"selected: {soundFontPath}");
                     Synth.SoundFontPath = soundFontPath;
                     Env.SoundFontDir = soundFontPath.ToDirectoryName();
+                    Title = $"MidiPlayer: {midiFilePath.ToFileName()} {soundFontPath.ToFileName()}";
                     break;
-                case (int) BaseDir.MidiFile:
+                case (int) Request.MidiFile:
                     midiFilePath = getActualPathBy(data);
                     if (!(midiFilePath.Contains(".MID") || midiFilePath.Contains(".mid"))) {
                         Log.Warn("not a midi file.");
@@ -108,11 +127,21 @@ namespace MidiPlayer.Activity {
                     Log.Info($"selected: {midiFilePath}");
                     Synth.MidiFilePath = midiFilePath;
                     Env.MidiFileDir = midiFilePath.ToDirectoryName();
+                    Title = $"MidiPlayer: {midiFilePath.ToFileName()} {soundFontPath.ToFileName()}";
+                    break;
+                case (int) Request.AddPlayList:
+                    var _midiFilePath = getActualPathBy(data);
+                    if (!(_midiFilePath.Contains(".MID") || _midiFilePath.Contains(".mid"))) {
+                        Log.Warn("not a midi file.");
+                        break;
+                    }
+                    Log.Info($"selected: {_midiFilePath}");
+                    playList.Add(_midiFilePath); // add to playlist
+                    Env.MidiFileDir = _midiFilePath.ToDirectoryName();
                     break;
                 default:
                     break;
             }
-            Title = $"MidiPlayer: {midiFilePath.ToFileName()} {soundFontPath.ToFileName()}";
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,87 +153,6 @@ namespace MidiPlayer.Activity {
             }
             if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != (int) Permission.Granted) {
                 ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.WriteExternalStorage }, 0);
-            }
-        }
-
-        async Task<int> playSong() {
-            try {
-                await Task.Run(() => Synth.Start());
-                logMemoryInto();
-                return 1;
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-                return 0;
-            }
-        }
-
-        async Task<int> stopSong() {
-            try {
-                await Task.Run(() => Synth.Stop());
-                logMemoryInto();
-                return 1;
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-                return 0;
-            }
-        }
-
-        async void onLoadSoundFontButton_Click(object sender, EventArgs e) {
-            Log.Info("loadSoundFontButton clicked.");
-            try {
-                if (Synth.Playing) {
-                    await stopSong();
-                }
-                Intent _intent = new Intent(Intent.ActionOpenDocument);
-                Android.Net.Uri _uri = Android.Net.Uri.Parse($"content://com.android.externalstorage.documents/document/primary%3A{Env.SoundFontDir}");
-                _intent.SetData(_uri);
-                _intent.SetType("*/*");
-                _intent.PutExtra("android.provider.extra.INITIAL_URI", _uri);
-                _intent.PutExtra("android.content.extra.SHOW_ADVANCED", true);
-                _intent.AddCategory(Intent.CategoryOpenable);
-                StartActivityForResult(_intent, (int) BaseDir.SoundFont);
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-
-        async void onLoadMidiButton_Click(object sender, EventArgs e) {
-            Log.Info("loadMidiButton clicked.");
-            try {
-                if (Synth.Playing) {
-                    await stopSong();
-                }
-                Intent _intent = new Intent(Intent.ActionOpenDocument);
-                Android.Net.Uri _uri = Android.Net.Uri.Parse($"content://com.android.externalstorage.documents/document/primary%3A{Env.MidiFileDir}");
-                _intent.SetData(_uri);
-                _intent.SetType("*/*");
-                _intent.PutExtra("android.provider.extra.INITIAL_URI", _uri);
-                _intent.PutExtra("android.content.extra.SHOW_ADVANCED", true);
-                _intent.AddCategory(Intent.CategoryOpenable);
-                StartActivityForResult(_intent, (int) BaseDir.MidiFile);
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-
-        async void onStartButton_Click(object sender, EventArgs e) {
-            Log.Info("startButton clicked.");
-            try {
-                if (!midiFilePath.HasValue()) {
-                    return;
-                }
-                await playSong();
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-
-        async void onStopButton_Click(object sender, EventArgs e) {
-            Log.Info("stopButton clicked.");
-            try {
-                await stopSong();
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
             }
         }
 
@@ -223,6 +171,86 @@ namespace MidiPlayer.Activity {
 
             Button _stopButton = FindViewById<Button>(Resource.Id.stopButton);
             _stopButton.Click += onStopButton_Click;
+
+            Button _addPlaylistButton = FindViewById<Button>(Resource.Id.addPlaylistButton);
+            _addPlaylistButton.Click += onAddPlaylistButton_Click;
+
+            Button _deletePlaylistButton = FindViewById<Button>(Resource.Id.deletePlaylistButton);
+            _deletePlaylistButton.Click += onDeletePlaylistButton_Click;
+        }
+
+        void onLoadSoundFontButton_Click(object sender, EventArgs e) {
+            Log.Info("loadSoundFontButton clicked.");
+            try {
+                if (Synth.Playing) {
+                    stopSong();
+                }
+                callIntent(Env.SoundFontDir, (int) Request.SoundFont);
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
+        }
+
+        void onLoadMidiButton_Click(object sender, EventArgs e) {
+            Log.Info("loadMidiButton clicked.");
+            try {
+                if (Synth.Playing) {
+                    stopSong();
+                }
+                callIntent(Env.MidiFileDir, (int) Request.MidiFile);
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
+        }
+
+        void onStartButton_Click(object sender, EventArgs e) {
+            Log.Info("startButton clicked.");
+            try {
+                if (!midiFilePath.HasValue()) {
+                    return;
+                }
+                playSong();
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
+        }
+
+        void onStopButton_Click(object sender, EventArgs e) {
+            Log.Info("stopButton clicked.");
+            try {
+                stopSong();
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
+        }
+
+        void onAddPlaylistButton_Click(object sender, EventArgs e) {
+            Log.Info("addPlaylistButton clicked.");
+            try {
+                callIntent(Env.MidiFileDir, (int) Request.AddPlayList);
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
+        }
+
+        void onDeletePlaylistButton_Click(object sender, EventArgs e) {
+            Log.Info("deletePlaylistButton clicked.");
+            try {
+                playList.Clear();
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
+        }
+
+        void callIntent(string targetDir, int requestCode) {
+            var _intent = new Intent(Intent.ActionOpenDocument);
+            var _uri = Android.Net.Uri.Parse($"content://com.android.externalstorage.documents/document/primary%3A{targetDir}");
+            _intent.SetData(_uri);
+            _intent.SetType("*/*");
+            _intent.PutExtra("android.provider.extra.INITIAL_URI", _uri);
+            _intent.PutExtra("android.content.extra.SHOW_ADVANCED", true);
+            _intent.AddCategory(Intent.CategoryOpenable);
+            StartActivityForResult(_intent, requestCode);
         }
 
         static string getActualPathBy(Intent data) {
@@ -238,6 +266,32 @@ namespace MidiPlayer.Activity {
             return _path;
         }
 
+        async void playSong() {
+            try {
+                await Task.Run(() => {
+                    if (!playList.Ready) {
+                        Synth.MidiFilePath = midiFilePath;
+                        Synth.Start();
+                    } else {
+                        Synth.MidiFilePath = playList.Next;
+                        Synth.Start();
+                    }
+                });
+                logMemoryInto();
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
+        }
+
+        async void stopSong() {
+            try {
+                await Task.Run(() => Synth.Stop());
+                logMemoryInto();
+            } catch (Exception ex) {
+                Log.Error(ex.Message);
+            }
+        }
+
         static void logMemoryInto() {
             var _maxMemory = Java.Lang.Runtime.GetRuntime().MaxMemory();
             var _freeMemory = Java.Lang.Runtime.GetRuntime().FreeMemory();
@@ -247,8 +301,5 @@ namespace MidiPlayer.Activity {
             Log.Info($"totalMemory: {_totalMemory.ToMegabytes()}MB");
             // TODO: Mono runtime.
         }
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // inner Classes
     }
 }
