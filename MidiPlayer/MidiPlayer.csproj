@@ -51,6 +51,7 @@
     <Compile Include="Conf.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Env.cs" />
+    <Compile Include="EventQueue.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="PlayList.cs" />

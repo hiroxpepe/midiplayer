@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Linq;
 
 using NativeFuncs;
 using void_ptr = System.IntPtr;
@@ -28,12 +29,9 @@ namespace MidiPlayer {
 
         static bool stopping = false;
 
-        static int cont = 0;
-        static Fluidsynth.handle_midi_event_func_t event_callback = (void_ptr data, fluid_midi_event_t evt) => {
-            //Log.Info(cont.ToString());
-            cont++;
-            return Fluidsynth.fluid_synth_handle_midi_event(synth, evt);
-        };
+        static Fluidsynth.handle_midi_event_func_t event_callback;
+
+        static Func<IntPtr, IntPtr, int> onMessage;
 
         static Action onStart;
 
@@ -52,6 +50,25 @@ namespace MidiPlayer {
 
         public static bool Playing {
             get => ready;
+        }
+
+        public static Func<IntPtr, IntPtr, int> OnMessage {
+            get => onMessage;
+            set {
+                onMessage += value;
+                onMessage += (void_ptr data, fluid_midi_event_t evt) => {
+                    Enumerable.Range(0, 15).ToList().ForEach(x => {
+                        var _data = EventQueue.Dequeue(x);
+                        if (!(_data is null)) {
+                            Fluidsynth.fluid_synth_program_change(synth, x, _data.Prog);
+                            Fluidsynth.fluid_synth_cc(synth, x, (int) ControlChange.Pan, _data.Pan);
+                            Fluidsynth.fluid_synth_cc(synth, x, (int) ControlChange.Volume, _data.Vol);
+                        }
+                    });
+                    return Fluidsynth.fluid_synth_handle_midi_event(data, evt);
+                };
+                event_callback = new Fluidsynth.handle_midi_event_func_t(onMessage);
+            }
         }
 
         public static Action OnStart {
@@ -113,8 +130,8 @@ namespace MidiPlayer {
                 if (!ready) {
                     Init();
                 }
-                adriver = Fluidsynth.new_fluid_audio_driver(setting, synth); // start the synthesizer thread
-                Fluidsynth.fluid_player_play(player); // play the midi files, if any
+                adriver = Fluidsynth.new_fluid_audio_driver(setting, synth);
+                Fluidsynth.fluid_player_play(player);
                 Log.Info("start :)");
                 onStart();
                 Fluidsynth.fluid_player_join(player);
@@ -138,6 +155,10 @@ namespace MidiPlayer {
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
+        }
+
+        public static int HandleEvent(IntPtr data, IntPtr evt) {
+            return Fluidsynth.fluid_synth_handle_midi_event(data, evt);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
