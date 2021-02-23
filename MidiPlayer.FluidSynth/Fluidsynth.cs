@@ -75,5 +75,11 @@ namespace NativeFuncs {
 
         [DllImport("libfluidsynth.so")]
         internal static extern int fluid_synth_handle_midi_event(void_ptr data, fluid_midi_event_t evt);
+
+        [DllImport("libfluidsynth.so")]
+        internal static extern int fluid_synth_program_change(fluid_synth_t synth, int chan, int program);
+
+        [DllImport("libfluidsynth.so")]
+        internal static extern int fluid_synth_cc(fluid_synth_t synth, int chan, int ctrl, int val);
     }
 }
