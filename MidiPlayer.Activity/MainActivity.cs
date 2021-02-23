@@ -74,12 +74,12 @@ namespace MidiPlayer.Activity {
             Synth.OnEnd += () => {
                 Log.Info("OnEnd called.");
                 if (!playList.Ready) {
-                    stopSong();
-                    playSong();
+                    Synth.Stop();
+                    Synth.Start();
                 } else {
-                    stopSong();
+                    Synth.Stop();
                     Synth.MidiFilePath = playList.Next;
-                    playSong();
+                    Synth.Start();
                 }
             };
         }
