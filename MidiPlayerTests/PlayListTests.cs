@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MidiPlayer.Tests {
+namespace MidiPlayer.Test {
     [TestClass()]
     public class PlayListTests {
         [TestMethod()]

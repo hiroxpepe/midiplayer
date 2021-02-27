@@ -2,7 +2,7 @@
 using Android.Support.V7.App;
 using Android.Widget;
 
-namespace MidiPlayer.Activity {
+namespace MidiPlayer.Droid {
     /// <summary>
     ///  partial class for initialize the component
     /// </summary>
