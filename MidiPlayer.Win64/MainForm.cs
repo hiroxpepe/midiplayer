@@ -36,7 +36,7 @@ namespace MidiPlayer.Win64 {
 
             int _count = 0;
             Synth.OnMessage += (IntPtr data, IntPtr evt) => {
-                Log.Info($"OnMessage count: {_count}");
+                //Log.Info($"OnMessage count: {_count}");
                 _count++;
                 return Synth.HandleEvent(data, evt);
             };
