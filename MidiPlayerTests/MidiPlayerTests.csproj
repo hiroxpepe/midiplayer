@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MidiPlayer.SoundFont\MidiPlayer.SoundFont.csproj" />
     <ProjectReference Include="..\MidiPlayer\MidiPlayer.csproj" />
   </ItemGroup>
 
