@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayer.FluidSynth", "Mi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayerTests", "MidiPlayerTests\MidiPlayerTests.csproj", "{0C4ED722-5C23-4C5B-A478-A8D9279C413C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiPlayer.Win64", "MidiPlayer.Win64\MidiPlayer.Win64.csproj", "{A99AAD96-61C9-481B-8156-DBCD279A742A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{0C4ED722-5C23-4C5B-A478-A8D9279C413C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C4ED722-5C23-4C5B-A478-A8D9279C413C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C4ED722-5C23-4C5B-A478-A8D9279C413C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A99AAD96-61C9-481B-8156-DBCD279A742A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A99AAD96-61C9-481B-8156-DBCD279A742A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A99AAD96-61C9-481B-8156-DBCD279A742A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A99AAD96-61C9-481B-8156-DBCD279A742A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
