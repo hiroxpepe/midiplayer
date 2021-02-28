@@ -87,5 +87,41 @@ namespace NativeFuncs {
 
         [DllImport(LIBLARY)]
         internal static extern int fluid_synth_cc(fluid_synth_t synth, int chan, int ctrl, int val);
+
+        [DllImport(LIBLARY)]
+        internal static extern int fluid_midi_event_get_type(fluid_midi_event_t evt);
+
+        [DllImport(LIBLARY)]
+        internal static extern int fluid_midi_event_get_channel(fluid_midi_event_t evt);
+
+        [DllImport(LIBLARY)]
+        internal static extern int fluid_midi_event_get_key(fluid_midi_event_t evt);
+
+        [DllImport(LIBLARY)]
+        internal static extern int fluid_midi_event_get_velocity(fluid_midi_event_t evt);
+
+        [DllImport(LIBLARY)]
+        internal static extern int fluid_midi_event_get_control(fluid_midi_event_t evt);
+
+        [DllImport(LIBLARY)]
+        internal static extern int fluid_midi_event_get_value(fluid_midi_event_t evt);
+
+        [DllImport(LIBLARY)]
+        internal static extern int fluid_midi_event_get_program(fluid_midi_event_t evt);
     }
 }
+
+// fluid_midi_event_type
+// NOTE_OFF       = 128
+// NOTE_ON        = 144
+// CONTROL_CHANGE = 176
+// PROGRAM_CHANGE = 192
+
+// fluid_midi_control_chang
+// BANK_SELECT_MSB =  0
+// DATA_ENTRY_MSB  =  6
+// VOLUME_MSB      =  7
+// PAN_MSB         = 10
+// EXPRESSION_MSB  = 11
+// BANK_SELECT_LSB = 32
+// DATA_ENTRY_LSB  = 38

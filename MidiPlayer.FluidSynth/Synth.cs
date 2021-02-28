@@ -65,6 +65,24 @@ namespace MidiPlayer {
                             Fluidsynth.fluid_synth_cc(synth, x, (int) ControlChange.Volume, _data.Vol);
                         }
                     });
+                    var _type = Fluidsynth.fluid_midi_event_get_type(evt);
+                    var _channel = Fluidsynth.fluid_midi_event_get_channel(evt);
+                    var _control = Fluidsynth.fluid_midi_event_get_control(evt);
+                    var _value = Fluidsynth.fluid_midi_event_get_value(evt);
+                    var _program = Fluidsynth.fluid_midi_event_get_program(evt);
+                    // PROGRAM_CHANGE = 192 (merged drum trucks)
+                    //     _type: 192, _program: 16 
+                    // BANK_SELECT_MSB =  0 [-- drums: 127 --]
+                    //     _type: 176, _control:  0, _value: 127
+                    // BANK_SELECT_LSB = 32
+                    //     _type: 176, _control: 32, _value:   0
+                    // VOLUME_MSB      =  7
+                    //     _type: 176, _control:  7, _value:  90 
+                    // PAN_MSB         = 10
+                    //     _type: 176, _control: 10, _value:  64 
+                    if (_type != 128 && _type != 144) { // not note on or note off
+                        Log.Info($"_type: {_type} _channel: {_channel} _control: {_control} _value: {_value} _program: {_program}");
+                    }
                     return Fluidsynth.fluid_synth_handle_midi_event(data, evt);
                 };
                 event_callback = new Fluidsynth.handle_midi_event_func_t(onMessage);
