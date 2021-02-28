@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/holo_orange_light">
         <Button
-            android:id="@+id/load_soundfont_button"
+            android:id="@+id/button_load_soundfont"
             android:text="Sound"
             android:textSize="35px"
             android:textStyle="bold"
@@ -27,49 +27,49 @@
             android:layout_height="wrap_content"
         />
         <Button
-            android:id="@+id/load_midifile_button"
+            android:id="@+id/button_load_midifile"
             android:text="Song"
             android:textSize="35px"
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/load_soundfont_button"
+            android:layout_toRightOf="@id/button_load_soundfont"
         />
         <Button
-            android:id="@+id/start_button"
+            android:id="@+id/button_start"
             android:text="Start"
             android:textSize="35px"
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/load_midifile_button"
+            android:layout_toRightOf="@id/button_load_midifile"
          />
         <Button
-            android:id="@+id/stop_button"
+            android:id="@+id/button_stop"
             android:text="Stop"
             android:textSize="35px"
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/start_button"
+            android:layout_toRightOf="@id/button_start"
          />
         <Button
-            android:id="@+id/add_playlist_button"
+            android:id="@+id/button_add_playlist"
             android:text="Add PL"
             android:textSize="35px"
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/stop_button"
+            android:layout_toRightOf="@id/button_stop"
          />
         <Button
-            android:id="@+id/delete_playlist_button"
+            android:id="@+id/button_delete_playlist"
             android:text="Del PL"
             android:textSize="35px"
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/add_playlist_button"
+            android:layout_toRightOf="@id/button_add_playlist"
          />
     </RelativeLayout>
     <RelativeLayout
@@ -87,7 +87,7 @@
 
         <!-- fader1 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_1"
+            android:id="@+id/linear_layout_fader_1"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -99,7 +99,7 @@
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light">
             <TextView
-                android:id="@+id/ch_text_view_1"
+                android:id="@+id/text_view_ch_1"
                 android:text="1"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -112,7 +112,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_1"
+                android:id="@+id/text_view_prog_1"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -125,14 +125,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_1"
+                android:id="@+id/number_picker_prog_1"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_1"
+                android:id="@+id/text_view_pan_1"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -145,14 +145,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_1"
+                android:id="@+id/number_picker_pan_1"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_1"
+                android:id="@+id/text_view_vol_1"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -165,14 +165,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_1"
+                android:id="@+id/number_picker_vol_1"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_1"
+                android:id="@+id/button_mute_1"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -181,7 +181,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_1"
+                android:id="@+id/button_send_synth_1"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -193,7 +193,7 @@
 
         <!-- fader2 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_2"
+            android:id="@+id/linear_layout_fader_2"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -204,9 +204,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_1">
+            android:layout_toRightOf="@id/linear_layout_fader_1">
             <TextView
-                android:id="@+id/ch_text_view_2"
+                android:id="@+id/text_view_ch_2"
                 android:text="2"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -219,7 +219,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_2"
+                android:id="@+id/text_view_prog_2"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -232,14 +232,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_2"
+                android:id="@+id/number_picker_prog_2"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_2"
+                android:id="@+id/text_view_pan_2"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -252,14 +252,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_2"
+                android:id="@+id/number_picker_pan_2"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_2"
+                android:id="@+id/text_view_vol_2"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -272,14 +272,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_2"
+                android:id="@+id/number_picker_vol_2"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_2"
+                android:id="@+id/button_mute_2"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -288,7 +288,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_2"
+                android:id="@+id/button_send_synth_2"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -300,7 +300,7 @@
 
         <!-- fader3 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_3"
+            android:id="@+id/linear_layout_fader_3"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -311,9 +311,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_2">
+            android:layout_toRightOf="@id/linear_layout_fader_2">
             <TextView
-                android:id="@+id/ch_text_view_3"
+                android:id="@+id/text_view_ch_3"
                 android:text="3"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -326,7 +326,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_3"
+                android:id="@+id/text_view_prog_3"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -339,14 +339,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_3"
+                android:id="@+id/number_picker_prog_3"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_3"
+                android:id="@+id/text_view_pan_3"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -359,14 +359,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_3"
+                android:id="@+id/number_picker_pan_3"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_3"
+                android:id="@+id/text_view_vol_3"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -379,14 +379,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_3"
+                android:id="@+id/number_picker_vol_3"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_3"
+                android:id="@+id/button_mute_3"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -395,7 +395,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_3"
+                android:id="@+id/button_send_synth_3"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -407,7 +407,7 @@
 
         <!-- fader4 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_4"
+            android:id="@+id/linear_layout_fader_4"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -418,9 +418,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_3">
+            android:layout_toRightOf="@id/linear_layout_fader_3">
             <TextView
-                android:id="@+id/ch_text_view_4"
+                android:id="@+id/text_view_ch_4"
                 android:text="4"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -433,7 +433,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_4"
+                android:id="@+id/text_view_prog_4"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -446,14 +446,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_4"
+                android:id="@+id/number_picker_prog_4"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_4"
+                android:id="@+id/text_view_pan_4"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -466,14 +466,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_4"
+                android:id="@+id/number_picker_pan_4"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_4"
+                android:id="@+id/text_view_vol_4"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -486,14 +486,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_4"
+                android:id="@+id/number_picker_vol_4"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_4"
+                android:id="@+id/button_mute_4"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -502,7 +502,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_4"
+                android:id="@+id/button_send_synth_4"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -514,7 +514,7 @@
 
         <!-- fader5 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_5"
+            android:id="@+id/linear_layout_fader_5"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -525,9 +525,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_4">
+            android:layout_toRightOf="@id/linear_layout_fader_4">
             <TextView
-                android:id="@+id/ch_text_view_5"
+                android:id="@+id/text_view_ch_5"
                 android:text="5"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -540,7 +540,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_5"
+                android:id="@+id/text_view_prog_5"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -553,14 +553,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_5"
+                android:id="@+id/number_picker_prog_5"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_5"
+                android:id="@+id/text_view_pan_5"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -573,14 +573,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_5"
+                android:id="@+id/number_picker_pan_5"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_5"
+                android:id="@+id/text_view_vol_5"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -593,14 +593,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_5"
+                android:id="@+id/number_picker_vol_5"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_5"
+                android:id="@+id/button_mute_5"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -609,7 +609,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_5"
+                android:id="@+id/button_send_synth_5"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -621,7 +621,7 @@
 
         <!-- fader6 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_6"
+            android:id="@+id/linear_layout_fader_6"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -632,9 +632,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_5">
+            android:layout_toRightOf="@id/linear_layout_fader_5">
             <TextView
-                android:id="@+id/ch_text_view_6"
+                android:id="@+id/text_view_ch_6"
                 android:text="6"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -647,7 +647,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_6"
+                android:id="@+id/text_view_prog_6"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -660,14 +660,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_6"
+                android:id="@+id/number_picker_prog_6"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_6"
+                android:id="@+id/text_view_pan_6"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -680,14 +680,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_6"
+                android:id="@+id/number_picker_pan_6"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_6"
+                android:id="@+id/text_view_vol_6"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -700,14 +700,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_6"
+                android:id="@+id/number_picker_vol_6"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_6"
+                android:id="@+id/button_mute_6"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -716,7 +716,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_6"
+                android:id="@+id/button_send_synth_6"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -728,7 +728,7 @@
 
         <!-- fader7 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_7"
+            android:id="@+id/linear_layout_fader_7"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -739,9 +739,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_6">
+            android:layout_toRightOf="@id/linear_layout_fader_6">
             <TextView
-                android:id="@+id/ch_text_view_7"
+                android:id="@+id/text_view_ch_7"
                 android:text="7"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -754,7 +754,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_7"
+                android:id="@+id/text_view_prog_7"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -767,14 +767,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_7"
+                android:id="@+id/number_picker_prog_7"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_7"
+                android:id="@+id/text_view_pan_7"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -787,14 +787,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_7"
+                android:id="@+id/number_picker_pan_7"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_7"
+                android:id="@+id/text_view_vol_7"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -807,14 +807,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_7"
+                android:id="@+id/number_picker_vol_7"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_7"
+                android:id="@+id/button_mute_7"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -823,7 +823,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_7"
+                android:id="@+id/button_send_synth_7"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -835,7 +835,7 @@
 
         <!-- fader8 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_8"
+            android:id="@+id/linear_layout_fader_8"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -846,9 +846,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_7">
+            android:layout_toRightOf="@id/linear_layout_fader_7">
             <TextView
-                android:id="@+id/ch_text_view_8"
+                android:id="@+id/text_view_ch_8"
                 android:text="8"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -861,7 +861,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_8"
+                android:id="@+id/text_view_prog_8"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -874,14 +874,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_8"
+                android:id="@+id/number_picker_prog_8"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_8"
+                android:id="@+id/text_view_pan_8"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -894,14 +894,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_8"
+                android:id="@+id/number_picker_pan_8"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_8"
+                android:id="@+id/text_view_vol_8"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -914,14 +914,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_8"
+                android:id="@+id/number_picker_vol_8"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_8"
+                android:id="@+id/button_mute_8"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -930,7 +930,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_8"
+                android:id="@+id/button_send_synth_8"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -942,7 +942,7 @@
 
         <!-- fader9 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_9"
+            android:id="@+id/linear_layout_fader_9"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -953,9 +953,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_8">
+            android:layout_toRightOf="@id/linear_layout_fader_8">
             <TextView
-                android:id="@+id/ch_text_view_9"
+                android:id="@+id/text_view_ch_9"
                 android:text="9"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -968,7 +968,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_9"
+                android:id="@+id/text_view_prog_9"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -981,14 +981,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_9"
+                android:id="@+id/number_picker_prog_9"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_9"
+                android:id="@+id/text_view_pan_9"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1001,14 +1001,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_9"
+                android:id="@+id/number_picker_pan_9"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_9"
+                android:id="@+id/text_view_vol_9"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1021,14 +1021,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_9"
+                android:id="@+id/number_picker_vol_9"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_9"
+                android:id="@+id/button_mute_9"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -1037,7 +1037,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_9"
+                android:id="@+id/button_send_synth_9"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -1049,7 +1049,7 @@
 
         <!-- fader10 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_10"
+            android:id="@+id/linear_layout_fader_10"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -1060,9 +1060,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_9">
+            android:layout_toRightOf="@id/linear_layout_fader_9">
             <TextView
-                android:id="@+id/ch_text_view_10"
+                android:id="@+id/text_view_ch_10"
                 android:text="10"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1075,7 +1075,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_10"
+                android:id="@+id/text_view_prog_10"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1088,14 +1088,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_10"
+                android:id="@+id/number_picker_prog_10"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_10"
+                android:id="@+id/text_view_pan_10"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1108,14 +1108,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_10"
+                android:id="@+id/number_picker_pan_10"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_10"
+                android:id="@+id/text_view_vol_10"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1128,14 +1128,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_10"
+                android:id="@+id/number_picker_vol_10"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_10"
+                android:id="@+id/button_mute_10"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -1144,7 +1144,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_10"
+                android:id="@+id/button_send_synth_10"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -1156,7 +1156,7 @@
 
         <!-- fader11 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_11"
+            android:id="@+id/linear_layout_fader_11"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -1167,9 +1167,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_10">
+            android:layout_toRightOf="@id/linear_layout_fader_10">
             <TextView
-                android:id="@+id/ch_text_view_11"
+                android:id="@+id/text_view_ch_11"
                 android:text="11"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1182,7 +1182,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_11"
+                android:id="@+id/text_view_prog_11"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1195,14 +1195,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_11"
+                android:id="@+id/number_picker_prog_11"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_11"
+                android:id="@+id/text_view_pan_11"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1215,14 +1215,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_11"
+                android:id="@+id/number_picker_pan_11"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_11"
+                android:id="@+id/text_view_vol_11"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1235,14 +1235,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_11"
+                android:id="@+id/number_picker_vol_11"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_11"
+                android:id="@+id/button_mute_11"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -1251,7 +1251,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_11"
+                android:id="@+id/button_send_synth_11"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -1263,7 +1263,7 @@
 
         <!-- fader12 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_12"
+            android:id="@+id/linear_layout_fader_12"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -1274,9 +1274,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_11">
+            android:layout_toRightOf="@id/linear_layout_fader_11">
             <TextView
-                android:id="@+id/ch_text_view_12"
+                android:id="@+id/text_view_ch_12"
                 android:text="12"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1289,7 +1289,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_12"
+                android:id="@+id/text_view_prog_12"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1302,14 +1302,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_12"
+                android:id="@+id/number_picker_prog_12"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_12"
+                android:id="@+id/text_view_pan_12"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1322,14 +1322,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_12"
+                android:id="@+id/number_picker_pan_12"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_12"
+                android:id="@+id/text_view_vol_12"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1342,14 +1342,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_12"
+                android:id="@+id/number_picker_vol_12"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_12"
+                android:id="@+id/button_mute_12"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -1358,7 +1358,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_12"
+                android:id="@+id/button_send_synth_12"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -1370,7 +1370,7 @@
 
         <!-- fader13 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_13"
+            android:id="@+id/linear_layout_fader_13"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -1381,9 +1381,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_12">
+            android:layout_toRightOf="@id/linear_layout_fader_12">
             <TextView
-                android:id="@+id/ch_text_view_13"
+                android:id="@+id/text_view_ch_13"
                 android:text="13"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1396,7 +1396,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_13"
+                android:id="@+id/text_view_prog_13"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1409,14 +1409,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_13"
+                android:id="@+id/number_picker_prog_13"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_13"
+                android:id="@+id/text_view_pan_13"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1429,14 +1429,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_13"
+                android:id="@+id/number_picker_pan_13"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_13"
+                android:id="@+id/text_view_vol_13"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1449,14 +1449,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_13"
+                android:id="@+id/number_picker_vol_13"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_13"
+                android:id="@+id/button_mute_13"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -1465,7 +1465,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_13"
+                android:id="@+id/button_send_synth_13"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -1477,7 +1477,7 @@
 
         <!-- fader14 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_14"
+            android:id="@+id/linear_layout_fader_14"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -1488,9 +1488,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_13">
+            android:layout_toRightOf="@id/linear_layout_fader_13">
             <TextView
-                android:id="@+id/ch_text_view_14"
+                android:id="@+id/text_view_ch_14"
                 android:text="14"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1503,7 +1503,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_14"
+                android:id="@+id/text_view_prog_14"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1516,14 +1516,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_14"
+                android:id="@+id/number_picker_prog_14"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_14"
+                android:id="@+id/text_view_pan_14"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1536,14 +1536,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_14"
+                android:id="@+id/number_picker_pan_14"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_14"
+                android:id="@+id/text_view_vol_14"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1556,14 +1556,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_14"
+                android:id="@+id/number_picker_vol_14"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_14"
+                android:id="@+id/button_mute_14"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -1572,7 +1572,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_14"
+                android:id="@+id/button_send_synth_14"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -1584,7 +1584,7 @@
 
         <!-- fader15 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_15"
+            android:id="@+id/linear_layout_fader_15"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -1595,9 +1595,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_14">
+            android:layout_toRightOf="@id/linear_layout_fader_14">
             <TextView
-                android:id="@+id/ch_text_view_15"
+                android:id="@+id/text_view_ch_15"
                 android:text="15"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1610,7 +1610,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_15"
+                android:id="@+id/text_view_prog_15"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1623,14 +1623,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_15"
+                android:id="@+id/number_picker_prog_15"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_15"
+                android:id="@+id/text_view_pan_15"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1643,14 +1643,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_15"
+                android:id="@+id/number_picker_pan_15"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_15"
+                android:id="@+id/text_view_vol_15"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1663,14 +1663,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_15"
+                android:id="@+id/number_picker_vol_15"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_15"
+                android:id="@+id/button_mute_15"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -1679,7 +1679,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_15"
+                android:id="@+id/button_send_synth_15"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
@@ -1691,7 +1691,7 @@
 
         <!-- fader16 -->
         <LinearLayout
-            android:id="@+id/fader_linear_layout_16"
+            android:id="@+id/linear_layout_fader_16"
             android:orientation="vertical"
             android:minWidth="25px"
             android:minHeight="25px"
@@ -1702,9 +1702,9 @@
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             android:background="@android:color/holo_red_light"
-            android:layout_toRightOf="@id/fader_linear_layout_15">
+            android:layout_toRightOf="@id/linear_layout_fader_15">
             <TextView
-                android:id="@+id/ch_text_view_16"
+                android:id="@+id/text_view_ch_16"
                 android:text="16"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1717,7 +1717,7 @@
                 android:background="@android:color/holo_red_light"
             />
             <TextView
-                android:id="@+id/prog_text_view_16"
+                android:id="@+id/text_view_prog_16"
                 android:text="PRG"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1730,14 +1730,14 @@
                 android:background="@android:color/holo_orange_light"
             />
             <NumberPicker
-                android:id="@+id/prog_number_picker_16"
+                android:id="@+id/number_picker_prog_16"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
             />
             <TextView
-                android:id="@+id/pan_text_view_16"
+                android:id="@+id/text_view_pan_16"
                 android:text="PAN"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1750,14 +1750,14 @@
                 android:background="@android:color/holo_green_light"
             />
             <NumberPicker
-                android:id="@+id/pan_number_picker_16"
+                android:id="@+id/number_picker_pan_16"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
             />
             <TextView
-                android:id="@+id/vol_text_view_16"
+                android:id="@+id/text_view_vol_16"
                 android:text="VOL"
                 android:textSize="24px"
                 android:textStyle="bold"
@@ -1770,14 +1770,14 @@
                 android:background="@android:color/holo_blue_light"
             />
             <NumberPicker
-                android:id="@+id/vol_number_picker_16"
+                android:id="@+id/number_picker_vol_16"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
             />
             <Button
-                android:id="@+id/mute_button_16"
+                android:id="@+id/button_mute_16"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="M"
@@ -1786,7 +1786,7 @@
                 android:padding="0dp"
             />
             <Button
-                android:id="@+id/send_synth_button_16"
+                android:id="@+id/button_send_synth_16"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:text="S"
