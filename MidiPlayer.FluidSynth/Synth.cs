@@ -129,6 +129,10 @@ namespace MidiPlayer {
             try {
                 if (!ready) {
                     Init();
+                    if (!ready) {
+                        Log.Error("failed to init.");
+                        return;
+                    }
                 }
                 adriver = Fluidsynth.new_fluid_audio_driver(setting, synth);
                 Fluidsynth.fluid_player_play(player);

@@ -1,0 +1,72 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <StartupObject>MidiPlayer.Win64.Program</StartupObject>
+    <Company>STUDIO MeowToon</Company>
+    <Authors>Hiroyuki Adachi</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="libs\libfluidsynth-2.dll" />
+    <None Remove="libs\libglib-2.0-0.dll" />
+    <None Remove="libs\libgobject-2.0-0.dll" />
+    <None Remove="libs\libgthread-2.0-0.dll" />
+    <None Remove="libs\libinstpatch-2.dll" />
+    <None Remove="libs\libinstpatch-2.pdb" />
+    <None Remove="libs\libintl-8.dll" />
+    <None Remove="libs\libsndfile-1.dll" />
+    <None Remove="NLog.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="libs\libfluidsynth-2.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libglib-2.0-0.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libgobject-2.0-0.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libgthread-2.0-0.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libinstpatch-2.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libinstpatch-2.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libintl-8.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libsndfile-1.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="4.7.8" />
+    <PackageReference Include="NLog.Config" Version="4.7.8" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.1" />
+    <PackageReference Include="NLog.Schema" Version="4.7.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MidiPlayer.FluidSynth\MidiPlayer.FluidSynth.csproj" />
+    <ProjectReference Include="..\MidiPlayer\MidiPlayer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="NLog.xsd">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
