@@ -366,18 +366,6 @@
     <Folder Include="Resources\drawable\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NLog">
-      <Version>4.7.8</Version>
-    </PackageReference>
-    <PackageReference Include="NLog.Config">
-      <Version>4.7.8</Version>
-    </PackageReference>
-    <PackageReference Include="NLog.Extensions.Logging">
-      <Version>1.7.1</Version>
-    </PackageReference>
-    <PackageReference Include="NLog.Schema">
-      <Version>4.7.8</Version>
-    </PackageReference>
     <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Android.Support.Core.Utils" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Android.Support.CustomTabs" Version="28.0.0.3" />
