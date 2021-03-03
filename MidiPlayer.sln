@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayerTests", "MidiPlay
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayer.Win64", "MidiPlayer.Win64\MidiPlayer.Win64.csproj", "{A99AAD96-61C9-481B-8156-DBCD279A742A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiPlayer.SoundFont", "MidiPlayer.SoundFont\MidiPlayer.SoundFont.csproj", "{2696249B-3E24-4537-93A5-70F87E7546B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayer.SoundFont", "MidiPlayer.SoundFont\MidiPlayer.SoundFont.csproj", "{2696249B-3E24-4537-93A5-70F87E7546B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiPlayer.Midi", "MidiPlayer.Midi\MidiPlayer.Midi.csproj", "{131BB0F6-CE56-4369-8E13-627C211C5BA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{2696249B-3E24-4537-93A5-70F87E7546B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2696249B-3E24-4537-93A5-70F87E7546B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2696249B-3E24-4537-93A5-70F87E7546B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{131BB0F6-CE56-4369-8E13-627C211C5BA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{131BB0F6-CE56-4369-8E13-627C211C5BA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{131BB0F6-CE56-4369-8E13-627C211C5BA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{131BB0F6-CE56-4369-8E13-627C211C5BA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

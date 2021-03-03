@@ -1,12 +1,12 @@
 ﻿
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MidiPlayer.Tests {
+namespace MidiPlayer.SoundFont.Tests {
     [TestClass()]
     public class SoundFontInfoTests {
         [TestMethod()]
         public void GetInstrumentTest() {
-            var _target = new SoundFont.SoundFontInfo("../data/OmegaGMGS2.sf2");
+            var _target = new SoundFontInfo("../data/OmegaGMGS2.sf2");
             var _result1 = _target.GetInstrumentName(0, 0);
             Assert.AreEqual("Grand Piano", _result1); // bank:0, prog:0
             var _result2 = _target.GetInstrumentName(8, 38);
