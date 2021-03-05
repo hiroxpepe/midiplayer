@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
 
@@ -11,10 +11,42 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="libs\libfluidsynth-2.dll" />
+    <None Remove="libs\libglib-2.0-0.dll" />
+    <None Remove="libs\libgobject-2.0-0.dll" />
+    <None Remove="libs\libgthread-2.0-0.dll" />
+    <None Remove="libs\libinstpatch-2.dll" />
+    <None Remove="libs\libinstpatch-2.pdb" />
+    <None Remove="libs\libintl-8.dll" />
+    <None Remove="libs\libsndfile-1.dll" />
     <None Remove="NLog.config" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="libs\libfluidsynth-2.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libglib-2.0-0.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libgobject-2.0-0.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libgthread-2.0-0.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libinstpatch-2.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libinstpatch-2.pdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libintl-8.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\libsndfile-1.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -28,6 +60,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MidiPlayer.FluidSynth\MidiPlayer.FluidSynth.csproj" />
     <ProjectReference Include="..\MidiPlayer.Midi\MidiPlayer.Midi.csproj" />
     <ProjectReference Include="..\MidiPlayer.SoundFont\MidiPlayer.SoundFont.csproj" />
     <ProjectReference Include="..\MidiPlayer\MidiPlayer.csproj" />

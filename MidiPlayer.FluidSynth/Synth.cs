@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using NativeFuncs;
@@ -82,6 +83,12 @@ namespace MidiPlayer {
                     //     _type: 176, _control: 10, _value:  64 
                     if (_type != 128 && _type != 144) { // not note on or note off
                         Log.Info($"_type: {_type} _channel: {_channel} _control: {_control} _value: {_value} _program: {_program}");
+                    }
+                    if (_type == 192) {
+                        Multi.ApplyProgramChange(_channel, _program);
+                    }
+                    if (_type == 176) {
+                        Multi.ApplyControlChange(_channel, _control, _value);
                     }
                     return Fluidsynth.fluid_synth_handle_midi_event(data, evt);
                 };
@@ -183,6 +190,19 @@ namespace MidiPlayer {
             return Fluidsynth.fluid_synth_handle_midi_event(data, evt);
         }
 
+        public static int GetBank(int channel) {
+            var _bank = Multi.Get(channel).Bank;
+            if (_bank == -1) { // unset BANK_SELECT_LSB = 32
+                _bank = 0;
+            }
+            return _bank;
+        }
+
+        public static int GetProgram(int channel) {
+            var _program = Multi.Get(channel).Program;
+            return _program;
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private static Methods [verb]
 
@@ -202,6 +222,101 @@ namespace MidiPlayer {
             } finally {
                 ready = false;
                 stopping = false;
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // inner Classes
+
+        static class Multi {
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // static Fields
+
+            static Map<int, Track> trackMap;
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // static Constructor
+
+            static Multi() {
+                trackMap = new Map<int, Track>();
+                Enumerable.Range(0, 16).ToList().ForEach(x => trackMap.Add(x, new Track()));
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // static Properties [noun, adjective]
+
+            public static List<Track> List {
+                get => trackMap.Select(x => x.Value).ToList();
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // public static Methods [verb]
+
+            /// <summary>
+            /// PROGRAM_CHANGE = 192
+            /// </summary>
+            public static void ApplyProgramChange(int channel, int program) {
+                trackMap[channel].Program = program;
+            }
+
+            /// <summary>
+            /// CONTROL_CHANGE = 176
+            /// </summary>
+            public static void ApplyControlChange(int channel, int control, int value) {
+                // BANK_SELECT_MSB =  0 [-- drums: 127 --]
+                //     _type: 176, _control:  0, _value: 127
+                // BANK_SELECT_LSB = 32
+                //     _type: 176, _control: 32, _value:   0
+                // VOLUME_MSB      =  7
+                //     _type: 176, _control:  7, _value:  90 
+                // PAN_MSB         = 10
+                //     _type: 176, _control: 10, _value:  64 
+                switch (control) {
+                    case 0: // BANK_SELECT_MSB
+                        if (channel == 9) { // Drum
+                            trackMap[channel].Bank = value + 1; // 128
+                        }
+                        break;
+                    case 32: // BANK_SELECT_LSB
+                        if (channel != 9) { // not Drum
+                            trackMap[channel].Bank = value;
+                        }
+                        break;
+                    case 7: // VOLUME_MSB
+                        break;
+                    case 10: // PAN_MSB
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            public static Track Get(int channel) {
+                return trackMap[channel];
+            }
+        }
+
+        class Track {
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Fields
+
+            int bank = -1;
+
+            int program = -1;
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Properties [noun, adjective]
+
+            public int Bank {
+                get => bank;
+                set => bank = value;
+            }
+
+            public int Program {
+                get => program;
+                set => program = value;
             }
         }
     }
