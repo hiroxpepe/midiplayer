@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using NativeFuncs;
+using static NativeFuncs.Fluidsynth;
 using void_ptr = System.IntPtr;
 using fluid_settings_t = System.IntPtr;
 using fluid_synth_t = System.IntPtr;
@@ -28,7 +28,7 @@ namespace MidiPlayer {
 
         static fluid_audio_driver_t adriver = IntPtr.Zero;
 
-        static Fluidsynth.handle_midi_event_func_t event_callback;
+        static handle_midi_event_func_t event_callback;
 
         static Func<IntPtr, IntPtr, int> onMessage;
 
@@ -79,16 +79,16 @@ namespace MidiPlayer {
                     Enumerable.Range(0, 15).ToList().ForEach(x => {
                         var _data = EventQueue.Dequeue(x);
                         if (!(_data is null)) {
-                            Fluidsynth.fluid_synth_program_change(synth, x, _data.Prog);
-                            Fluidsynth.fluid_synth_cc(synth, x, (int) ControlChange.Pan, _data.Pan);
-                            Fluidsynth.fluid_synth_cc(synth, x, (int) ControlChange.Volume, _data.Vol);
+                            fluid_synth_program_change(synth, x, _data.Prog);
+                            fluid_synth_cc(synth, x, (int) ControlChange.Pan, _data.Pan);
+                            fluid_synth_cc(synth, x, (int) ControlChange.Volume, _data.Vol);
                         }
                     });
-                    var _type = Fluidsynth.fluid_midi_event_get_type(evt);
-                    var _channel = Fluidsynth.fluid_midi_event_get_channel(evt);
-                    var _control = Fluidsynth.fluid_midi_event_get_control(evt);
-                    var _value = Fluidsynth.fluid_midi_event_get_value(evt);
-                    var _program = Fluidsynth.fluid_midi_event_get_program(evt);
+                    var _type = fluid_midi_event_get_type(evt);
+                    var _channel = fluid_midi_event_get_channel(evt);
+                    var _control = fluid_midi_event_get_control(evt);
+                    var _value = fluid_midi_event_get_value(evt);
+                    var _program = fluid_midi_event_get_program(evt);
                     // PROGRAM_CHANGE = 192 (merged drum trucks)
                     //     _type: 192, _program: 16 
                     // BANK_SELECT_MSB =  0 [-- drums: 127 --]
@@ -108,9 +108,9 @@ namespace MidiPlayer {
                     if (_type == 176) {
                         Multi.ApplyControlChange(_channel, _control, _value);
                     }
-                    return Fluidsynth.fluid_synth_handle_midi_event(data, evt);
+                    return fluid_synth_handle_midi_event(data, evt);
                 };
-                event_callback = new Fluidsynth.handle_midi_event_func_t(onMessage);
+                event_callback = new handle_midi_event_func_t(onMessage);
             }
         }
 
@@ -133,29 +133,29 @@ namespace MidiPlayer {
                     Log.Warn("no sound font or no midi file.");
                     return;
                 }
-                setting = Fluidsynth.new_fluid_settings();
-                synth = Fluidsynth.new_fluid_synth(setting);
-                player = Fluidsynth.new_fluid_player(synth);
+                setting = new_fluid_settings();
+                synth = new_fluid_synth(setting);
+                player = new_fluid_player(synth);
                 Log.Info($"try to load the sound font: {SoundFontPath}");
-                if (Fluidsynth.fluid_is_soundfont(SoundFontPath) != 1) {
+                if (fluid_is_soundfont(SoundFontPath) != 1) {
                     Log.Error("not a sound font.");
                     return;
                 }
-                Fluidsynth.fluid_player_set_playback_callback(player, event_callback, synth);
-                int _sfont_id = Fluidsynth.fluid_synth_sfload(synth, SoundFontPath, true);
-                if (_sfont_id == Fluidsynth.FLUID_FAILED) {
+                fluid_player_set_playback_callback(player, event_callback, synth);
+                int _sfont_id = fluid_synth_sfload(synth, SoundFontPath, true);
+                if (_sfont_id == FLUID_FAILED) {
                     Log.Error("failed to load the sound font.");
                     return;
                 } else {
                     Log.Info($"loaded the sound font: {SoundFontPath}");
                 }
                 Log.Info($"try to load the midi file: {MidiFilePath}");
-                if (Fluidsynth.fluid_is_midifile(MidiFilePath) != 1) {
+                if (fluid_is_midifile(MidiFilePath) != 1) {
                     Log.Error("not a midi file.");
                     return;
                 }
-                int _result = Fluidsynth.fluid_player_add(player, MidiFilePath);
-                if (_result == Fluidsynth.FLUID_FAILED) {
+                int _result = fluid_player_add(player, MidiFilePath);
+                if (_result == FLUID_FAILED) {
                     Log.Error("failed to load the midi file.");
                     return;
                 } else {
@@ -177,11 +177,11 @@ namespace MidiPlayer {
                         return;
                     }
                 }
-                adriver = Fluidsynth.new_fluid_audio_driver(setting, synth);
-                Fluidsynth.fluid_player_play(player);
+                adriver = new_fluid_audio_driver(setting, synth);
+                fluid_player_play(player);
                 Log.Info("start :)");
                 onStart();
-                Fluidsynth.fluid_player_join(player);
+                fluid_player_join(player);
                 Log.Info("end :D");
                 if (stopping == false) {
                     onEnd();
@@ -195,7 +195,7 @@ namespace MidiPlayer {
             try {
                 if (!player.IsZero()) {
                     stopping = true;
-                    Fluidsynth.fluid_player_stop(player);
+                    fluid_player_stop(player);
                 }
                 final();
                 Log.Info("stop :|");
@@ -205,7 +205,7 @@ namespace MidiPlayer {
         }
 
         public static int HandleEvent(IntPtr data, IntPtr evt) {
-            return Fluidsynth.fluid_synth_handle_midi_event(data, evt);
+            return fluid_synth_handle_midi_event(data, evt);
         }
 
         public static int GetBank(int channel) {
@@ -238,10 +238,10 @@ namespace MidiPlayer {
 
         static void final() {
             try {
-                Fluidsynth.delete_fluid_audio_driver(adriver);
-                Fluidsynth.delete_fluid_player(player);
-                Fluidsynth.delete_fluid_synth(synth);
-                Fluidsynth.delete_fluid_settings(setting);
+                delete_fluid_audio_driver(adriver);
+                delete_fluid_player(player);
+                delete_fluid_synth(synth);
+                delete_fluid_settings(setting);
                 adriver = IntPtr.Zero;
                 player = IntPtr.Zero;
                 synth = IntPtr.Zero;
