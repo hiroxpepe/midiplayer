@@ -31,6 +31,24 @@ namespace MidiPlayer.Test {
             Assert.AreEqual(16, _result);
         }
 
+        [TestMethod()]
+        public void GetVoiceTest1() {
+            var _result = Synth.GetVoice(0);
+            Assert.AreEqual("Tuba", _result);
+        }
+
+        [TestMethod()]
+        public void GetVoiceTest2() {
+            var _result = Synth.GetVoice(9);
+            Assert.AreEqual("Power Kit", _result);
+        }
+
+        [TestMethod()]
+        public void GetVoiceTest3() {
+            var _result = Synth.GetVoice(14);
+            Assert.AreEqual("Warm Pad", _result);
+        }
+
         [TestInitialize]
         public void TestInitialize() {
             Synth.SoundFontPath = "../data/OmegaGMGS2.sf2";

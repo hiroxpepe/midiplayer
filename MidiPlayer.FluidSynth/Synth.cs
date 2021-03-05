@@ -10,6 +10,7 @@ using fluid_synth_t = System.IntPtr;
 using fluid_audio_driver_t = System.IntPtr;
 using fluid_player_t = System.IntPtr;
 using fluid_midi_event_t = System.IntPtr;
+using MidiPlayer.SoundFont;
 
 namespace MidiPlayer {
 
@@ -26,10 +27,6 @@ namespace MidiPlayer {
 
         static fluid_audio_driver_t adriver = IntPtr.Zero;
 
-        static bool ready = false;
-
-        static bool stopping = false;
-
         static Fluidsynth.handle_midi_event_func_t event_callback;
 
         static Func<IntPtr, IntPtr, int> onMessage;
@@ -38,11 +35,23 @@ namespace MidiPlayer {
 
         static Action onEnd;
 
+        static string soundFontPath;
+
+        static SoundFontInfo soundFontInfo;
+
+        static bool ready = false;
+
+        static bool stopping = false;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Properties [noun, adjective] 
 
         public static string SoundFontPath {
-            get; set;
+            get => soundFontPath;
+            set {
+                soundFontPath = value;
+                soundFontInfo = new SoundFontInfo(soundFontPath);
+            }
         }
 
         public static string MidiFilePath {
@@ -201,6 +210,13 @@ namespace MidiPlayer {
         public static int GetProgram(int channel) {
             var _program = Multi.Get(channel).Program;
             return _program;
+        }
+
+        public static string GetVoice(int channel) {
+            var _bank = GetBank(channel);
+            var _program = GetProgram(channel);
+            var _voice = soundFontInfo.GetInstrumentName(_bank, _program); 
+            return _voice;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
