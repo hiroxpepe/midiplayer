@@ -5,11 +5,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Sanford.Multimedia.Midi" Version="6.6.2" />
+    <Content Include="Sanford.Multimedia.Midi.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MidiPlayer\MidiPlayer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Sanford.Multimedia.Midi">
+      <HintPath>libs\Sanford.Multimedia.Midi.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
