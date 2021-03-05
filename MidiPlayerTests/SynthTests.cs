@@ -49,6 +49,24 @@ namespace MidiPlayer.Test {
             Assert.AreEqual("Warm Pad", _result);
         }
 
+        [TestMethod()]
+        public void GetTrackNameTest1() {
+            var _result = Synth.GetTrackName(0);
+            Assert.AreEqual("Cmon", _result);
+        }
+
+        [TestMethod()]
+        public void GetTrackNameTest2() {
+            var _result = Synth.GetTrackName(6);
+            Assert.AreEqual("Bass", _result);
+        }
+
+        [TestMethod()]
+        public void GetTrackNameTest3() {
+            var _result = Synth.GetTrackName(7);
+            Assert.AreEqual("Drum OverTop", _result);
+        }
+
         [TestInitialize]
         public void TestInitialize() {
             Synth.SoundFontPath = "../data/OmegaGMGS2.sf2";

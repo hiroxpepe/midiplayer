@@ -10,6 +10,7 @@ using fluid_synth_t = System.IntPtr;
 using fluid_audio_driver_t = System.IntPtr;
 using fluid_player_t = System.IntPtr;
 using fluid_midi_event_t = System.IntPtr;
+using MidiPlayer.Midi;
 using MidiPlayer.SoundFont;
 
 namespace MidiPlayer {
@@ -37,7 +38,11 @@ namespace MidiPlayer {
 
         static string soundFontPath;
 
+        static string midiFilePath;
+
         static SoundFontInfo soundFontInfo;
+
+        static StandardMidiFile standardMidiFile;
 
         static bool ready = false;
 
@@ -55,7 +60,11 @@ namespace MidiPlayer {
         }
 
         public static string MidiFilePath {
-            get; set;
+            get => midiFilePath;
+            set {
+                midiFilePath = value;
+                standardMidiFile = new StandardMidiFile(midiFilePath);
+            }
         }
 
         public static bool Playing {
@@ -217,6 +226,11 @@ namespace MidiPlayer {
             var _program = GetProgram(channel);
             var _voice = soundFontInfo.GetInstrumentName(_bank, _program); 
             return _voice;
+        }
+
+        public static string GetTrackName(int channel) {
+            var _trackName = standardMidiFile.GetTrackName(channel);
+            return _trackName;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

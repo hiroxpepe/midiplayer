@@ -3,10 +3,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MidiPlayer.Midi.Test {
     [TestClass()]
-    public class SmfTests {
+    public class StandardMidiFileTests {
         [TestMethod()]
         public void GetTrackNameTest() {
-            var _target = new Smf("../data/Cmon.mid");
+            var _target = new StandardMidiFile("../data/Cmon.mid");
             var _result0 = _target.GetTrackName(0);
             Assert.AreEqual("Cmon", _result0);
             var _result1 = _target.GetTrackName(1);
