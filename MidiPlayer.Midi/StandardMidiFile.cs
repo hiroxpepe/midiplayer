@@ -6,7 +6,7 @@ namespace MidiPlayer.Midi {
     /// <summary>
     /// class for standard midi file
     /// </summary>
-    public class Smf {
+    public class StandardMidiFile {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields
@@ -16,7 +16,7 @@ namespace MidiPlayer.Midi {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
-        public Smf(string target) {
+        public StandardMidiFile(string target) {
             sequence = new Sequence();
             sequence.Format = 1;
             sequence.Load(target);
