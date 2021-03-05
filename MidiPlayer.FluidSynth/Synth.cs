@@ -49,6 +49,37 @@ namespace MidiPlayer {
         static bool stopping = false;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
+        // static Constructor
+
+        static Synth() {
+            onMessage += (void_ptr data, fluid_midi_event_t evt) => {
+                Enumerable.Range(0, 15).ToList().ForEach(x => {
+                    var _data = EventQueue.Dequeue(x);
+                    if (!(_data is null)) {
+                        fluid_synth_program_change(synth, x, _data.Prog);
+                        fluid_synth_cc(synth, x, (int) ControlChange.Pan, _data.Pan);
+                        fluid_synth_cc(synth, x, (int) ControlChange.Volume, _data.Vol);
+                    }
+                });
+                var _type = fluid_midi_event_get_type(evt);
+                var _channel = fluid_midi_event_get_channel(evt);
+                var _control = fluid_midi_event_get_control(evt);
+                var _value = fluid_midi_event_get_value(evt);
+                var _program = fluid_midi_event_get_program(evt);
+                if (_type != 128 && _type != 144) { // not note on or note off
+                    Log.Info($"_type: {_type} _channel: {_channel} _control: {_control} _value: {_value} _program: {_program}");
+                }
+                if (_type == 192) {
+                    Multi.ApplyProgramChange(_channel, _program);
+                }
+                if (_type == 176) {
+                    Multi.ApplyControlChange(_channel, _control, _value);
+                }
+                return fluid_synth_handle_midi_event(data, evt);
+            };
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Properties [noun, adjective] 
 
         public static string SoundFontPath {
@@ -75,41 +106,6 @@ namespace MidiPlayer {
             get => onMessage;
             set {
                 onMessage += value;
-                onMessage += (void_ptr data, fluid_midi_event_t evt) => {
-                    Enumerable.Range(0, 15).ToList().ForEach(x => {
-                        var _data = EventQueue.Dequeue(x);
-                        if (!(_data is null)) {
-                            fluid_synth_program_change(synth, x, _data.Prog);
-                            fluid_synth_cc(synth, x, (int) ControlChange.Pan, _data.Pan);
-                            fluid_synth_cc(synth, x, (int) ControlChange.Volume, _data.Vol);
-                        }
-                    });
-                    var _type = fluid_midi_event_get_type(evt);
-                    var _channel = fluid_midi_event_get_channel(evt);
-                    var _control = fluid_midi_event_get_control(evt);
-                    var _value = fluid_midi_event_get_value(evt);
-                    var _program = fluid_midi_event_get_program(evt);
-                    // PROGRAM_CHANGE = 192 (merged drum trucks)
-                    //     _type: 192, _program: 16 
-                    // BANK_SELECT_MSB =  0 [-- drums: 127 --]
-                    //     _type: 176, _control:  0, _value: 127
-                    // BANK_SELECT_LSB = 32
-                    //     _type: 176, _control: 32, _value:   0
-                    // VOLUME_MSB      =  7
-                    //     _type: 176, _control:  7, _value:  90 
-                    // PAN_MSB         = 10
-                    //     _type: 176, _control: 10, _value:  64 
-                    if (_type != 128 && _type != 144) { // not note on or note off
-                        Log.Info($"_type: {_type} _channel: {_channel} _control: {_control} _value: {_value} _program: {_program}");
-                    }
-                    if (_type == 192) {
-                        Multi.ApplyProgramChange(_channel, _program);
-                    }
-                    if (_type == 176) {
-                        Multi.ApplyControlChange(_channel, _control, _value);
-                    }
-                    return fluid_synth_handle_midi_event(data, evt);
-                };
                 event_callback = new handle_midi_event_func_t(onMessage);
             }
         }
