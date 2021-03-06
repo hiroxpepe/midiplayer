@@ -1,10 +1,28 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MidiPlayer.Win64 {
+    /// <summary>
+    /// double buffered ListView
+    /// </summary>
+    public class BufferedListView : ListView {
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // protected Methods [verb]
+
+        protected override bool DoubleBuffered {
+            get {
+                return true;
+            }
+            set {
+            }
+        }
+    }
+
     /// <summary>
     /// main form for app
     /// </summary>
@@ -24,7 +42,7 @@ namespace MidiPlayer.Win64 {
 
         public MainForm() {
             InitializeComponent();
-
+            DoubleBuffered = true;
             playList = new PlayList();
         }
 
@@ -33,15 +51,10 @@ namespace MidiPlayer.Win64 {
 
         void MainForm_Load(object sender, EventArgs e) {
             Conf.Load();
+            initializeControl();
 
-            int _count = 0;
             Synth.OnMessage += (IntPtr data, IntPtr evt) => {
-                //Log.Info($"OnMessage count: {_count}");
-                _count++;
-                var _channel = Synth.GetChannel(evt);
-                if (_channel == 9) {
-                    Log.Info($"IsSounded:{Synth.IsSounded(_channel)}");
-                }
+                Invoke(updateList());
                 return Synth.HandleEvent(data, evt);
             };
 
@@ -143,6 +156,64 @@ namespace MidiPlayer.Win64 {
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
+        }
+
+        MethodInvoker updateList() {
+            var _midiChannelArray = Synth.MidiChannelList.ToArray();
+            var _listViewItemList = new List<ListViewItem>();
+            return async () => {
+                var _item = new string[6];
+                _listViewItemList.Clear();
+                await Task.Run(() => {
+                    for (var _idx = 0; _idx < _midiChannelArray.Length; _idx++) {
+                        var _midiChannel = _midiChannelArray[_idx];
+                        var _sounds = Synth.IsSounded(_midiChannel);
+                        var _trackName = Synth.GetTrackName(_idx + 1, _midiChannel);
+                        var _voice = Synth.GetVoice(_midiChannel);
+                        var _bank = Synth.GetBank(_midiChannel);
+                        var _program = Synth.GetProgram(_midiChannel);
+                        _item[0] = _sounds.ToString();
+                        _item[1] = _trackName;
+                        _item[2] = _voice;
+                        _item[3] = _midiChannel.ToString();
+                        _item[4] = _bank.ToString();
+                        _item[5] = _program.ToString();
+                        _listViewItemList.Add(new ListViewItem(_item));
+                    }
+                });
+                listView.BeginUpdate();
+                listView.Items.Clear();
+                _listViewItemList.ForEach(x => listView.Items.Add(x));
+                listView.EndUpdate();
+            };
+        }
+
+        void initializeControl() {
+            // initialize ListView
+            listView.FullRowSelect = true;
+            listView.GridLines = true;
+            listView.Sorting = SortOrder.None; // do not sort automatically.
+            listView.View = View.Details;
+            var _column1 = new ColumnHeader();
+            _column1.Text = "On";
+            _column1.Width = 50;
+            var _column2 = new ColumnHeader();
+            _column2.Text = "Name";
+            _column2.Width = 180;
+            var _column3 = new ColumnHeader();
+            _column3.Text = "Voice";
+            _column3.Width = 180;
+            var _column4 = new ColumnHeader();
+            _column4.Text = "Chan";
+            _column4.Width = 50;
+            var _column5 = new ColumnHeader();
+            _column5.Text = "Bank";
+            _column5.Width = 50;
+            var _column6 = new ColumnHeader();
+            _column6.Text = "Prog";
+            _column6.Width = 50;
+            ColumnHeader[] _columnHeaderArray = { _column1, _column2, _column3, _column4, _column5, _column6 };
+            listView.Columns.AddRange(_columnHeaderArray);
         }
     }
 }

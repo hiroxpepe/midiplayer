@@ -101,6 +101,10 @@ namespace MidiPlayer {
             }
         }
 
+        public static List<int> MidiChannelList {
+            get => standardMidiFile.MidiChannelList;
+        }
+
         public static bool Playing {
             get => ready;
         }
@@ -356,9 +360,9 @@ namespace MidiPlayer {
 
             bool sounds = false;
 
-            int bank = -1;
+            int bank = 0;
 
-            int program = -1;
+            int program = 0;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjective]

@@ -45,7 +45,13 @@ namespace MidiPlayer.SoundFont {
         // public Methods [verb]
 
         public string GetInstrumentName(int bank, int prog) {
-            return map[bank].Where(x => x.Prog == prog).First().Name;
+            var _voice = map[bank];
+            var _result = _voice.Where(x => x.Prog == prog);
+            if (_result.Count() == 0) {
+                return map[0].Where(x => x.Prog == prog).First().Name; // return default bank's voice.
+            } else {
+                return _voice.Where(x => x.Prog == prog).First().Name;
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
