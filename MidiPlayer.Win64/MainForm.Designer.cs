@@ -29,7 +29,7 @@ namespace MidiPlayer.Win64 {
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonStop = new System.Windows.Forms.Button();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.listView = new System.Windows.Forms.ListView();
+            this.listView = new BufferedListView();
             this.SuspendLayout();
             // 
             // buttonLoadSoundFont
