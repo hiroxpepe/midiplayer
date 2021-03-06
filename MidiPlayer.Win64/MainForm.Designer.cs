@@ -29,6 +29,7 @@ namespace MidiPlayer.Win64 {
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonStop = new System.Windows.Forms.Button();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.listView = new System.Windows.Forms.ListView();
             this.SuspendLayout();
             // 
             // buttonLoadSoundFont
@@ -79,11 +80,21 @@ namespace MidiPlayer.Win64 {
             // 
             this.openFileDialog.FileName = "openFileDialog";
             // 
+            // listView
+            // 
+            this.listView.HideSelection = false;
+            this.listView.Location = new System.Drawing.Point(12, 74);
+            this.listView.Name = "listView";
+            this.listView.Size = new System.Drawing.Size(604, 423);
+            this.listView.TabIndex = 4;
+            this.listView.UseCompatibleStateImageBehavior = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(628, 297);
+            this.ClientSize = new System.Drawing.Size(628, 508);
+            this.Controls.Add(this.listView);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.buttonLoadMidiFile);
@@ -102,6 +113,7 @@ namespace MidiPlayer.Win64 {
         private System.Windows.Forms.Button buttonStart;
         private System.Windows.Forms.Button buttonStop;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
+        private System.Windows.Forms.ListView listView;
     }
 }
 
