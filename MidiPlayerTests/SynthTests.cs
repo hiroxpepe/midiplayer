@@ -15,55 +15,55 @@ namespace MidiPlayer.Test {
 
         [TestMethod()]
         public void GetBankTest2() {
-            var _result = Synth.GetBank(9);
+            var _result = Synth.GetBank(7);
             Assert.AreEqual(128, _result);
         }
 
         [TestMethod()]
         public void GetProgramTest1() {
-            var _result = Synth.GetProgram(0);
+            var _result = Synth.GetProgram(1);
             Assert.AreEqual(58, _result);
         }
 
         [TestMethod()]
         public void GetProgramTest2() {
-            var _result = Synth.GetProgram(9);
+            var _result = Synth.GetProgram(8);
             Assert.AreEqual(16, _result);
         }
 
         [TestMethod()]
         public void GetVoiceTest1() {
-            var _result = Synth.GetVoice(0);
+            var _result = Synth.GetVoice(1);
             Assert.AreEqual("Tuba", _result);
         }
 
         [TestMethod()]
         public void GetVoiceTest2() {
-            var _result = Synth.GetVoice(9);
+            var _result = Synth.GetVoice(8);
             Assert.AreEqual("Power Kit", _result);
         }
 
         [TestMethod()]
         public void GetVoiceTest3() {
-            var _result = Synth.GetVoice(14);
+            var _result = Synth.GetVoice(4);
             Assert.AreEqual("Warm Pad", _result);
         }
 
         [TestMethod()]
         public void GetTrackNameTest1() {
-            var _result = Synth.GetTrackName(0, -1);
+            var _result = Synth.GetTrackName(0);
             Assert.AreEqual("Cmon", _result);
         }
 
         [TestMethod()]
         public void GetTrackNameTest2() {
-            var _result = Synth.GetTrackName(6, 11);
+            var _result = Synth.GetTrackName(6);
             Assert.AreEqual("Bass", _result);
         }
 
         [TestMethod()]
         public void GetTrackNameTest3() {
-            var _result = Synth.GetTrackName(7, 9);
+            var _result = Synth.GetTrackName(7);
             Assert.AreEqual("Drum OverTop", _result);
         }
 

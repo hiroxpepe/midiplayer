@@ -53,14 +53,14 @@ namespace MidiPlayer.Midi {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
 
-        public (string, int) GetTrackNameAndMidiChannel(int index) {
+        public (string, int) GetTrackNameAndMidiChannel(int track) {
             var _trackCount = sequence.Count;
-            if (index > _trackCount) {
+            if (track > _trackCount) {
                 throw new ArgumentOutOfRangeException("index is out of range.");
             }
             var _trackName = "undefined";
             var _channel = -1; // conductor track gets -1;
-            var _track = sequence[index];
+            var _track = sequence[track];
             for (var _idx = 0; _idx < _track.Count; _idx++) {
                 var _evt = _track.GetMidiEvent(_idx);
                 var _msg = _evt.MidiMessage;
@@ -85,14 +85,11 @@ namespace MidiPlayer.Midi {
             return (_trackName, _channel);
         }
 
-        public string GetTrackName(int index, int channel) {
-            if (!MidiChannelList.Contains(channel) && channel != -1) { // conductor track gets -1;
-                throw new ArgumentOutOfRangeException("index is out of range.");
-            }
+        public string GetTrackName(int track) {
             var _trackName = "undefined";
             Enumerable.Range(0, TrackCountIncludeConductorTrack).ToList().ForEach(x => {
                 (string name, int channel) _result = GetTrackNameAndMidiChannel(x);
-                if (index == x && channel == _result.channel) {
+                if (track == x) {
                     _trackName = _result.name;
                 }
             });

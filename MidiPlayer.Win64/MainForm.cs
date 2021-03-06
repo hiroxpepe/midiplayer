@@ -166,12 +166,12 @@ namespace MidiPlayer.Win64 {
                 _listViewItemList.Clear();
                 await Task.Run(() => {
                     for (var _idx = 0; _idx < _midiChannelArray.Length; _idx++) {
-                        var _midiChannel = _midiChannelArray[_idx];
-                        var _sounds = Synth.IsSounded(_midiChannel);
-                        var _trackName = Synth.GetTrackName(_idx + 1, _midiChannel);
-                        var _voice = Synth.GetVoice(_midiChannel);
-                        var _bank = Synth.GetBank(_midiChannel);
-                        var _program = Synth.GetProgram(_midiChannel);
+                        var _midiChannel = Synth.GetChannel(_idx + 1);
+                        var _sounds = Synth.IsSounded(_idx + 1);
+                        var _trackName = Synth.GetTrackName(_idx + 1);
+                        var _voice = Synth.GetVoice(_idx + 1);
+                        var _bank = Synth.GetBank(_idx + 1);
+                        var _program = Synth.GetProgram(_idx + 1);
                         _item[0] = _sounds.ToString();
                         _item[1] = _trackName;
                         _item[2] = _voice;
