@@ -157,6 +157,7 @@ namespace MidiPlayer {
                     Log.Error("not a midi file.");
                     return;
                 }
+                Multi.StandardMidiFile = standardMidiFile;
                 int _result = fluid_player_add(player, MidiFilePath);
                 if (_result == FLUID_FAILED) {
                     Log.Error("failed to load the midi file.");
@@ -216,28 +217,33 @@ namespace MidiPlayer {
             return _channel;
         }
 
-        public static int GetBank(int channel) {
-            var _bank = Multi.Get(channel).Bank;
+        public static int GetChannel(int track) {
+            var _channel = Multi.Get(track).Channel;
+            return _channel;
+        }
+
+        public static int GetBank(int track) {
+            var _bank = Multi.Get(track).Bank;
             if (_bank == -1) { // unset BANK_SELECT_LSB = 32
                 _bank = 0;
             }
             return _bank;
         }
 
-        public static int GetProgram(int channel) {
-            var _program = Multi.Get(channel).Program;
+        public static int GetProgram(int track) {
+            var _program = Multi.Get(track).Program;
             return _program;
         }
 
-        public static string GetVoice(int channel) {
-            var _bank = GetBank(channel);
-            var _program = GetProgram(channel);
+        public static string GetVoice(int track) {
+            var _bank = GetBank(track);
+            var _program = GetProgram(track);
             var _voice = soundFontInfo.GetInstrumentName(_bank, _program); 
             return _voice;
         }
 
-        public static string GetTrackName(int index, int channel) {
-            var _trackName = standardMidiFile.GetTrackName(index, channel);
+        public static string GetTrackName(int track) {
+            var _trackName = standardMidiFile.GetTrackName(track);
             return _trackName;
         }
 
@@ -277,12 +283,13 @@ namespace MidiPlayer {
 
             static Map<int, Track> trackMap;
 
+            static StandardMidiFile standardMidiFile;
+
             ///////////////////////////////////////////////////////////////////////////////////////////
             // static Constructor
 
             static Multi() {
                 trackMap = new Map<int, Track>();
-                Enumerable.Range(0, 16).ToList().ForEach(x => trackMap.Add(x, new Track()));
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
@@ -292,6 +299,14 @@ namespace MidiPlayer {
                 get => trackMap.Select(x => x.Value).ToList();
             }
 
+            public static StandardMidiFile StandardMidiFile {
+                get => standardMidiFile;
+                set {
+                    standardMidiFile = value;
+                    init();
+                }
+            }
+
             ///////////////////////////////////////////////////////////////////////////////////////////
             // public static Methods [verb]
 
@@ -299,21 +314,21 @@ namespace MidiPlayer {
             /// NOTE_ON = 144
             /// </summary>
             public static void ApplyNoteOn(int channel) {
-                trackMap[channel].Sounds = true;
+                trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Sounds = true);
             }
 
             /// <summary>
             /// NOTE_OFF = 128
             /// </summary>
             public static void ApplyNoteOff(int channel) {
-                trackMap[channel].Sounds = false;
+                trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Sounds = false);
             }
 
             /// <summary>
             /// PROGRAM_CHANGE = 192
             /// </summary>
             public static void ApplyProgramChange(int channel, int program) {
-                trackMap[channel].Program = program;
+                trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Program = program);
             }
 
             /// <summary>
@@ -331,12 +346,12 @@ namespace MidiPlayer {
                 switch (control) {
                     case 0: // BANK_SELECT_MSB
                         if (channel == 9) { // Drum
-                            trackMap[channel].Bank = value + 1; // 128
+                            trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Bank = value + 1); // 128
                         }
                         break;
                     case 32: // BANK_SELECT_LSB
                         if (channel != 9) { // not Drum
-                            trackMap[channel].Bank = value;
+                            trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Bank = value);
                         }
                         break;
                     case 7: // VOLUME_MSB
@@ -348,8 +363,25 @@ namespace MidiPlayer {
                 }
             }
 
-            public static Track Get(int channel) {
-                return trackMap[channel];
+            public static void ApplyChannel(int track, int channel) {
+                trackMap[track].Channel = channel;
+            }
+
+            public static Track Get(int track) {
+                var _track = trackMap[track];
+                return _track;
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // private static Methods [verb]
+
+            static void init() {
+                trackMap.Clear();
+                Enumerable.Range(0, 16).ToList().ForEach(x => trackMap.Add(x, new Track()));
+                var _list = standardMidiFile.MidiChannelList;
+                for (var _idx = 0; _idx < MidiChannelList.Count; _idx++) {
+                    trackMap[_idx + 1].Channel = _list[_idx]; // exclude conductor track;
+                }
             }
         }
 
@@ -359,6 +391,8 @@ namespace MidiPlayer {
             // Fields
 
             bool sounds = false;
+
+            int channel = -1;
 
             int bank = 0;
 
@@ -370,6 +404,11 @@ namespace MidiPlayer {
             public bool Sounds {
                 get => sounds;
                 set => sounds = value;
+            }
+
+            public int Channel {
+                get => channel;
+                set => channel = value;
             }
 
             public int Bank {
