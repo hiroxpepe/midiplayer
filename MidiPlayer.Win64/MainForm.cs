@@ -38,6 +38,10 @@ namespace MidiPlayer.Win64 {
             Synth.OnMessage += (IntPtr data, IntPtr evt) => {
                 //Log.Info($"OnMessage count: {_count}");
                 _count++;
+                var _channel = Synth.GetChannel(evt);
+                if (_channel == 9) {
+                    Log.Info($"IsSounded:{Synth.IsSounded(_channel)}");
+                }
                 return Synth.HandleEvent(data, evt);
             };
 

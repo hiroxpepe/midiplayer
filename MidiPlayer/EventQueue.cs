@@ -24,7 +24,7 @@ namespace MidiPlayer {
 
         static EventQueue() {
             queueMap = new Map<int, Queue<Data>>();
-            Enumerable.Range(0, 15).ToList().ForEach(x => queueMap.Add(x, new Queue<Data>()));
+            Enumerable.Range(0, 16).ToList().ForEach(x => queueMap.Add(x, new Queue<Data>()));
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
