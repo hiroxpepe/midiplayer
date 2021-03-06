@@ -232,8 +232,8 @@ namespace MidiPlayer {
             return _voice;
         }
 
-        public static string GetTrackName(int channel) {
-            var _trackName = standardMidiFile.GetTrackName(channel);
+        public static string GetTrackName(int index, int channel) {
+            var _trackName = standardMidiFile.GetTrackName(index, channel);
             return _trackName;
         }
 
