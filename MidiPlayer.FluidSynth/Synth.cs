@@ -53,7 +53,7 @@ namespace MidiPlayer {
 
         static Synth() {
             onMessage += (void_ptr data, fluid_midi_event_t evt) => {
-                Enumerable.Range(0, 15).ToList().ForEach(x => {
+                Enumerable.Range(0, 16).ToList().ForEach(x => {
                     var _data = EventQueue.Dequeue(x);
                     if (!(_data is null)) {
                         fluid_synth_program_change(synth, x, _data.Prog);
@@ -69,10 +69,13 @@ namespace MidiPlayer {
                 if (_type != 128 && _type != 144) { // not note on or note off
                     Log.Info($"_type: {_type} _channel: {_channel} _control: {_control} _value: {_value} _program: {_program}");
                 }
-                if (_type == 192) {
+                if (_type == 144) { // NOTE_ON = 144
+                    Multi.ApplyNoteOn(_channel);
+                } else if (_type == 128) { // NOTE_OFF = 128
+                    Multi.ApplyNoteOff(_channel);
+                } else if (_type == 192) { // PROGRAM_CHANGE = 192
                     Multi.ApplyProgramChange(_channel, _program);
-                }
-                if (_type == 176) {
+                } else if (_type == 176) { // CONTROL_CHANGE = 176
                     Multi.ApplyControlChange(_channel, _control, _value);
                 }
                 return fluid_synth_handle_midi_event(data, evt);
@@ -204,6 +207,11 @@ namespace MidiPlayer {
             return fluid_synth_handle_midi_event(data, evt);
         }
 
+        public static int GetChannel(IntPtr evt) {
+            var _channel = fluid_midi_event_get_channel(evt);
+            return _channel;
+        }
+
         public static int GetBank(int channel) {
             var _bank = Multi.Get(channel).Bank;
             if (_bank == -1) { // unset BANK_SELECT_LSB = 32
@@ -227,6 +235,10 @@ namespace MidiPlayer {
         public static string GetTrackName(int channel) {
             var _trackName = standardMidiFile.GetTrackName(channel);
             return _trackName;
+        }
+
+        public static bool IsSounded(int channel) {
+            return Multi.Get(channel).Sounds;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,6 +292,20 @@ namespace MidiPlayer {
             // public static Methods [verb]
 
             /// <summary>
+            /// NOTE_ON = 144
+            /// </summary>
+            public static void ApplyNoteOn(int channel) {
+                trackMap[channel].Sounds = true;
+            }
+
+            /// <summary>
+            /// NOTE_OFF = 128
+            /// </summary>
+            public static void ApplyNoteOff(int channel) {
+                trackMap[channel].Sounds = false;
+            }
+
+            /// <summary>
             /// PROGRAM_CHANGE = 192
             /// </summary>
             public static void ApplyProgramChange(int channel, int program) {
@@ -328,12 +354,19 @@ namespace MidiPlayer {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields
 
+            bool sounds = false;
+
             int bank = -1;
 
             int program = -1;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, adjective]
+
+            public bool Sounds {
+                get => sounds;
+                set => sounds = value;
+            }
 
             public int Bank {
                 get => bank;
