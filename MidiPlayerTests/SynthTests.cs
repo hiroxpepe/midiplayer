@@ -51,19 +51,19 @@ namespace MidiPlayer.Test {
 
         [TestMethod()]
         public void GetTrackNameTest1() {
-            var _result = Synth.GetTrackName(0);
+            var _result = Synth.GetTrackName(0, -1);
             Assert.AreEqual("Cmon", _result);
         }
 
         [TestMethod()]
         public void GetTrackNameTest2() {
-            var _result = Synth.GetTrackName(6);
+            var _result = Synth.GetTrackName(6, 11);
             Assert.AreEqual("Bass", _result);
         }
 
         [TestMethod()]
         public void GetTrackNameTest3() {
-            var _result = Synth.GetTrackName(7);
+            var _result = Synth.GetTrackName(7, 9);
             Assert.AreEqual("Drum OverTop", _result);
         }
 
