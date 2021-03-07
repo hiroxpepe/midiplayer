@@ -1,5 +1,4 @@
 ﻿
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +15,10 @@ namespace MidiPlayer.Midi {
 
         Sequence sequence;
 
+        List<int> channelList;
+
+        Map<int, string> trackNameMap;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
@@ -23,80 +26,90 @@ namespace MidiPlayer.Midi {
             sequence = new Sequence();
             sequence.Format = 1;
             sequence.Load(target);
+            channelList = new List<int>();
+            Enumerable.Range(0, TrackCountIncludeConductorTrack).ToList().ForEach(x => {
+                var _channel = getMidiChannel(x);
+                if (_channel != -1) { // exclude conductor track;
+                    channelList.Add(_channel);
+                }
+            });
+            trackNameMap = new Map<int, string>();
+            Enumerable.Range(0, TrackCountIncludeConductorTrack).ToList().ForEach(x => {
+                trackNameMap.Add(x, getTrackName(x));
+            });
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjective] 
 
+        /// <summary>
+        /// TODO: to private
+        /// </summary>
         public int TrackCount {
             get => sequence.Count - 1; // exclude conductor track;
         }
 
+        /// <summary>
+        /// TODO: to private
+        /// </summary>
         public int TrackCountIncludeConductorTrack {
             get => sequence.Count;
         }
 
         public List<int> MidiChannelList {
-            get {
-                var _list = new List<int>();
-                Enumerable.Range(0, TrackCountIncludeConductorTrack).ToList().ForEach(x => {
-                    (string name, int channel) _result = GetTrackNameAndMidiChannel(x);
-                    var _channel = _result.channel;
-                    if (_channel != -1) { // exclude conductor track;
-                        _list.Add(_result.channel);
-                    }
-                });
-                return _list;
-            }
+            get => channelList;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
 
-        public (string, int) GetTrackNameAndMidiChannel(int index) {
-            var _trackCount = sequence.Count;
-            if (index > _trackCount) {
-                throw new ArgumentOutOfRangeException("index is out of range.");
-            }
+        public string GetTrackName(int track) {
+            return trackNameMap[track];
+        }
+
+        /// <summary>
+        /// TODO: to private
+        /// FIXME: use only from test.
+        /// </summary>
+        public (string, int) GetTrackNameAndMidiChannel(int track) {
+            return (getTrackName(track), getMidiChannel(track));
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // private Methods [verb]
+
+        string getTrackName(int track) {
             var _trackName = "undefined";
-            var _channel = -1; // conductor track gets -1;
-            var _track = sequence[index];
+            var _track = sequence[track];
             for (var _idx = 0; _idx < _track.Count; _idx++) {
                 var _evt = _track.GetMidiEvent(_idx);
                 var _msg = _evt.MidiMessage;
-                // search trackName from meta message.
                 if (_msg.MessageType == MessageType.Meta) {
                     var _metaMsg = (MetaMessage) _msg;
                     if (_metaMsg.MetaType == MetaType.TrackName) {
                         var _data = _metaMsg.GetBytes();
                         var _text = Encoding.UTF8.GetString(_data);
                         _trackName = _text;
+                        break;
                     }
                 }
-                // search midi ch from channel message.
+            }
+            return _trackName;
+        }
+
+        int getMidiChannel(int track) {
+            var _channel = -1; // conductor track gets -1;
+            var _track = sequence[track];
+            for (var _idx = 0; _idx < _track.Count; _idx++) {
+                var _evt = _track.GetMidiEvent(_idx);
+                var _msg = _evt.MidiMessage;
                 if (_msg.MessageType == MessageType.Channel) {
                     var _chanMsg = (ChannelMessage) _msg;
                     _channel = _chanMsg.MidiChannel;
-                }
-                if (_channel != -1) {
                     break;
                 }
             }
-            return (_trackName, _channel);
-        }
-
-        public string GetTrackName(int index, int channel) {
-            if (!MidiChannelList.Contains(channel) && channel != -1) { // conductor track gets -1;
-                throw new ArgumentOutOfRangeException("index is out of range.");
-            }
-            var _trackName = "undefined";
-            Enumerable.Range(0, TrackCountIncludeConductorTrack).ToList().ForEach(x => {
-                (string name, int channel) _result = GetTrackNameAndMidiChannel(x);
-                if (index == x && channel == _result.channel) {
-                    _trackName = _result.name;
-                }
-            });
-            return _trackName;
+            return _channel;
         }
     }
 }
