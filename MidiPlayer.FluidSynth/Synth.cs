@@ -256,7 +256,7 @@ namespace MidiPlayer {
         public static string GetVoice(int track) {
             var _bank = GetBank(track);
             var _program = GetProgram(track);
-            var _voice = soundFontInfo.GetInstrumentName(_bank, _program); 
+            var _voice = soundFontInfo.GetVoice(_bank, _program); 
             return _voice;
         }
 
