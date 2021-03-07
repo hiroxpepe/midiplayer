@@ -1,28 +1,12 @@
 ﻿
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MidiPlayer.Win64 {
-    /// <summary>
-    /// double buffered ListView
-    /// </summary>
-    public class BufferedListView : ListView {
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // protected Methods [verb]
-
-        protected override bool DoubleBuffered {
-            get {
-                return true;
-            }
-            set {
-            }
-        }
-    }
-
     /// <summary>
     /// main form for app
     /// </summary>
@@ -54,14 +38,17 @@ namespace MidiPlayer.Win64 {
             initializeControl();
 
             Synth.OnMessage += (IntPtr data, IntPtr evt) => {
-                Invoke(updateList());
                 return Synth.HandleEvent(data, evt);
             };
 
             Synth.OnStart += () => {
                 Log.Info("OnStart called.");
                 Invoke((MethodInvoker) (() => {
-                    this.Text = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
+                    Text = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
+                    listView.Items.Clear();
+                    Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
+                        listView.Items.Add(new ListViewItem(new string[] { "--", "--", "--", "--", "--", "--" }));
+                    });
                 }));
             };
 
@@ -75,6 +62,11 @@ namespace MidiPlayer.Win64 {
                     Synth.MidiFilePath = playList.Next;
                     Synth.Start();
                 }
+            };
+
+            Synth.OnUpdate += (object sender, PropertyChangedEventArgs e) => {
+                var _track = (Synth.Track) sender;
+                Invoke(updateList(_track));
             };
         }
 
@@ -158,32 +150,17 @@ namespace MidiPlayer.Win64 {
             }
         }
 
-        MethodInvoker updateList() {
-            var _midiChannelArray = Synth.MidiChannelList.ToArray();
-            var _listViewItemList = new List<ListViewItem>();
-            return async () => {
-                var _item = new string[6];
-                _listViewItemList.Clear();
-                await Task.Run(() => {
-                    for (var _idx = 0; _idx < _midiChannelArray.Length; _idx++) {
-                        var _midiChannel = Synth.GetChannel(_idx + 1);
-                        var _sounds = Synth.IsSounded(_idx + 1);
-                        var _trackName = Synth.GetTrackName(_idx + 1);
-                        var _voice = Synth.GetVoice(_idx + 1);
-                        var _bank = Synth.GetBank(_idx + 1);
-                        var _program = Synth.GetProgram(_idx + 1);
-                        _item[0] = _sounds.ToString();
-                        _item[1] = _trackName;
-                        _item[2] = _voice;
-                        _item[3] = _midiChannel.ToString();
-                        _item[4] = _bank.ToString();
-                        _item[5] = _program.ToString();
-                        _listViewItemList.Add(new ListViewItem(_item));
-                    }
-                });
+        MethodInvoker updateList(Synth.Track track) {
+            return () => {
                 listView.BeginUpdate();
-                listView.Items.Clear();
-                _listViewItemList.ForEach(x => listView.Items.Add(x));
+                listView.Items[track.Index - 1] = new ListViewItem(new string[] {
+                    track.Sounds.ToString(),
+                    track.Name,
+                    Synth.GetVoice(track.Index),
+                    track.Channel.ToString(),
+                    track.Bank.ToString(),
+                    track.Program.ToString()
+                });
                 listView.EndUpdate();
             };
         }
