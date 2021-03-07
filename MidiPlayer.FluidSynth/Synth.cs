@@ -243,8 +243,8 @@ namespace MidiPlayer {
         }
 
         public static string GetTrackName(int track) {
-            var _trackName = standardMidiFile.GetTrackName(track);
-            return _trackName;
+            var _name = Multi.Get(track).Name;
+            return _name;
         }
 
         public static bool IsSounded(int channel) {
@@ -363,10 +363,6 @@ namespace MidiPlayer {
                 }
             }
 
-            public static void ApplyChannel(int track, int channel) {
-                trackMap[track].Channel = channel;
-            }
-
             public static Track Get(int track) {
                 var _track = trackMap[track];
                 return _track;
@@ -379,8 +375,10 @@ namespace MidiPlayer {
                 trackMap.Clear();
                 Enumerable.Range(0, 16).ToList().ForEach(x => trackMap.Add(x, new Track()));
                 var _list = standardMidiFile.MidiChannelList;
+                trackMap[0].Name = standardMidiFile.GetTrackName(0);
                 for (var _idx = 0; _idx < MidiChannelList.Count; _idx++) {
                     trackMap[_idx + 1].Channel = _list[_idx]; // exclude conductor track;
+                    trackMap[_idx + 1].Name = standardMidiFile.GetTrackName(_idx + 1);
                 }
             }
         }
@@ -391,6 +389,8 @@ namespace MidiPlayer {
             // Fields
 
             bool sounds = false;
+
+            string name = "undefined";
 
             int channel = -1;
 
@@ -404,6 +404,11 @@ namespace MidiPlayer {
             public bool Sounds {
                 get => sounds;
                 set => sounds = value;
+            }
+
+            public string Name {
+                get => name;
+                set => name = value;
             }
 
             public int Channel {
