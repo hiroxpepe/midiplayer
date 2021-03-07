@@ -473,7 +473,12 @@ namespace MidiPlayer {
             }
 
             public int Bank {
-                get => bank;
+                get {
+                    if (channel == 9 && bank != 128) {
+                        return 128; // Drum
+                    }
+                    return bank;
+                }
                 set {
                     bank = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Bank)));
