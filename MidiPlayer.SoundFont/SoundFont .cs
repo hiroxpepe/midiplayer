@@ -44,7 +44,7 @@ namespace MidiPlayer.SoundFont {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
 
-        public string GetInstrumentName(int bank, int prog) {
+        public string GetVoice(int bank, int prog) {
             var _voice = map[bank];
             var _result = _voice.Where(x => x.Prog == prog);
             if (_result.Count() == 0) {

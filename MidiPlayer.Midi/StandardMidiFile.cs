@@ -27,14 +27,14 @@ namespace MidiPlayer.Midi {
             sequence.Format = 1;
             sequence.Load(target);
             channelList = new List<int>();
-            Enumerable.Range(0, TrackCountIncludeConductorTrack).ToList().ForEach(x => {
+            Enumerable.Range(0, trackCountIncludeConductorTrack).ToList().ForEach(x => {
                 var _channel = getMidiChannel(x);
                 if (_channel != -1) { // exclude conductor track;
                     channelList.Add(_channel);
                 }
             });
             trackNameMap = new Map<int, string>();
-            Enumerable.Range(0, TrackCountIncludeConductorTrack).ToList().ForEach(x => {
+            Enumerable.Range(0, trackCountIncludeConductorTrack).ToList().ForEach(x => {
                 trackNameMap.Add(x, getTrackName(x));
             });
         }
@@ -42,18 +42,8 @@ namespace MidiPlayer.Midi {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, adjective] 
 
-        /// <summary>
-        /// TODO: to private
-        /// </summary>
         public int TrackCount {
             get => sequence.Count - 1; // exclude conductor track;
-        }
-
-        /// <summary>
-        /// TODO: to private
-        /// </summary>
-        public int TrackCountIncludeConductorTrack {
-            get => sequence.Count;
         }
 
         public List<int> MidiChannelList {
@@ -67,12 +57,11 @@ namespace MidiPlayer.Midi {
             return trackNameMap[track];
         }
 
-        /// <summary>
-        /// TODO: to private
-        /// FIXME: use only from test.
-        /// </summary>
-        public (string, int) GetTrackNameAndMidiChannel(int track) {
-            return (getTrackName(track), getMidiChannel(track));
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // private Properties [noun, adjective] 
+
+        int trackCountIncludeConductorTrack {
+            get => sequence.Count;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +99,13 @@ namespace MidiPlayer.Midi {
                 }
             }
             return _channel;
+        }
+
+        /// <summary>
+        /// NOTE: use only from unit-test.
+        /// </summary>
+        (string, int) getTrackNameAndMidiChannel(int track) {
+            return (getTrackName(track), getMidiChannel(track));
         }
     }
 }
