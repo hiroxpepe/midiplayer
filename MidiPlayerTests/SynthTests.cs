@@ -70,7 +70,7 @@ namespace MidiPlayer.Test {
         [TestInitialize]
         public void TestInitialize() {
             Synth.SoundFontPath = "../data/OmegaGMGS2.sf2";
-            Synth.MidiFilePath = "../data/Cmon.mid";
+            Synth.MidiFilePath = "../data/Cmon_v1.mid";
             Synth.OnMessage += (IntPtr data, IntPtr evt) => {
                 return Synth.HandleEvent(data, evt);
             };
