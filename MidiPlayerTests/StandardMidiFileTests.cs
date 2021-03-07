@@ -7,7 +7,7 @@ namespace MidiPlayer.Midi.Test {
     public class StandardMidiFileTests {
         [TestMethod()]
         public void getTrackNameAndMidiChannelTest1() {
-            var _target = new StandardMidiFile("../data/Cmon.mid");
+            var _target = new StandardMidiFile("../data/Cmon_v1.mid");
             var _private = new PrivateObject(_target);
             var _result0 = _private.Invoke("getTrackNameAndMidiChannel", 0);
             Assert.AreEqual(("Cmon", -1), _result0);
@@ -32,21 +32,21 @@ namespace MidiPlayer.Midi.Test {
         [TestMethod()]
         [ExpectedException(typeof(System.ArgumentOutOfRangeException))]
         public void getTrackNameAndMidiChannelTest2() {
-            var _target = new StandardMidiFile("../data/Cmon.mid");
+            var _target = new StandardMidiFile("../data/Cmon_v1.mid");
             var _private = new PrivateObject(_target);
             _private.Invoke("getTrackNameAndMidiChannel", 9);
         }
 
         [TestMethod()]
         public void TrackCountTest1() {
-            var _target = new StandardMidiFile("../data/Cmon.mid");
+            var _target = new StandardMidiFile("../data/Cmon_v1.mid");
             var _result = _target.TrackCount;
             Assert.AreEqual(8, _result);
         }
 
         [TestMethod()]
         public void trackCountIncludeConductorTrackTest1() {
-            var _target = new StandardMidiFile("../data/Cmon.mid");
+            var _target = new StandardMidiFile("../data/Cmon_v1.mid");
             var _private = new PrivateObject(_target);
             var _result = _private.Invoke("trackCountIncludeConductorTrack");
             Assert.AreEqual(9, _result);
@@ -54,14 +54,14 @@ namespace MidiPlayer.Midi.Test {
 
         [TestMethod()]
         public void MidiChannelListTest1() {
-            var _target = new StandardMidiFile("../data/Cmon.mid");
+            var _target = new StandardMidiFile("../data/Cmon_v1.mid");
             var _result = _target.MidiChannelList;
             CollectionAssert.AreEqual(new List<int>() { 13, 0, 15, 14, 12, 11, 9, 9 }, _result);
         }
 
         [TestMethod()]
         public void GetTrackNameTest1() {
-            var _target = new StandardMidiFile("../data/Cmon.mid");
+            var _target = new StandardMidiFile("../data/Cmon_v1.mid");
             var _result1 = _target.GetTrackName(1);
             Assert.AreEqual("Vocal Main", _result1);
             var _result2 = _target.GetTrackName(2);
@@ -78,6 +78,23 @@ namespace MidiPlayer.Midi.Test {
             Assert.AreEqual("Drum OverTop", _result7);
             var _result8 = _target.GetTrackName(8);
             Assert.AreEqual("Durm SN & BD", _result8);
+        }
+
+        [TestMethod()]
+        public void GetTrackNameTest2() {
+            var _target = new StandardMidiFile("../data/Tornado_v2.mid");
+            var _result0 = _target.GetTrackName(0);
+            Assert.AreEqual("Tornado", _result0);
+            var _result1 = _target.GetTrackName(1);
+            Assert.AreEqual("Bass", _result1);
+            var _result2 = _target.GetTrackName(2);
+            Assert.AreEqual("Seque", _result2);
+            var _result3 = _target.GetTrackName(3);
+            Assert.AreEqual("Pad", _result3);
+            var _result4 = _target.GetTrackName(4);
+            Assert.AreEqual("Melody", _result4);
+            var _result5 = _target.GetTrackName(5);
+            Assert.AreEqual("Drum", _result5);
         }
     }
 }
