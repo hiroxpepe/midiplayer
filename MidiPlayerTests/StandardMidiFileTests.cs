@@ -96,5 +96,40 @@ namespace MidiPlayer.Midi.Test {
             var _result5 = _target.GetTrackName(5);
             Assert.AreEqual("Drum", _result5);
         }
+
+        [TestMethod()]
+        public void GetTrackNameTest3() {
+            var _target = new StandardMidiFile("../data/ABC_v1.mid");
+            var _result0 = _target.GetTrackName(0);
+            Assert.AreEqual("ABC", _result0);
+            var _result1 = _target.GetTrackName(1);
+            Assert.AreEqual("Brass1", _result1);
+            var _result2 = _target.GetTrackName(2);
+            Assert.AreEqual("Brass2", _result2);
+            var _result3 = _target.GetTrackName(3);
+            Assert.AreEqual("Melody Main", _result3);
+            var _result4 = _target.GetTrackName(4);
+            Assert.AreEqual("Synth Reff", _result4);
+            var _result5 = _target.GetTrackName(5);
+            Assert.AreEqual("Synth Pad2", _result5);
+            var _result6 = _target.GetTrackName(6);
+            Assert.AreEqual("Synth Pad1", _result6);
+            var _result7 = _target.GetTrackName(7);
+            Assert.AreEqual("DX Reff", _result7);
+            var _result8 = _target.GetTrackName(8);
+            Assert.AreEqual("Drum Main", _result8);
+            var _result9 = _target.GetTrackName(9);
+            Assert.AreEqual("Percussion1", _result9);
+            var _result10 = _target.GetTrackName(10);
+            Assert.AreEqual("Percussion2", _result10);
+            var _result11 = _target.GetTrackName(11);
+            Assert.AreEqual("Bass", _result11);
+            var _result12 = _target.GetTrackName(12);
+            Assert.AreEqual("Bass over dub", _result12);
+            var _result13 = _target.GetTrackName(13);
+            Assert.AreEqual("DX Sequence", _result13);
+            var _result14 = _target.GetTrackName(14);
+            Assert.AreEqual("Orchestral Hit", _result14);
+        }
     }
 }
