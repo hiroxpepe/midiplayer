@@ -15,9 +15,7 @@ namespace MidiPlayer.Midi {
 
         Sequence sequence;
 
-        List<int> channelList;
-
-        Map<int, string> trackNameMap;
+        Map<int, (string name, int channel)> nameAndMidiChannelMap;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
@@ -26,16 +24,17 @@ namespace MidiPlayer.Midi {
             sequence = new Sequence();
             sequence.Format = 1;
             sequence.Load(target);
-            channelList = new List<int>();
+            Map<int, (string name, int channel)> _nameAndMidiChannelMap;
+            _nameAndMidiChannelMap = new Map<int, (string name, int channel)>();
             Enumerable.Range(0, trackCountIncludeConductorTrack).ToList().ForEach(x => {
-                var _channel = getMidiChannel(x);
-                if (_channel != -1) { // exclude conductor track;
-                    channelList.Add(_channel);
-                }
+                _nameAndMidiChannelMap.Add(x, getTrackNameAndMidiChannel(x));
             });
-            trackNameMap = new Map<int, string>();
-            Enumerable.Range(0, trackCountIncludeConductorTrack).ToList().ForEach(x => {
-                trackNameMap.Add(x, getTrackName(x));
+            nameAndMidiChannelMap = new Map<int, (string name, int channel)>();
+            var _idx = 0;
+            _nameAndMidiChannelMap.ToList().ForEach(x => {
+                if (!x.Value.name.Equals("System Setup") && !(x.Value.name.Equals("") && x.Value.channel == -1)) { // no need track
+                    nameAndMidiChannelMap.Add(_idx++, x.Value);
+                }
             });
         }
 
@@ -47,14 +46,14 @@ namespace MidiPlayer.Midi {
         }
 
         public List<int> MidiChannelList {
-            get => channelList;
+            get => nameAndMidiChannelMap.Where(x => x.Value.channel != -1).Select(x => x.Value.channel).ToList();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb]
 
         public string GetTrackName(int track) {
-            return trackNameMap[track];
+            return nameAndMidiChannelMap[track].name;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,10 +100,7 @@ namespace MidiPlayer.Midi {
             return _channel;
         }
 
-        /// <summary>
-        /// NOTE: use only from unit-test.
-        /// </summary>
-        (string, int) getTrackNameAndMidiChannel(int track) {
+        (string name, int channel) getTrackNameAndMidiChannel(int track) {
             return (getTrackName(track), getMidiChannel(track));
         }
     }
