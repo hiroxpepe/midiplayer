@@ -119,27 +119,30 @@ namespace MidiPlayer {
             get => ready;
         }
 
-        public static Func<IntPtr, IntPtr, int> OnMessage {
-            get => onMessage;
-            set {
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // static Events [adjective] 
+
+        public static event Func<IntPtr, IntPtr, int> OnMessage {
+            add {
                 onMessage += value;
                 event_callback = new handle_midi_event_func_t(onMessage);
             }
+            remove => onMessage -= value;
         }
 
-        public static Action OnStart {
-            get => onStart;
-            set => onStart += value;
+        public static event Action OnStart {
+            add => onStart += value;
+            remove => onStart -= value;
         }
 
-        public static Action OnEnd {
-            get => onEnd;
-            set => onEnd += value;
+        public static event Action OnEnd {
+            add => onEnd += value;
+            remove => onEnd -= value;
         }
 
-        public static Action<object, PropertyChangedEventArgs> OnUpdate {
-            get => onUpdate;
-            set => onUpdate += value;
+        public static event Action<object, PropertyChangedEventArgs> OnUpdate {
+            add => onUpdate += value;
+            remove => onUpdate -= value;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
