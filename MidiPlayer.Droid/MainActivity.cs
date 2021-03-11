@@ -21,7 +21,7 @@ namespace MidiPlayer.Droid {
     public partial class MainActivity : AppCompatActivity {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [nouns, noun phrases]
 
         string soundFontPath = "undefined";
 
@@ -436,7 +436,7 @@ namespace MidiPlayer.Droid {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        // private Methods [verb, verb phrases]
 
         void requestPermissions() {
             if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != (int) Permission.Granted) {

@@ -20,7 +20,7 @@ namespace MidiPlayer {
     public class Synth {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Fields
+        // static Fields [nouns, noun phrases]
 
         static fluid_settings_t setting = IntPtr.Zero;
 
@@ -89,7 +89,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Properties [noun, adjective] 
+        // static Properties [noun, noun phrase, adjective] 
 
         public static string SoundFontPath {
             get => soundFontPath;
@@ -120,7 +120,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Events [adjective] 
+        // static Events [verb, verb phrase] 
 
         public static event Func<IntPtr, IntPtr, int> OnMessage {
             add {
@@ -146,7 +146,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public static Methods [verb]
+        // public static Methods [verb, verb phrases]
 
         public static void Init() {
             try {
@@ -273,7 +273,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private static Methods [verb]
+        // private static Methods [verb, verb phrases]
 
         static void final() {
             try {
@@ -304,7 +304,7 @@ namespace MidiPlayer {
         static class Multi {
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // static Fields
+            // static Fields [nouns, noun phrases]
 
             static Map<int, Track> trackMap;
 
@@ -318,7 +318,7 @@ namespace MidiPlayer {
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // static Properties [noun, adjective]
+            // static Properties [noun, noun phrase, adjective]
 
             public static List<Track> List {
                 get => trackMap.Select(x => x.Value).ToList();
@@ -333,7 +333,7 @@ namespace MidiPlayer {
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // public static Methods [verb]
+            // public static Methods [verb, verb phrases]
 
             /// <summary>
             /// NOTE_ON = 144
@@ -394,7 +394,7 @@ namespace MidiPlayer {
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // private static Methods [verb]
+            // private static Methods [verb, verb phrases]
 
             static void init() {
                 trackMap.Clear();
@@ -411,7 +411,7 @@ namespace MidiPlayer {
         public class Track : INotifyPropertyChanged {
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // Fields
+            // Fields [nouns, noun phrases]
 
             int index = -1;
 
@@ -433,7 +433,7 @@ namespace MidiPlayer {
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // Events [adjective] 
+            // Events [verb, verb phrase] 
 
             /// <summary>
             /// implementation for INotifyPropertyChanged
@@ -441,7 +441,7 @@ namespace MidiPlayer {
             public event PropertyChangedEventHandler PropertyChanged;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // Properties [noun, adjective]
+            // Properties [noun, noun phrase, adjective]
 
             public int Index {
                 get => index;

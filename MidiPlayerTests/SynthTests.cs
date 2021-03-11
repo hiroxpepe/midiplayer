@@ -92,7 +92,7 @@ namespace MidiPlayer.Test {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        // private Methods [verb, verb phrases]
 
         async void playSong() {
             try {

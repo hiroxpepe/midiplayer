@@ -11,7 +11,7 @@ namespace MidiPlayer.Midi {
     public class StandardMidiFile {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [nouns, noun phrases]
 
         Sequence sequence;
 
@@ -39,7 +39,7 @@ namespace MidiPlayer.Midi {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Properties [noun, adjective] 
+        // Properties [noun, noun phrase, adjective] 
 
         public int TrackCount {
             get => sequence.Count - 1; // exclude conductor track;
@@ -50,21 +50,21 @@ namespace MidiPlayer.Midi {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public Methods [verb]
+        // public Methods [verb, verb phrases]
 
         public string GetTrackName(int track) {
             return nameAndMidiChannelMap[track].name;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Properties [noun, adjective] 
+        // private Properties [noun, noun phrase, adjective] 
 
         int trackCountIncludeConductorTrack {
             get => sequence.Count;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        // private Methods [verb, verb phrases]
 
         string getTrackName(int track) {
             var _trackName = "undefined";

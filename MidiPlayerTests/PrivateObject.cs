@@ -9,7 +9,7 @@ namespace MidiPlayer {
     public class PrivateObject {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [nouns, noun phrases]
 
         private readonly object obj;
 
@@ -21,7 +21,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public Methods [verb]
+        // public Methods [verb, verb phrases]
 
         public object Invoke(string methodName, params object[] args) {
             var _type = obj.GetType();

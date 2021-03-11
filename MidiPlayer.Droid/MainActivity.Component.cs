@@ -9,7 +9,7 @@ namespace MidiPlayer.Droid {
     public partial class MainActivity : AppCompatActivity {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        // private Methods [verb, verb phrases]
 
         /// <summary>
         /// initialize the component.
