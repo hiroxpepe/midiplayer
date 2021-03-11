@@ -10,7 +10,7 @@ namespace MidiPlayer.SoundFont {
     public class SoundFontInfo {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [nouns, noun phrases]
 
         NAudio.SoundFont.SoundFont soundFont;
 
@@ -42,7 +42,7 @@ namespace MidiPlayer.SoundFont {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public Methods [verb]
+        // public Methods [verb, verb phrases]
 
         public string GetVoice(int bank, int prog) {
             var _voice = map[bank];
@@ -60,7 +60,7 @@ namespace MidiPlayer.SoundFont {
         class Voice {
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // Properties [noun, adjective] 
+            // Properties [noun, noun phrase, adjective] 
 
             public int Prog {
                 get; set;

@@ -9,12 +9,12 @@ namespace MidiPlayer {
     public static class Log {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Fields
+        // static Fields [nouns, noun phrases]
 
         static Logger logger = LogManager.GetCurrentClassLogger();
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public static Methods [verb]
+        // public static Methods [verb, verb phrases]
 
         public static void Fatal(string target) {
             LogEventInfo _event = new LogEventInfo(LogLevel.Fatal, logger.Name, target);

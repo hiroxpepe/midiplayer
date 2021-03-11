@@ -8,7 +8,7 @@ namespace MidiPlayer.Win64 {
     public class BufferedListView : ListView {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // protected Methods [verb]
+        // protected Methods [verb, verb phrases]
 
         protected override bool DoubleBuffered {
             get {

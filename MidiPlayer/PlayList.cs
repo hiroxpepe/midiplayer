@@ -8,7 +8,7 @@ namespace MidiPlayer {
     public class PlayList {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [nouns, noun phrases]
 
         List<string> targetList = new List<string>();
 
@@ -22,7 +22,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Properties [noun, adjective] 
+        // Properties [noun, noun phrase, adjective] 
 
         public bool Ready {
             get => targetList.Count == 0 ? false : true;
@@ -46,7 +46,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public Methods [verb]
+        // public Methods [verb, verb phrases]
 
         public void Add(string target) {
             targetList.Add(target);

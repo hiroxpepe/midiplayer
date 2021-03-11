@@ -15,7 +15,7 @@ namespace MidiPlayer {
     public class EventQueue {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Fields
+        // static Fields [nouns, noun phrases]
 
         static Map<int, Queue<Data>> queueMap = new Map<int, Queue<Data>>();
 
@@ -28,7 +28,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public static Methods [verb]
+        // public static Methods [verb, verb phrases]
 
         public static void Enqueue(int idx, Data value) {
             queueMap[idx].Enqueue(value);
@@ -45,7 +45,7 @@ namespace MidiPlayer {
     public class Data {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Properties [noun, adjective] 
+        // Properties [noun, noun phrase, adjective] 
 
         int prog;
 
@@ -54,7 +54,7 @@ namespace MidiPlayer {
         int vol;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Properties [noun, adjective] 
+        // Properties [noun, noun phrase, adjective] 
 
         public int Prog {
             get => prog - 1;

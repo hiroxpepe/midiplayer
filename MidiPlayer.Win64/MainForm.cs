@@ -13,7 +13,7 @@ namespace MidiPlayer.Win64 {
     public partial class MainForm : Form {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [nouns, noun phrases]
 
         string soundFontPath = "undefined";
 
@@ -124,7 +124,7 @@ namespace MidiPlayer.Win64 {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        // private Methods [verb, verb phrases]
 
         async void playSong() {
             try {

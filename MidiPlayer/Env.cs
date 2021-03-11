@@ -6,14 +6,14 @@ namespace MidiPlayer {
     public class Env {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Fields
+        // static Fields [nouns, noun phrases]
 
         static string soundFontDir = "Music";
 
         static string midiFileDir = "Music";
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Properties [noun, adjective] 
+        // static Properties [noun, noun phrase, adjective] 
 
         public static string SoundFontDir {
             get {
