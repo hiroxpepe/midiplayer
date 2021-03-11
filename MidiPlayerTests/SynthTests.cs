@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using static System.Threading.Thread;
 
@@ -78,6 +79,8 @@ namespace MidiPlayer.Test {
             Synth.OnStart += () => {
             };
             Synth.OnEnd += () => {
+            };
+            Synth.OnUpdate += (object sender, PropertyChangedEventArgs e) => {
             };
             playSong();
             Sleep(3000);
