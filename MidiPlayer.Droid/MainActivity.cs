@@ -21,7 +21,7 @@ namespace MidiPlayer.Droid {
     public partial class MainActivity : AppCompatActivity {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [nouns, noun phrases]
 
         string soundFontPath = "undefined";
 
@@ -54,22 +54,19 @@ namespace MidiPlayer.Droid {
             initializeComponent();
             Conf.Load();
 
-            int _count = 0;
-            Synth.OnMessage += (IntPtr data, IntPtr evt) => {
-                //Log.Info($"OnMessage count: {_count}");
-                _count++;
+            Synth.Playbacking += (IntPtr data, IntPtr evt) => {
                 return Synth.HandleEvent(data, evt);
             };
 
-            Synth.OnStart += () => {
-                Log.Info("OnStart called.");
+            Synth.Started += () => {
+                Log.Info("Started called.");
                 MainThread.BeginInvokeOnMainThread(() => {
                     Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
                 });
             };
 
-            Synth.OnEnd += () => {
-                Log.Info("OnEnd called.");
+            Synth.Ended += () => {
+                Log.Info("Ended called.");
                 if (!playList.Ready) {
                     Synth.Stop();
                     Synth.Start();
@@ -436,7 +433,7 @@ namespace MidiPlayer.Droid {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        // private Methods [verb, verb phrases]
 
         void requestPermissions() {
             if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != (int) Permission.Granted) {

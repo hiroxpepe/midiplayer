@@ -73,14 +73,14 @@ namespace MidiPlayer.Test {
         public void TestInitialize() {
             Synth.SoundFontPath = "../data/OmegaGMGS2.sf2";
             Synth.MidiFilePath = "../data/Cmon_v1.mid";
-            Synth.OnMessage += (IntPtr data, IntPtr evt) => {
+            Synth.Playbacking += (IntPtr data, IntPtr evt) => {
                 return Synth.HandleEvent(data, evt);
             };
-            Synth.OnStart += () => {
+            Synth.Start += () => {
             };
-            Synth.OnEnd += () => {
+            Synth.Ended += () => {
             };
-            Synth.OnUpdate += (object sender, PropertyChangedEventArgs e) => {
+            Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
             };
             playSong();
             Sleep(3000);
@@ -92,7 +92,7 @@ namespace MidiPlayer.Test {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        // private Methods [verb, verb phrases]
 
         async void playSong() {
             try {

@@ -11,14 +11,14 @@ namespace MidiPlayer {
     public class Conf {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Fields
+        // static Fields [nouns, noun phrases]
 
         static readonly string APP_CONF_FILE_PATH = "storage/emulated/0/Android/data/com.studio.meowtoon.midiplayer/files/app_conf.json";
 
         static Json json = null;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Properties [noun, adjective] 
+        // static Properties [noun, noun phrase, adjective] 
 
         public static bool Ready {
             get => !(json is null);
@@ -34,7 +34,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public static Methods [verb]
+        // public static Methods [verb, verb phrases]
 
         public static void Load() {
             if (File.Exists(APP_CONF_FILE_PATH)) {
@@ -60,7 +60,7 @@ namespace MidiPlayer {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private static Methods [verb]
+        // private static Methods [verb, verb phrases]
 
         static Json loadJson(Stream target) {
             var _serializer = new DataContractJsonSerializer(typeof(Json));

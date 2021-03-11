@@ -13,7 +13,7 @@ namespace MidiPlayer.Win64 {
     public partial class MainForm : Form {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields
+        // Fields [nouns, noun phrases]
 
         string soundFontPath = "undefined";
 
@@ -37,12 +37,12 @@ namespace MidiPlayer.Win64 {
             Conf.Load();
             initializeControl();
 
-            Synth.OnMessage += (IntPtr data, IntPtr evt) => {
+            Synth.Playbacking += (IntPtr data, IntPtr evt) => {
                 return Synth.HandleEvent(data, evt);
             };
 
-            Synth.OnStart += () => {
-                Log.Info("OnStart called.");
+            Synth.Started += () => {
+                Log.Info("Started called.");
                 Invoke((MethodInvoker) (() => {
                     Text = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
                     listView.Items.Clear();
@@ -52,8 +52,8 @@ namespace MidiPlayer.Win64 {
                 }));
             };
 
-            Synth.OnEnd += () => {
-                Log.Info("OnEnd called.");
+            Synth.Ended += () => {
+                Log.Info("Ended called.");
                 if (!playList.Ready) {
                     Synth.Stop();
                     Synth.Start();
@@ -64,7 +64,7 @@ namespace MidiPlayer.Win64 {
                 }
             };
 
-            Synth.OnUpdate += (object sender, PropertyChangedEventArgs e) => {
+            Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
                 var _track = (Synth.Track) sender;
                 Invoke(updateList(_track));
             };
@@ -124,7 +124,7 @@ namespace MidiPlayer.Win64 {
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Methods [verb]
+        // private Methods [verb, verb phrases]
 
         async void playSong() {
             try {
