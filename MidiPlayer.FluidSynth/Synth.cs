@@ -32,13 +32,13 @@ namespace MidiPlayer {
 
         static handle_midi_event_func_t event_callback;
 
-        static Func<IntPtr, IntPtr, int> onMessage;
+        static Func<IntPtr, IntPtr, int> onPlaybacking;
 
-        static Action onStart;
+        static Action onStarted;
 
-        static Action onEnd;
+        static Action onEnded;
 
-        static Action<object, PropertyChangedEventArgs> onUpdate;
+        static Action<object, PropertyChangedEventArgs> onUpdated;
 
         static string soundFontPath;
 
@@ -56,7 +56,7 @@ namespace MidiPlayer {
         // static Constructor
 
         static Synth() {
-            onMessage += (void_ptr data, fluid_midi_event_t evt) => {
+            onPlaybacking += (void_ptr data, fluid_midi_event_t evt) => {
                 Enumerable.Range(0, 16).ToList().ForEach(x => {
                     var _data = EventQueue.Dequeue(x);
                     if (!(_data is null)) {
@@ -122,27 +122,27 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Events [verb, verb phrase] 
 
-        public static event Func<IntPtr, IntPtr, int> OnMessage {
+        public static event Func<IntPtr, IntPtr, int> Playbacking {
             add {
-                onMessage += value;
-                event_callback = new handle_midi_event_func_t(onMessage);
+                onPlaybacking += value;
+                event_callback = new handle_midi_event_func_t(onPlaybacking);
             }
-            remove => onMessage -= value;
+            remove => onPlaybacking -= value;
         }
 
-        public static event Action OnStart {
-            add => onStart += value;
-            remove => onStart -= value;
+        public static event Action Started {
+            add => onStarted += value;
+            remove => onStarted -= value;
         }
 
-        public static event Action OnEnd {
-            add => onEnd += value;
-            remove => onEnd -= value;
+        public static event Action Ended {
+            add => onEnded += value;
+            remove => onEnded -= value;
         }
 
-        public static event Action<object, PropertyChangedEventArgs> OnUpdate {
-            add => onUpdate += value;
-            remove => onUpdate -= value;
+        public static event Action<object, PropertyChangedEventArgs> Updated {
+            add => onUpdated += value;
+            remove => onUpdated -= value;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +177,7 @@ namespace MidiPlayer {
                 }
                 Multi.StandardMidiFile = standardMidiFile;
                 Enumerable.Range(0, 16).ToList().ForEach(x => {
-                    Multi.Get(x).PropertyChanged += onUpdateCallBack;
+                    Multi.Get(x).PropertyChanged += onPropertyChanged;
                 });
                 int _result = fluid_player_add(player, MidiFilePath);
                 if (_result == FLUID_FAILED) {
@@ -205,11 +205,11 @@ namespace MidiPlayer {
                 adriver = new_fluid_audio_driver(setting, synth);
                 fluid_player_play(player);
                 Log.Info("start :)");
-                onStart();
+                onStarted();
                 fluid_player_join(player);
                 Log.Info("end :D");
                 if (stopping == false) {
-                    onEnd();
+                    onEnded();
                 }
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -294,8 +294,8 @@ namespace MidiPlayer {
             }
         }
 
-        static void onUpdateCallBack(object sender, PropertyChangedEventArgs e) {
-            onUpdate(sender, e);
+        static void onPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            onUpdated(sender, e);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
