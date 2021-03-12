@@ -26,7 +26,7 @@ namespace MidiPlayer.Midi {
             sequence.Load(target);
             Map<int, (string name, int channel)> _nameAndMidiChannelMap;
             _nameAndMidiChannelMap = new Map<int, (string name, int channel)>();
-            Enumerable.Range(0, trackCountIncludeConductorTrack).ToList().ForEach(x => {
+            Enumerable.Range(0, sequence.Count).ToList().ForEach(x => {
                 _nameAndMidiChannelMap.Add(x, getTrackNameAndMidiChannel(x));
             });
             nameAndMidiChannelMap = new Map<int, (string name, int channel)>();
@@ -42,7 +42,7 @@ namespace MidiPlayer.Midi {
         // Properties [noun, noun phrase, adjective] 
 
         public int TrackCount {
-            get => sequence.Count - 1; // exclude conductor track;
+            get => nameAndMidiChannelMap.Where(x => x.Value.channel != -1).Count(); // exclude conductor track;
         }
 
         public List<int> MidiChannelList {
@@ -54,13 +54,6 @@ namespace MidiPlayer.Midi {
 
         public string GetTrackName(int track) {
             return nameAndMidiChannelMap[track].name;
-        }
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // private Properties [noun, noun phrase, adjective] 
-
-        int trackCountIncludeConductorTrack {
-            get => sequence.Count;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
