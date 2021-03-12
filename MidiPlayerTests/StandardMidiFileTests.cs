@@ -1,4 +1,4 @@
-﻿
+﻿using MidiPlayer.Midi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using System.Collections.Generic;
@@ -41,6 +41,20 @@ namespace MidiPlayer.Midi.Test {
         [TestMethod()]
         public void TrackCountTest1() {
             var _target = new StandardMidiFile("../data/Cmon_v1.mid");
+            var _result = _target.TrackCount;
+            AreEqual(8, _result);
+        }
+
+        [TestMethod()]
+        public void TrackCountTest2() {
+            var _target = new StandardMidiFile("../data/ABC_v1.mid");
+            var _result = _target.TrackCount;
+            AreEqual(14, _result);
+        }
+
+        [TestMethod()]
+        public void TrackCountTest3() {
+            var _target = new StandardMidiFile("../data/DoYouSay_v4.mid");
             var _result = _target.TrackCount;
             AreEqual(8, _result);
         }
