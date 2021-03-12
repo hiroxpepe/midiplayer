@@ -60,14 +60,6 @@ namespace MidiPlayer.Midi.Test {
         }
 
         [TestMethod()]
-        public void trackCountIncludeConductorTrackTest1() {
-            var _target = new StandardMidiFile("../data/Cmon_v1.mid");
-            var _private = new PrivateObject(_target);
-            var _result = _private.Invoke("trackCountIncludeConductorTrack");
-            AreEqual(9, _result);
-        }
-
-        [TestMethod()]
         public void MidiChannelListTest1() {
             var _target = new StandardMidiFile("../data/Cmon_v1.mid");
             var _result = _target.MidiChannelList;
