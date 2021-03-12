@@ -76,7 +76,7 @@ namespace MidiPlayer.Test {
             Synth.Playbacking += (IntPtr data, IntPtr evt) => {
                 return Synth.HandleEvent(data, evt);
             };
-            Synth.Start += () => {
+            Synth.Started += () => {
             };
             Synth.Ended += () => {
             };
