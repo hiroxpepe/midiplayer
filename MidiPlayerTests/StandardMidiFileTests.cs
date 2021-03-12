@@ -1,4 +1,4 @@
-﻿
+﻿using MidiPlayer.Midi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using System.Collections.Generic;
@@ -46,11 +46,17 @@ namespace MidiPlayer.Midi.Test {
         }
 
         [TestMethod()]
-        public void trackCountIncludeConductorTrackTest1() {
-            var _target = new StandardMidiFile("../data/Cmon_v1.mid");
-            var _private = new PrivateObject(_target);
-            var _result = _private.Invoke("trackCountIncludeConductorTrack");
-            AreEqual(9, _result);
+        public void TrackCountTest2() {
+            var _target = new StandardMidiFile("../data/ABC_v1.mid");
+            var _result = _target.TrackCount;
+            AreEqual(14, _result);
+        }
+
+        [TestMethod()]
+        public void TrackCountTest3() {
+            var _target = new StandardMidiFile("../data/DoYouSay_v4.mid");
+            var _result = _target.TrackCount;
+            AreEqual(8, _result);
         }
 
         [TestMethod()]
