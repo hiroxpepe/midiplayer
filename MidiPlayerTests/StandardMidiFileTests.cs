@@ -1,4 +1,4 @@
-﻿
+﻿using MidiPlayer.Midi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using System.Collections.Generic;
@@ -46,11 +46,17 @@ namespace MidiPlayer.Midi.Test {
         }
 
         [TestMethod()]
-        public void trackCountIncludeConductorTrackTest1() {
-            var _target = new StandardMidiFile("../data/Cmon_v1.mid");
-            var _private = new PrivateObject(_target);
-            var _result = _private.Invoke("trackCountIncludeConductorTrack");
-            AreEqual(9, _result);
+        public void TrackCountTest2() {
+            var _target = new StandardMidiFile("../data/ABC_v1.mid");
+            var _result = _target.TrackCount;
+            AreEqual(14, _result);
+        }
+
+        [TestMethod()]
+        public void TrackCountTest3() {
+            var _target = new StandardMidiFile("../data/DoYouSay_v4.mid");
+            var _result = _target.TrackCount;
+            AreEqual(8, _result);
         }
 
         [TestMethod()]
@@ -131,6 +137,29 @@ namespace MidiPlayer.Midi.Test {
             AreEqual("DX Sequence", _result13);
             var _result14 = _target.GetTrackName(14);
             AreEqual("Orchestral Hit", _result14);
+        }
+
+        [TestMethod()]
+        public void GetTrackNameTest4() {
+            var _target = new StandardMidiFile("../data/DoYouSay_v4.mid");
+            var _result0 = _target.GetTrackName(0);
+            AreEqual("DoYouSay", _result0);
+            var _result1 = _target.GetTrackName(1);
+            AreEqual("Vocal Main", _result1);
+            var _result2 = _target.GetTrackName(2);
+            AreEqual("Vocal Cho", _result2);
+            var _result3 = _target.GetTrackName(3);
+            AreEqual("Synth Pad", _result3);
+            var _result4 = _target.GetTrackName(4);
+            AreEqual("Guiter Clean", _result4);
+            var _result5 = _target.GetTrackName(5);
+            AreEqual("Guiter Riff", _result5);
+            var _result6 = _target.GetTrackName(6);
+            AreEqual("Bass", _result6);
+            var _result7 = _target.GetTrackName(7);
+            AreEqual("Drum OverTop", _result7);
+            var _result8 = _target.GetTrackName(8);
+            AreEqual("Drum SN & BD", _result8);
         }
     }
 }

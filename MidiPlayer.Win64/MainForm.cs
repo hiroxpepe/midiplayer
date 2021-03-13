@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace MidiPlayer.Win64 {
                     Text = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
                     listView.Items.Clear();
                     Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
-                        listView.Items.Add(new ListViewItem(new string[] { "--", "--", "--", "--", "--", "--" }));
+                        listView.Items.Add(new ListViewItem(new string[] { "  ●", "--", "--", "--", "--", "--" }));
                     });
                 }));
             };
@@ -145,22 +146,36 @@ namespace MidiPlayer.Win64 {
         async void stopSong() {
             try {
                 await Task.Run(() => Synth.Stop());
+                Invoke((MethodInvoker) (() => {
+                    Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
+                        listView.Items[x].SubItems[0].ForeColor = Color.Black;
+                    });
+                }));
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
         }
 
         MethodInvoker updateList(Synth.Track track) {
+            const int _column1Idx = 0;
+            var _trackIdx = track.Index - 1; // exclude conductor track;
             return () => {
-                listView.BeginUpdate();
-                listView.Items[track.Index - 1] = new ListViewItem(new string[] {
-                    track.Sounds.ToString(),
+                var _listViewItem = new ListViewItem(new string[] {
+                    "  ●",
                     track.Name,
                     Synth.GetVoice(track.Index),
                     track.Channel.ToString(),
                     track.Bank.ToString(),
                     track.Program.ToString()
                 });
+                listView.BeginUpdate();
+                listView.Items[_trackIdx] = _listViewItem;
+                listView.Items[_trackIdx].UseItemStyleForSubItems = false;
+                if (track.Sounds) {
+                    listView.Items[_trackIdx].SubItems[_column1Idx].ForeColor = Color.Lime;
+                } else {
+                    listView.Items[_trackIdx].SubItems[_column1Idx].ForeColor = Color.Black;
+                }
                 listView.EndUpdate();
             };
         }
@@ -173,7 +188,7 @@ namespace MidiPlayer.Win64 {
             listView.View = View.Details;
             var _column1 = new ColumnHeader();
             _column1.Text = "On";
-            _column1.Width = 50;
+            _column1.Width = 40;
             var _column2 = new ColumnHeader();
             _column2.Text = "Name";
             _column2.Width = 180;
