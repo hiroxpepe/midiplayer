@@ -47,7 +47,7 @@ namespace MidiPlayer.Win64 {
                     Text = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
                     listView.Items.Clear();
                     Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
-                        listView.Items.Add(new ListViewItem(new string[] { "--", "--", "--", "--", "--", "--" }));
+                        listView.Items.Add(new ListViewItem(new string[] { "   -", "--", "--", "--", "--", "--" }));
                     });
                 }));
             };
@@ -154,7 +154,7 @@ namespace MidiPlayer.Win64 {
             return () => {
                 listView.BeginUpdate();
                 listView.Items[track.Index - 1] = new ListViewItem(new string[] {
-                    track.Sounds.ToString(),
+                    track.Sounds ? "  ●" : "   -",
                     track.Name,
                     Synth.GetVoice(track.Index),
                     track.Channel.ToString(),
@@ -173,7 +173,7 @@ namespace MidiPlayer.Win64 {
             listView.View = View.Details;
             var _column1 = new ColumnHeader();
             _column1.Text = "On";
-            _column1.Width = 50;
+            _column1.Width = 40;
             var _column2 = new ColumnHeader();
             _column2.Text = "Name";
             _column2.Width = 180;
