@@ -15,21 +15,21 @@ namespace MidiPlayer {
 
         static readonly string APP_CONF_FILE_PATH = "storage/emulated/0/Android/data/com.studio.meowtoon.midiplayer/files/app_conf.json";
 
-        static Json json = null;
+        static Json _json = null;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Properties [noun, noun phrase, adjective] 
 
         public static bool Ready {
-            get => !(json is null);
+            get => !(_json is null);
         }
 
         public static App Value {
             get {
-                if (json is null) {
+                if (_json is null) {
                     return null;
                 }
-                return json.App;
+                return _json.App;
             }
         }
 
@@ -38,24 +38,24 @@ namespace MidiPlayer {
 
         public static void Load() {
             if (File.Exists(APP_CONF_FILE_PATH)) {
-                using (var _stream = new StreamReader(APP_CONF_FILE_PATH)) {
-                    json = loadJson(_stream.ReadToEnd().ToMemoryStream());
+                using (var stream = new StreamReader(APP_CONF_FILE_PATH)) {
+                    _json = loadJson(stream.ReadToEnd().ToMemoryStream());
                 }
             } else {
-                Synth _synth = new Synth();
-                _synth.SoundFontDir = "undefined";
-                _synth.MidiFileDir = "undefined";
-                App _app = new App();
-                _app.PlayList = null;
-                _app.Synth = _synth;
-                json = new Json();
-                json.App = _app;
+                Synth synth = new Synth();
+                synth.SoundFontDir = "undefined";
+                synth.MidiFileDir = "undefined";
+                App app = new App();
+                app.PlayList = null;
+                app.Synth = synth;
+                _json = new Json();
+                _json.App = app;
             }
         }
 
         public static void Save() {
-            using (var _stream = new FileStream(APP_CONF_FILE_PATH, FileMode.Create, FileAccess.Write)) {
-                saveJson(_stream);
+            using (var stream = new FileStream(APP_CONF_FILE_PATH, FileMode.Create, FileAccess.Write)) {
+                saveJson(stream);
             }
         }
 
@@ -63,14 +63,14 @@ namespace MidiPlayer {
         // private static Methods [verb, verb phrases]
 
         static Json loadJson(Stream target) {
-            var _serializer = new DataContractJsonSerializer(typeof(Json));
-            return (Json) _serializer.ReadObject(target);
+            var serializer = new DataContractJsonSerializer(typeof(Json));
+            return (Json) serializer.ReadObject(target);
         }
 
         static void saveJson(Stream target) {
-            using (var _writer = JsonReaderWriterFactory.CreateJsonWriter(target, Encoding.UTF8, true, true)) {
-                var _serializer = new DataContractJsonSerializer(typeof(Json));
-                _serializer.WriteObject(_writer, json);
+            using (var writer = JsonReaderWriterFactory.CreateJsonWriter(target, Encoding.UTF8, true, true)) {
+                var serializer = new DataContractJsonSerializer(typeof(Json));
+                serializer.WriteObject(writer, _json);
             }
         }
 

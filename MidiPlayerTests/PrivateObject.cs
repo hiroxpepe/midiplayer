@@ -11,33 +11,33 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        private readonly object obj;
+        private readonly object _obj;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
         public PrivateObject(object obj) {
-            this.obj = obj;
+            _obj = obj;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb, verb phrases]
 
         public object Invoke(string methodName, params object[] args) {
-            var _type = obj.GetType();
-            var _bindingFlags = BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance;
+            var type = _obj.GetType();
+            var bindingFlags = BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance;
             try {
-                return _type.InvokeMember(methodName, _bindingFlags, null, obj, args);
+                return type.InvokeMember(methodName, bindingFlags, null, _obj, args);
             } catch (Exception ex) {
                 throw ex.InnerException;
             }
         }
 
         public object Invoke(string methodName) {
-            var _type = obj.GetType();
-            var _bindingFlags = BindingFlags.InvokeMethod | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Instance;
+            var type = _obj.GetType();
+            var bindingFlags = BindingFlags.InvokeMethod | BindingFlags.GetProperty | BindingFlags.NonPublic | BindingFlags.Instance;
             try {
-                return _type.InvokeMember(methodName, _bindingFlags, null, obj, null);
+                return type.InvokeMember(methodName, bindingFlags, null, _obj, null);
             } catch (Exception ex) {
                 throw ex.InnerException;
             }

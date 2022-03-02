@@ -11,39 +11,39 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
-        static Logger logger = LogManager.GetCurrentClassLogger();
+        static Logger _logger = LogManager.GetCurrentClassLogger();
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public static Methods [verb, verb phrases]
 
         public static void Fatal(string target) {
-            LogEventInfo _event = new LogEventInfo(LogLevel.Fatal, logger.Name, target);
-            logger.Log(typeof(Log), _event);
+            LogEventInfo eventInfo = new LogEventInfo(LogLevel.Fatal, _logger.Name, target);
+            _logger.Log(typeof(Log), eventInfo);
         }
 
         public static void Error(string target) {
-            LogEventInfo _event = new LogEventInfo(LogLevel.Error, logger.Name, target);
-            logger.Log(typeof(Log), _event);
+            LogEventInfo eventInfo = new LogEventInfo(LogLevel.Error, _logger.Name, target);
+            _logger.Log(typeof(Log), eventInfo);
         }
 
         public static void Warn(string target) {
-            LogEventInfo _event = new LogEventInfo(LogLevel.Warn, logger.Name, target);
-            logger.Log(typeof(Log), _event);
+            LogEventInfo eventInfo = new LogEventInfo(LogLevel.Warn, _logger.Name, target);
+            _logger.Log(typeof(Log), eventInfo);
         }
 
         public static void Info(string target) {
-            LogEventInfo _event = new LogEventInfo(LogLevel.Info, logger.Name, target);
-            logger.Log(typeof(Log), _event);
+            LogEventInfo eventInfo = new LogEventInfo(LogLevel.Info, _logger.Name, target);
+            _logger.Log(typeof(Log), eventInfo);
         }
 
         public static void Debug(string target) {
-            LogEventInfo _event = new LogEventInfo(LogLevel.Debug, logger.Name, target);
-            logger.Log(typeof(Log), _event);
+            LogEventInfo eventInfo = new LogEventInfo(LogLevel.Debug, _logger.Name, target);
+            _logger.Log(typeof(Log), eventInfo);
         }
 
         public static void Trace(string target) {
-            LogEventInfo _event = new LogEventInfo(LogLevel.Trace, logger.Name, target);
-            logger.Log(typeof(Log), _event);
+            LogEventInfo eventInfo = new LogEventInfo(LogLevel.Trace, _logger.Name, target);
+            _logger.Log(typeof(Log), eventInfo);
         }
     }
 }

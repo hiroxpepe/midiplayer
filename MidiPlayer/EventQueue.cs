@@ -17,25 +17,25 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
-        static Map<int, Queue<Data>> queueMap = new Map<int, Queue<Data>>();
+        static Map<int, Queue<Data>> _queueMap = new Map<int, Queue<Data>>();
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Constructor
 
         static EventQueue() {
-            queueMap = new Map<int, Queue<Data>>();
-            Enumerable.Range(0, 16).ToList().ForEach(x => queueMap.Add(x, new Queue<Data>()));
+            _queueMap = new Map<int, Queue<Data>>();
+            Enumerable.Range(0, 16).ToList().ForEach(x => _queueMap.Add(x, new Queue<Data>()));
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public static Methods [verb, verb phrases]
 
         public static void Enqueue(int idx, Data value) {
-            queueMap[idx].Enqueue(value);
+            _queueMap[idx].Enqueue(value);
         }
 
         public static Data Dequeue(int idx) {
-            return queueMap[idx].Count == 0 ? null : queueMap[idx].Dequeue();
+            return _queueMap[idx].Count == 0 ? null : _queueMap[idx].Dequeue();
         }
     }
 
@@ -47,28 +47,28 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, noun phrase, adjective] 
 
-        int prog;
+        int _prog;
 
-        int pan;
+        int _pan;
 
-        int vol;
+        int _vol;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, noun phrase, adjective] 
 
         public int Prog {
-            get => prog - 1;
-            set => prog = value;
+            get => _prog - 1;
+            set => _prog = value;
         }
 
         public int Pan {
-            get => pan - 1;
-            set => pan = value;
+            get => _pan - 1;
+            set => _pan = value;
         }
 
         public int Vol {
-            get => vol - 1;
-            set => vol = value;
+            get => _vol - 1;
+            set => _vol = value;
         }
     }
 }

@@ -13,27 +13,27 @@ namespace MidiPlayer.Midi {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        Sequence sequence;
+        Sequence _sequence;
 
-        Map<int, (string name, int channel)> nameAndMidiChannelMap;
+        Map<int, (string name, int channel)> _nameAndMidiChannelMap;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
         public StandardMidiFile(string target) {
-            sequence = new Sequence();
-            sequence.Format = 1;
-            sequence.Load(target);
-            Map<int, (string name, int channel)> _nameAndMidiChannelMap;
-            _nameAndMidiChannelMap = new Map<int, (string name, int channel)>();
-            Enumerable.Range(0, sequence.Count).ToList().ForEach(x => {
-                _nameAndMidiChannelMap.Add(x, getTrackNameAndMidiChannel(x));
-            });
+            _sequence = new Sequence();
+            _sequence.Format = 1;
+            _sequence.Load(target);
+            Map<int, (string name, int channel)> nameAndMidiChannelMap;
             nameAndMidiChannelMap = new Map<int, (string name, int channel)>();
-            var _idx = 0;
-            _nameAndMidiChannelMap.ToList().ForEach(x => {
+            Enumerable.Range(0, _sequence.Count).ToList().ForEach(x => {
+                nameAndMidiChannelMap.Add(x, getTrackNameAndMidiChannel(x));
+            });
+            this._nameAndMidiChannelMap = new Map<int, (string name, int channel)>();
+            var idx = 0;
+            nameAndMidiChannelMap.ToList().ForEach(x => {
                 if (!x.Value.name.Equals("System Setup") && !(x.Value.name.Equals("") && x.Value.channel == -1)) { // no need track
-                    nameAndMidiChannelMap.Add(_idx++, x.Value);
+                    this._nameAndMidiChannelMap.Add(idx++, x.Value);
                 }
             });
         }
@@ -42,59 +42,59 @@ namespace MidiPlayer.Midi {
         // Properties [noun, noun phrase, adjective] 
 
         public int TrackCount {
-            get => nameAndMidiChannelMap.Where(x => x.Value.channel != -1).Count(); // exclude conductor track;
+            get => _nameAndMidiChannelMap.Where(x => x.Value.channel != -1).Count(); // exclude conductor track;
         }
 
         public List<int> MidiChannelList {
-            get => nameAndMidiChannelMap.Where(x => x.Value.channel != -1).Select(x => x.Value.channel).ToList();
+            get => _nameAndMidiChannelMap.Where(x => x.Value.channel != -1).Select(x => x.Value.channel).ToList();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb, verb phrases]
 
-        public string GetTrackName(int track) {
-            return nameAndMidiChannelMap[track].name;
+        public string GetTrackName(int trackIndex) {
+            return _nameAndMidiChannelMap[trackIndex].name;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb, verb phrases]
 
-        string getTrackName(int track) {
-            var _trackName = "undefined";
-            var _track = sequence[track];
-            for (var _idx = 0; _idx < _track.Count; _idx++) {
-                var _evt = _track.GetMidiEvent(_idx);
-                var _msg = _evt.MidiMessage;
-                if (_msg.MessageType == MessageType.Meta) {
-                    var _metaMsg = (MetaMessage) _msg;
-                    if (_metaMsg.MetaType == MetaType.TrackName) {
-                        var _data = _metaMsg.GetBytes();
-                        var _text = Encoding.UTF8.GetString(_data);
-                        _trackName = _text;
+        string getTrackName(int trackIndex) {
+            var trackName = "undefined";
+            var track = _sequence[trackIndex];
+            for (var idx = 0; idx < track.Count; idx++) {
+                var evt = track.GetMidiEvent(idx);
+                var msg = evt.MidiMessage;
+                if (msg.MessageType == MessageType.Meta) {
+                    var metaMsg = (MetaMessage) msg;
+                    if (metaMsg.MetaType == MetaType.TrackName) {
+                        var data = metaMsg.GetBytes();
+                        var text = Encoding.UTF8.GetString(data);
+                        trackName = text;
                         break;
                     }
                 }
             }
-            return _trackName;
+            return trackName;
         }
 
-        int getMidiChannel(int track) {
-            var _channel = -1; // conductor track gets -1;
-            var _track = sequence[track];
-            for (var _idx = 0; _idx < _track.Count; _idx++) {
-                var _evt = _track.GetMidiEvent(_idx);
-                var _msg = _evt.MidiMessage;
-                if (_msg.MessageType == MessageType.Channel) {
-                    var _chanMsg = (ChannelMessage) _msg;
-                    _channel = _chanMsg.MidiChannel;
+        int getMidiChannel(int trackIndex) {
+            var channel = -1; // conductor track gets -1;
+            var track = _sequence[trackIndex];
+            for (var idx = 0; idx < track.Count; idx++) {
+                var evt = track.GetMidiEvent(idx);
+                var msg = evt.MidiMessage;
+                if (msg.MessageType == MessageType.Channel) {
+                    var chanMsg = (ChannelMessage) msg;
+                    channel = chanMsg.MidiChannel;
                     break;
                 }
             }
-            return _channel;
+            return channel;
         }
 
-        (string name, int channel) getTrackNameAndMidiChannel(int track) {
-            return (getTrackName(track), getMidiChannel(track));
+        (string name, int channel) getTrackNameAndMidiChannel(int trackIndex) {
+            return (getTrackName(trackIndex), getMidiChannel(trackIndex));
         }
     }
 }
