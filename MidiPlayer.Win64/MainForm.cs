@@ -16,11 +16,11 @@ namespace MidiPlayer.Win64 {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        string soundFontPath = "undefined";
+        string _soundFontPath = "undefined";
 
-        string midiFilePath = "undefined";
+        string _midiFilePath = "undefined";
 
-        PlayList playList;
+        PlayList _playList;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
@@ -28,7 +28,7 @@ namespace MidiPlayer.Win64 {
         public MainForm() {
             InitializeComponent();
             DoubleBuffered = true;
-            playList = new PlayList();
+            _playList = new PlayList();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,28 +46,28 @@ namespace MidiPlayer.Win64 {
                 Log.Info("Started called.");
                 Invoke((MethodInvoker) (() => {
                     Text = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
-                    listView.Items.Clear();
+                    _listView.Items.Clear();
                     Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
-                        listView.Items.Add(new ListViewItem(new string[] { "  ●", "--", "--", "--", "--", "--" }));
+                        _listView.Items.Add(new ListViewItem(new string[] { "  ●", "--", "--", "--", "--", "--" }));
                     });
                 }));
             };
 
             Synth.Ended += () => {
                 Log.Info("Ended called.");
-                if (!playList.Ready) {
+                if (!_playList.Ready) {
                     Synth.Stop();
                     Synth.Start();
                 } else {
                     Synth.Stop();
-                    Synth.MidiFilePath = playList.Next;
+                    Synth.MidiFilePath = _playList.Next;
                     Synth.Start();
                 }
             };
 
             Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
-                var _track = (Synth.Track) sender;
-                Invoke(updateList(_track));
+                var track = (Synth.Track) sender;
+                Invoke(updateList(track));
             };
         }
 
@@ -77,10 +77,10 @@ namespace MidiPlayer.Win64 {
                 if (Synth.Playing) {
                     stopSong();
                 }
-                var _dialog = openFileDialog.ShowDialog();
-                if (_dialog == DialogResult.OK) {
-                    soundFontPath = Path.GetFullPath(openFileDialog.FileName);
-                    Synth.SoundFontPath = soundFontPath;
+                var dialog = _openFileDialog.ShowDialog();
+                if (dialog == DialogResult.OK) {
+                    _soundFontPath = Path.GetFullPath(_openFileDialog.FileName);
+                    Synth.SoundFontPath = _soundFontPath;
                 }
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -93,10 +93,10 @@ namespace MidiPlayer.Win64 {
                 if (Synth.Playing) {
                     stopSong();
                 }
-                var _dialog = openFileDialog.ShowDialog();
-                if (_dialog == DialogResult.OK) {
-                    midiFilePath = Path.GetFullPath(openFileDialog.FileName);
-                    Synth.MidiFilePath = midiFilePath;
+                var dialog = _openFileDialog.ShowDialog();
+                if (dialog == DialogResult.OK) {
+                    _midiFilePath = Path.GetFullPath(_openFileDialog.FileName);
+                    Synth.MidiFilePath = _midiFilePath;
                 }
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -106,7 +106,7 @@ namespace MidiPlayer.Win64 {
         void buttonStart_Click(object sender, EventArgs e) {
             Log.Info("buttonStart clicked.");
             try {
-                if (!midiFilePath.HasValue()) {
+                if (!_midiFilePath.HasValue()) {
                     return;
                 }
                 playSong();
@@ -130,11 +130,11 @@ namespace MidiPlayer.Win64 {
         async void playSong() {
             try {
                 await Task.Run(() => {
-                    if (!playList.Ready) {
-                        Synth.MidiFilePath = midiFilePath;
+                    if (!_playList.Ready) {
+                        Synth.MidiFilePath = _midiFilePath;
                         Synth.Start();
                     } else {
-                        Synth.MidiFilePath = playList.Next;
+                        Synth.MidiFilePath = _playList.Next;
                         Synth.Start();
                     }
                 });
@@ -148,7 +148,7 @@ namespace MidiPlayer.Win64 {
                 await Task.Run(() => Synth.Stop());
                 Invoke((MethodInvoker) (() => {
                     Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
-                        listView.Items[x].SubItems[0].ForeColor = Color.Black;
+                        _listView.Items[x].SubItems[0].ForeColor = Color.Black;
                     });
                 }));
             } catch (Exception ex) {
@@ -158,9 +158,9 @@ namespace MidiPlayer.Win64 {
 
         MethodInvoker updateList(Synth.Track track) {
             const int _column1Idx = 0;
-            var _trackIdx = track.Index - 1; // exclude conductor track;
+            var trackIdx = track.Index - 1; // exclude conductor track;
             return () => {
-                var _listViewItem = new ListViewItem(new string[] {
+                var listViewItem = new ListViewItem(new string[] {
                     "  ●",
                     track.Name,
                     Synth.GetVoice(track.Index),
@@ -168,44 +168,44 @@ namespace MidiPlayer.Win64 {
                     track.Bank.ToString(),
                     track.Program.ToString()
                 });
-                listView.BeginUpdate();
-                listView.Items[_trackIdx] = _listViewItem;
-                listView.Items[_trackIdx].UseItemStyleForSubItems = false;
+                _listView.BeginUpdate();
+                _listView.Items[trackIdx] = listViewItem;
+                _listView.Items[trackIdx].UseItemStyleForSubItems = false;
                 if (track.Sounds) {
-                    listView.Items[_trackIdx].SubItems[_column1Idx].ForeColor = Color.Lime;
+                    _listView.Items[trackIdx].SubItems[_column1Idx].ForeColor = Color.Lime;
                 } else {
-                    listView.Items[_trackIdx].SubItems[_column1Idx].ForeColor = Color.Black;
+                    _listView.Items[trackIdx].SubItems[_column1Idx].ForeColor = Color.Black;
                 }
-                listView.EndUpdate();
+                _listView.EndUpdate();
             };
         }
 
         void initializeControl() {
             // initialize ListView
-            listView.FullRowSelect = true;
-            listView.GridLines = true;
-            listView.Sorting = SortOrder.None; // do not sort automatically.
-            listView.View = View.Details;
-            var _column1 = new ColumnHeader();
-            _column1.Text = "On";
-            _column1.Width = 40;
-            var _column2 = new ColumnHeader();
-            _column2.Text = "Name";
-            _column2.Width = 180;
-            var _column3 = new ColumnHeader();
-            _column3.Text = "Voice";
-            _column3.Width = 180;
-            var _column4 = new ColumnHeader();
-            _column4.Text = "Chan";
-            _column4.Width = 50;
-            var _column5 = new ColumnHeader();
-            _column5.Text = "Bank";
-            _column5.Width = 50;
-            var _column6 = new ColumnHeader();
-            _column6.Text = "Prog";
-            _column6.Width = 50;
-            ColumnHeader[] _columnHeaderArray = { _column1, _column2, _column3, _column4, _column5, _column6 };
-            listView.Columns.AddRange(_columnHeaderArray);
+            _listView.FullRowSelect = true;
+            _listView.GridLines = true;
+            _listView.Sorting = SortOrder.None; // do not sort automatically.
+            _listView.View = View.Details;
+            var column1 = new ColumnHeader();
+            column1.Text = "On";
+            column1.Width = 40;
+            var column2 = new ColumnHeader();
+            column2.Text = "Name";
+            column2.Width = 180;
+            var column3 = new ColumnHeader();
+            column3.Text = "Voice";
+            column3.Width = 180;
+            var column4 = new ColumnHeader();
+            column4.Text = "Chan";
+            column4.Width = 50;
+            var column5 = new ColumnHeader();
+            column5.Text = "Bank";
+            column5.Width = 50;
+            var column6 = new ColumnHeader();
+            column6.Text = "Prog";
+            column6.Width = 50;
+            ColumnHeader[] columnHeaderArray = { column1, column2, column3, column4, column5, column6 };
+            _listView.Columns.AddRange(columnHeaderArray);
         }
     }
 }

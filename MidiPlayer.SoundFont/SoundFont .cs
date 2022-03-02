@@ -12,29 +12,29 @@ namespace MidiPlayer.SoundFont {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        NAudio.SoundFont.SoundFont soundFont;
+        NAudio.SoundFont.SoundFont _soundFont;
 
-        Map<int, List<Voice>> map;
+        Map<int, List<Voice>> _map;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
         public SoundFontInfo(string target) {
             try {
-                soundFont = new NAudio.SoundFont.SoundFont(target);
-                var _map = new Map<int, List<Voice>>();
-                soundFont.Presets.ToList().ForEach(x => {
-                    if (!_map.ContainsKey(x.Bank)) {
-                        var _newList = new List<Voice>();
-                        _newList.Add(new Voice() { Prog = x.PatchNumber, Name = x.Name });
-                        _map.Add(x.Bank, _newList); // new bank and new voice
+                _soundFont = new NAudio.SoundFont.SoundFont(target);
+                var map = new Map<int, List<Voice>>();
+                _soundFont.Presets.ToList().ForEach(x => {
+                    if (!map.ContainsKey(x.Bank)) {
+                        var newList = new List<Voice>();
+                        newList.Add(new Voice() { Prog = x.PatchNumber, Name = x.Name });
+                        map.Add(x.Bank, newList); // new bank and new voice
                     } else {
-                        _map[x.Bank].Add(new Voice() { Prog = x.PatchNumber, Name = x.Name }); // exists bank and new voice
+                        map[x.Bank].Add(new Voice() { Prog = x.PatchNumber, Name = x.Name }); // exists bank and new voice
                     }
                 });
-                map = new Map<int, List<Voice>>();
-                _map.OrderBy(x => x.Key).ToList().ForEach(x => { // sort bank
-                    map.Add(x.Key, x.Value.OrderBy(_x => _x.Prog).ToList()); // sort prog
+                this._map = new Map<int, List<Voice>>();
+                map.OrderBy(x => x.Key).ToList().ForEach(x => { // sort bank
+                    this._map.Add(x.Key, x.Value.OrderBy(_x => _x.Prog).ToList()); // sort prog
                 });
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -45,12 +45,12 @@ namespace MidiPlayer.SoundFont {
         // public Methods [verb, verb phrases]
 
         public string GetVoice(int bank, int prog) {
-            var _voice = map[bank];
-            var _result = _voice.Where(x => x.Prog == prog);
-            if (_result.Count() == 0) {
-                return map[0].Where(x => x.Prog == prog).First().Name; // return default bank's voice.
+            var voice = _map[bank];
+            var result = voice.Where(x => x.Prog == prog);
+            if (result.Count() == 0) {
+                return _map[0].Where(x => x.Prog == prog).First().Name; // return default bank's voice.
             } else {
-                return _voice.Where(x => x.Prog == prog).First().Name;
+                return voice.Where(x => x.Prog == prog).First().Name;
             }
         }
 
