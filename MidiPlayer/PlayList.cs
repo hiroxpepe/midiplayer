@@ -10,38 +10,38 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        List<string> targetList = new List<string>();
+        List<string> _targetList = new List<string>();
 
-        int idx;
+        int _idx;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
         public PlayList() {
-            idx = 0;
+            _idx = 0;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, noun phrase, adjective] 
 
         public bool Ready {
-            get => targetList.Count == 0 ? false : true;
+            get => _targetList.Count == 0 ? false : true;
         }
 
         public string[] List {
-            get => targetList.ToArray();
+            get => _targetList.ToArray();
         }
 
         public string Current {
-            get => targetList[idx];
+            get => _targetList[_idx];
         }
 
         public string Next {
             get {
-                if (idx == targetList.Count) {
-                    idx = 0;
+                if (_idx == _targetList.Count) {
+                    _idx = 0;
                 }
-                return targetList[idx++];
+                return _targetList[_idx++];
             }
         }
 
@@ -49,11 +49,11 @@ namespace MidiPlayer {
         // public Methods [verb, verb phrases]
 
         public void Add(string target) {
-            targetList.Add(target);
+            _targetList.Add(target);
         }
 
         public void Clear() {
-            targetList.Clear();
+            _targetList.Clear();
         }
     }
 }

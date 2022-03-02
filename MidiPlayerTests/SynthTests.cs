@@ -11,62 +11,62 @@ namespace MidiPlayer.Test {
     public class SynthTests {
         [TestMethod()]
         public void GetBankTest1() {
-            var _result = Synth.GetBank(0);
-            AreEqual(0, _result);
+            var result = Synth.GetBank(0);
+            AreEqual(0, result);
         }
 
         [TestMethod()]
         public void GetBankTest2() {
-            var _result = Synth.GetBank(7);
-            AreEqual(128, _result);
+            var result = Synth.GetBank(7);
+            AreEqual(128, result);
         }
 
         [TestMethod()]
         public void GetProgramTest1() {
-            var _result = Synth.GetProgram(1);
-            AreEqual(58, _result);
+            var result = Synth.GetProgram(1);
+            AreEqual(58, result);
         }
 
         [TestMethod()]
         public void GetProgramTest2() {
-            var _result = Synth.GetProgram(8);
-            AreEqual(16, _result);
+            var result = Synth.GetProgram(8);
+            AreEqual(16, result);
         }
 
         [TestMethod()]
         public void GetVoiceTest1() {
-            var _result = Synth.GetVoice(1);
-            AreEqual("Tuba", _result);
+            var result = Synth.GetVoice(1);
+            AreEqual("Tuba", result);
         }
 
         [TestMethod()]
         public void GetVoiceTest2() {
-            var _result = Synth.GetVoice(8);
-            AreEqual("Power Kit", _result);
+            var result = Synth.GetVoice(8);
+            AreEqual("Power Kit", result);
         }
 
         [TestMethod()]
         public void GetVoiceTest3() {
-            var _result = Synth.GetVoice(4);
-            AreEqual("Warm Pad", _result);
+            var result = Synth.GetVoice(4);
+            AreEqual("Warm Pad", result);
         }
 
         [TestMethod()]
         public void GetTrackNameTest1() {
-            var _result = Synth.GetTrackName(0);
-            AreEqual("Cmon", _result);
+            var result = Synth.GetTrackName(0);
+            AreEqual("Cmon", result);
         }
 
         [TestMethod()]
         public void GetTrackNameTest2() {
-            var _result = Synth.GetTrackName(6);
-            AreEqual("Bass", _result);
+            var result = Synth.GetTrackName(6);
+            AreEqual("Bass", result);
         }
 
         [TestMethod()]
         public void GetTrackNameTest3() {
-            var _result = Synth.GetTrackName(7);
-            AreEqual("Drum OverTop", _result);
+            var result = Synth.GetTrackName(7);
+            AreEqual("Drum OverTop", result);
         }
 
         [TestInitialize]
