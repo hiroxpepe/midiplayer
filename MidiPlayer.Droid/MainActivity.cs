@@ -40,11 +40,17 @@ namespace MidiPlayer.Droid {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // EventHandler
 
+        /// <summary>
+        /// Activity OnRequestPermissionsResult().
+        /// </summary>
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults) {
             Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
+        /// <summary>
+        /// Activity OnCreate()
+        /// </summary>
         protected override void OnCreate(Bundle? savedInstanceState) {
             base.OnCreate(savedInstanceState);
             requestPermissions();
@@ -55,10 +61,25 @@ namespace MidiPlayer.Droid {
             initializeComponent();
             Conf.Load();
 
+            // load previous setting.
+            if (Env.ExistsSoundFont && Env.ExistsMidiFile) {
+                Synth.SoundFontPath = Env.SoundFontPath;
+                Synth.MidiFilePath = Env.MidiFilePath;
+                Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
+                _soundFontPath = Env.SoundFontPath;
+                _midiFilePath = Env.MidiFilePath;
+            }
+
+            /// <summary>
+            /// add a callback function to be called when the synth is playback.
+            /// </summary>
             Synth.Playbacking += (IntPtr data, IntPtr evt) => {
                 return Synth.HandleEvent(data, evt);
             };
 
+            /// <summary>
+            /// add a callback function to be called when the synth started.
+            /// </summary>
             Synth.Started += () => {
                 Log.Info("Started called.");
                 MainThread.BeginInvokeOnMainThread(() => {
@@ -66,6 +87,9 @@ namespace MidiPlayer.Droid {
                 });
             };
 
+            /// <summary>
+            /// add a callback function to be called when the synth ended.
+            /// </summary>
             Synth.Ended += () => {
                 Log.Info("Ended called.");
                 if (!_playList.Ready) {
@@ -79,24 +103,37 @@ namespace MidiPlayer.Droid {
             };
         }
 
+        /// <summary>
+        /// Activity OnStart.
+        /// </summary>
         protected override void OnStart() {
             base.OnStart();
         }
 
+        /// <summary>
+        /// Activity OnResume.
+        /// </summary>
         protected override void OnResume() {
             base.OnResume();
         }
 
+        /// <summary>
+        /// Activity OnPause.
+        /// </summary>
         protected override void OnPause() {
             base.OnPause();
         }
 
+        /// <summary>
+        /// Activity OnStop.
+        /// </summary>
         protected override void OnStop() {
             base.OnStop();
-            Conf.Value.PlayList = _playList.List;
-            Conf.Save();
         }
 
+        /// <summary>
+        /// Activity OnDestroy.
+        /// </summary>
         protected override void OnDestroy() {
             try {
                 stopSong();
@@ -107,6 +144,9 @@ namespace MidiPlayer.Droid {
             }
         }
 
+        /// <summary>
+        /// Activity OnActivityResult.
+        /// </summary>
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data) {
             switch (requestCode) {
                 case (int) Request.SoundFont:
@@ -118,18 +158,20 @@ namespace MidiPlayer.Droid {
                     Log.Info($"selected: {_soundFontPath}");
                     Synth.SoundFontPath = _soundFontPath;
                     Env.SoundFontDir = _soundFontPath.ToDirectoryName();
-                    Title = $"MidiPlayer: {this._midiFilePath.ToFileName()} {_soundFontPath.ToFileName()}";
+                    Env.SoundFontName = _soundFontPath.ToFileName();
+                    Title = $"MidiPlayer: {_midiFilePath.ToFileName()} {_soundFontPath.ToFileName()}";
                     break;
                 case (int) Request.MidiFile:
-                    this._midiFilePath = getActualPathBy(data);
-                    if (!(this._midiFilePath.Contains(".MID") || this._midiFilePath.Contains(".mid"))) {
+                    _midiFilePath = getActualPathBy(data);
+                    if (!(_midiFilePath.Contains(".MID") || _midiFilePath.Contains(".mid"))) {
                         Log.Warn("not a midi file.");
                         break;
                     }
-                    Log.Info($"selected: {this._midiFilePath}");
-                    Synth.MidiFilePath = this._midiFilePath;
-                    Env.MidiFileDir = this._midiFilePath.ToDirectoryName();
-                    Title = $"MidiPlayer: {this._midiFilePath.ToFileName()} {_soundFontPath.ToFileName()}";
+                    Log.Info($"selected: {_midiFilePath}");
+                    Synth.MidiFilePath = _midiFilePath;
+                    Env.MidiFileDir = _midiFilePath.ToDirectoryName();
+                    Env.MidiFileName = _midiFilePath.ToFileName();
+                    Title = $"MidiPlayer: {_midiFilePath.ToFileName()} {_soundFontPath.ToFileName()}";
                     break;
                 case (int) Request.AddPlayList:
                     var midiFilePath = getActualPathBy(data);
@@ -140,6 +182,7 @@ namespace MidiPlayer.Droid {
                     Log.Info($"selected: {midiFilePath}");
                     _playList.Add(midiFilePath); // add to playlist
                     Env.MidiFileDir = midiFilePath.ToDirectoryName();
+                    Env.MidiFileName = midiFilePath.ToFileName();
                     break;
                 default:
                     break;
@@ -152,7 +195,7 @@ namespace MidiPlayer.Droid {
                 if (Synth.Playing) {
                     stopSong();
                 }
-                callIntent(Env.SoundFontDir, (int) Request.SoundFont);
+                callIntent(Env.SoundFontDirForIntent, (int) Request.SoundFont);
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
@@ -164,7 +207,7 @@ namespace MidiPlayer.Droid {
                 if (Synth.Playing) {
                     stopSong();
                 }
-                callIntent(Env.MidiFileDir, (int) Request.MidiFile);
+                callIntent(Env.MidiFileDirForIntent, (int) Request.MidiFile);
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
@@ -173,7 +216,8 @@ namespace MidiPlayer.Droid {
         void buttonStart_Click(object sender, EventArgs e) {
             Log.Info("buttonStart clicked.");
             try {
-                if (!_midiFilePath.HasValue()) {
+                if (!_midiFilePath.HasValue()) { // FIXME: case sounFdont
+                    Log.Warn("midiFilePath has no value.");
                     return;
                 }
                 playSong();
@@ -259,6 +303,9 @@ namespace MidiPlayer.Droid {
             return path;
         }
 
+        /// <summary>
+        /// play the song.
+        /// </summary>
         async void playSong() {
             try {
                 await Task.Run(() => {
@@ -270,22 +317,31 @@ namespace MidiPlayer.Droid {
                         Synth.Start();
                     }
                 });
-                logMemoryInto();
+                logMemoryInro();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
         }
 
+        /// <summary>
+        /// stop the song.
+        /// </summary>
         async void stopSong() {
             try {
                 await Task.Run(() => Synth.Stop());
-                logMemoryInto();
+                Conf.Value.PlayList = _playList.List; // TODO: save
+                Conf.Save(); // TODO: save
+                logMemoryInro();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
         }
 
-        static void logMemoryInto() {
+        /// <summary>
+        /// show memory information to log.
+        /// FIXME: delete
+        /// </summary>
+        static void logMemoryInro() {
             var maxMemory = Java.Lang.Runtime.GetRuntime().MaxMemory();
             var freeMemory = Java.Lang.Runtime.GetRuntime().FreeMemory();
             var totalMemory = Java.Lang.Runtime.GetRuntime().TotalMemory();

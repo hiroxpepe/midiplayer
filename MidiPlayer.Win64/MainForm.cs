@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace MidiPlayer.Win64 {
     /// <summary>
-    /// main form for app
+    /// main form for the application.
     /// </summary>
     public partial class MainForm : Form {
 #nullable enable
@@ -120,6 +120,7 @@ namespace MidiPlayer.Win64 {
             Log.Info("buttonStop clicked.");
             try {
                 stopSong();
+                Conf.Save();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
