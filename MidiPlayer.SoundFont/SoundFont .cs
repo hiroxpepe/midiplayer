@@ -8,6 +8,7 @@ namespace MidiPlayer.SoundFont {
     /// class for soundfont information
     /// </summary>
     public class SoundFontInfo {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]

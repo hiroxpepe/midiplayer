@@ -6,6 +6,7 @@ using System.Collections.Generic;
 namespace MidiPlayer.Midi.Test {
     [TestClass()]
     public class StandardMidiFileTests {
+#nullable enable
         [TestMethod()]
         public void getTrackNameAndMidiChannelTest1() {
             var target = new StandardMidiFile("../data/Cmon_v1.mid");

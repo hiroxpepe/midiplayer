@@ -5,6 +5,7 @@ using static Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 namespace MidiPlayer.SoundFont.Tests {
     [TestClass()]
     public class SoundFontInfoTests {
+#nullable enable
         [TestMethod()]
         public void GetVoiceTest() {
             var target = new SoundFontInfo("../data/OmegaGMGS2.sf2");

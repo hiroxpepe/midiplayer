@@ -13,7 +13,7 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
-        static readonly string APP_CONF_FILE_PATH = "storage/emulated/0/Android/data/com.studio.meowtoon.midiplayer/files/app_conf.json";
+        const string APP_CONF_FILE_PATH = "storage/emulated/0/Android/data/com.studio.meowtoon.midiplayer/files/app_conf.json";
 
         static Json _json = null;
 
@@ -38,9 +38,8 @@ namespace MidiPlayer {
 
         public static void Load() {
             if (File.Exists(APP_CONF_FILE_PATH)) {
-                using (var stream = new StreamReader(APP_CONF_FILE_PATH)) {
-                    _json = loadJson(stream.ReadToEnd().ToMemoryStream());
-                }
+                using var stream = new StreamReader(APP_CONF_FILE_PATH);
+                _json = loadJson(stream.ReadToEnd().ToMemoryStream());
             } else {
                 Synth synth = new Synth();
                 synth.SoundFontDir = "undefined";
@@ -54,9 +53,8 @@ namespace MidiPlayer {
         }
 
         public static void Save() {
-            using (var stream = new FileStream(APP_CONF_FILE_PATH, FileMode.Create, FileAccess.Write)) {
-                saveJson(stream);
-            }
+            using var stream = new FileStream(APP_CONF_FILE_PATH, FileMode.Create, FileAccess.Write);
+            saveJson(stream);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,10 +66,9 @@ namespace MidiPlayer {
         }
 
         static void saveJson(Stream target) {
-            using (var writer = JsonReaderWriterFactory.CreateJsonWriter(target, Encoding.UTF8, true, true)) {
-                var serializer = new DataContractJsonSerializer(typeof(Json));
-                serializer.WriteObject(writer, _json);
-            }
+            using var writer = JsonReaderWriterFactory.CreateJsonWriter(target, Encoding.UTF8, true, true);
+            var serializer = new DataContractJsonSerializer(typeof(Json));
+            serializer.WriteObject(writer, _json);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

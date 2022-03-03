@@ -5,6 +5,7 @@ using static Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 namespace MidiPlayer.Test {
     [TestClass()]
     public class PlayListTests {
+#nullable enable
         [TestMethod()]
         public void NextTest1() {
             var target = new PlayList();

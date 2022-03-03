@@ -6,6 +6,8 @@ using System.Windows.Forms;
 
 namespace MidiPlayer.Win64 {
     static class Program {
+#nullable enable
+
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
