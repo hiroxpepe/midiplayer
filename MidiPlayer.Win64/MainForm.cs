@@ -189,22 +189,22 @@ namespace MidiPlayer.Win64 {
             _listView.View = View.Details;
             var column1 = new ColumnHeader();
             column1.Text = "On";
-            column1.Width = 40;
+            column1.Width = 35;
             var column2 = new ColumnHeader();
             column2.Text = "Name";
-            column2.Width = 180;
+            column2.Width = 115;
             var column3 = new ColumnHeader();
             column3.Text = "Voice";
-            column3.Width = 180;
+            column3.Width = 115;
             var column4 = new ColumnHeader();
             column4.Text = "Chan";
-            column4.Width = 50;
+            column4.Width = 45;
             var column5 = new ColumnHeader();
             column5.Text = "Bank";
-            column5.Width = 50;
+            column5.Width = 45;
             var column6 = new ColumnHeader();
             column6.Text = "Prog";
-            column6.Width = 50;
+            column6.Width = 45;
             ColumnHeader[] columnHeaderArray = { column1, column2, column3, column4, column5, column6 };
             _listView.Columns.AddRange(columnHeaderArray);
         }
