@@ -9,6 +9,7 @@ namespace MidiPlayer.Midi {
     /// class for standard midi file
     /// </summary>
     public class StandardMidiFile {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]

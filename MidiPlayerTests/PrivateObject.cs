@@ -7,6 +7,7 @@ namespace MidiPlayer {
     /// PrivateObject for MSTest
     /// </summary>
     public class PrivateObject {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]

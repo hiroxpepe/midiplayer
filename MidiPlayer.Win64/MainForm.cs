@@ -12,6 +12,7 @@ namespace MidiPlayer.Win64 {
     /// main form for app
     /// </summary>
     public partial class MainForm : Form {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
