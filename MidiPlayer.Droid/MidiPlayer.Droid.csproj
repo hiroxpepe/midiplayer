@@ -374,7 +374,7 @@
     <PackageReference Include="Xamarin.AndroidX.AppCompat.Resources" Version="1.1.0" />
     <PackageReference Include="Xamarin.AndroidX.AppCompat.AppCompatResources" Version="1.2.0.7" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.1" />
-    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.4.0" />
+    <PackageReference Include="Xamarin.Google.Android.Material" Version="1.3.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MidiPlayer.FluidSynth\MidiPlayer.FluidSynth.csproj">
