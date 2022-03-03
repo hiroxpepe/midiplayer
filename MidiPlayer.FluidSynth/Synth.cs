@@ -41,9 +41,9 @@ namespace MidiPlayer {
 
         static Action<object, PropertyChangedEventArgs> _onUpdated;
 
-        static string _soundFontPath;
+        static string _soundFontPath = string.Empty;
 
-        static string _midiFilePath;
+        static string _midiFilePath = string.Empty;
 
         static SoundFontInfo _soundFontInfo;
 
@@ -439,7 +439,7 @@ namespace MidiPlayer {
             /// <summary>
             /// implementation for INotifyPropertyChanged
             /// </summary>
-            public event PropertyChangedEventHandler PropertyChanged;
+            public event PropertyChangedEventHandler? PropertyChanged;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, noun phrase, adjective]
