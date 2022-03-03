@@ -45,7 +45,7 @@ namespace MidiPlayer.Droid {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
-        protected override void OnCreate(Bundle savedInstanceState) {
+        protected override void OnCreate(Bundle? savedInstanceState) {
             base.OnCreate(savedInstanceState);
             requestPermissions();
             Platform.Init(this, savedInstanceState);
@@ -107,7 +107,7 @@ namespace MidiPlayer.Droid {
             }
         }
 
-        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data) {
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data) {
             switch (requestCode) {
                 case (int) Request.SoundFont:
                     _soundFontPath = getActualPathBy(data);
