@@ -9,6 +9,7 @@ using static System.Threading.Thread;
 namespace MidiPlayer.Test {
     [TestClass()]
     public class SynthTests {
+#nullable enable
         [TestMethod()]
         public void GetBankTest1() {
             var result = Synth.GetBank(0);

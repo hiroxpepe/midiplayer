@@ -7,6 +7,7 @@ namespace MidiPlayer.Droid {
     ///  partial class for initialize the component
     /// </summary>
     public partial class MainActivity : AppCompatActivity {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb, verb phrases]

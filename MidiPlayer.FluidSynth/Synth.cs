@@ -18,6 +18,7 @@ using MidiPlayer.SoundFont;
 namespace MidiPlayer {
 
     public class Synth {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]

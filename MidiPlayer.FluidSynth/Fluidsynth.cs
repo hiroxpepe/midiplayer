@@ -10,6 +10,7 @@ using fluid_midi_event_t = System.IntPtr;
 namespace NativeFuncs {
 
     internal static class Fluidsynth {
+#nullable enable
 
         // must set to MidiPlayer.FluidSynth.csproj
 #if RUNTIME_LINUX
