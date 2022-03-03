@@ -7,6 +7,7 @@ namespace MidiPlayer {
     /// NOTE: using NLog
     /// </summary>
     public static class Log {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]

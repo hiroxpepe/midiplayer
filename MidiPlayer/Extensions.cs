@@ -8,6 +8,7 @@ namespace MidiPlayer {
     /// common extension method
     /// </summary>
     public static class Extensions {
+#nullable enable
 
         /// <summary>
         /// to memory stream
@@ -38,14 +39,14 @@ namespace MidiPlayer {
         }
 
         /// <summary>
-        /// returns TRUE if the string is not null or an empty string "".
+        /// returns true if the string is not null or an empty string "" or "undefined".
         /// </summary>
         public static bool HasValue(this string source) {
-            return !(source is null || source.Equals(""));
+            return !(source is null || source.Equals("") || source.Equals("undefined"));
         }
 
         /// <summary>
-        /// returns TRUE if IntPtr is IntPtr.Zero.
+        /// returns true if IntPtr is IntPtr.Zero.
         /// </summary>
         public static bool IsZero(this IntPtr source) {
             return source == IntPtr.Zero;

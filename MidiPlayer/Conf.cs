@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
@@ -6,14 +7,13 @@ using System.Text;
 
 namespace MidiPlayer {
     /// <summary>
-    /// config for app
+    /// config file for for the application.
     /// </summary>
     public class Conf {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
-
-        const string APP_CONF_FILE_PATH = "storage/emulated/0/Android/data/com.studio.meowtoon.midiplayer/files/app_conf.json";
 
         static Json _json = null;
 
@@ -36,10 +36,18 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public static Methods [verb, verb phrases]
 
+        /// <summary>
+        /// load the app_conf.json file.
+        /// </summary>
         public static void Load() {
-            if (File.Exists(APP_CONF_FILE_PATH)) {
-                using var stream = new StreamReader(APP_CONF_FILE_PATH);
+            if (File.Exists(ConfEnv.ConfPath)) {
+                using var stream = new StreamReader(ConfEnv.ConfPath);
                 _json = loadJson(stream.ReadToEnd().ToMemoryStream());
+                Log.Info("Conf loaded.");
+                Log.Info("Conf soundFontDir: " + _json.App.Synth.SoundFontDir);
+                Log.Info("Conf soundFontName: " + _json.App.Synth.SoundFontName);
+                Log.Info("Conf midiFileDir: " + _json.App.Synth.MidiFileDir);
+                Log.Info("Conf midiFileName: " + _json.App.Synth.MidiFileName);
             } else {
                 Synth synth = new Synth();
                 synth.SoundFontDir = "undefined";
@@ -52,9 +60,20 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>
+        /// save the app_conf.json file.
+        /// </summary>
         public static void Save() {
-            using var stream = new FileStream(APP_CONF_FILE_PATH, FileMode.Create, FileAccess.Write);
+            if (!Directory.Exists(ConfEnv.ConfDir)) {
+                Directory.CreateDirectory(ConfEnv.ConfDir);
+            }
+            using var stream = new FileStream(ConfEnv.ConfPath, FileMode.Create, FileAccess.Write);
             saveJson(stream);
+            Log.Info("Conf saved.");
+            Log.Info("Conf soundFontDir: " + _json.App.Synth.SoundFontDir);
+            Log.Info("Conf soundFontName: " + _json.App.Synth.SoundFontName);
+            Log.Info("Conf midiFileDir: " + _json.App.Synth.MidiFileDir);
+            Log.Info("Conf midiFileName: " + _json.App.Synth.MidiFileName);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,6 +92,43 @@ namespace MidiPlayer {
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
+
+        class ConfEnv {
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // static Fields [nouns, noun phrases]
+
+            const string WIN64_PATH = "conf\\app_conf.json";//"conf\\app_conf.json";
+
+            const string ANDROID_PATH = "storage/emulated/0/Android/data/com.studio.meowtoon.midiplayer/files/app_conf.json";
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Properties [noun, noun phrase, adjective] 
+
+            public static string ConfPath {
+                get {
+                    var os = Environment.OSVersion;
+                    if (os.Platform == PlatformID.Win32NT) {
+                        return WIN64_PATH;
+                    } else if (os.Platform == PlatformID.Unix) {
+                        return ANDROID_PATH;
+                    }
+                    return string.Empty;
+                }
+            }
+
+            public static string ConfDir {
+                get {
+                    var os = Environment.OSVersion;
+                    if (os.Platform == PlatformID.Win32NT) {
+                        return WIN64_PATH.Replace("\\app_conf.json", "");
+                    } else if (os.Platform == PlatformID.Unix) {
+                        return ANDROID_PATH.Replace("/app_conf.json", "");
+                    }
+                    return string.Empty;
+                }
+            }
+        }
 
         [DataContract]
         class Json {
@@ -102,6 +158,14 @@ namespace MidiPlayer {
             }
             [DataMember(Name = "midi_file_dir")]
             public string MidiFileDir {
+                get; set;
+            }
+            [DataMember(Name = "sound_font_name")]
+            public string SoundFontName {
+                get; set;
+            }
+            [DataMember(Name = "midi_file_name")]
+            public string MidiFileName {
                 get; set;
             }
         }
