@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayer.Win64", "MidiPla
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayer.SoundFont", "MidiPlayer.SoundFont\MidiPlayer.SoundFont.csproj", "{2696249B-3E24-4537-93A5-70F87E7546B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiPlayer.Midi", "MidiPlayer.Midi\MidiPlayer.Midi.csproj", "{131BB0F6-CE56-4369-8E13-627C211C5BA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayer.Midi", "MidiPlayer.Midi\MidiPlayer.Midi.csproj", "{131BB0F6-CE56-4369-8E13-627C211C5BA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
