@@ -13,6 +13,7 @@ namespace MidiPlayer {
     /// event queue class to send synth
     /// </summary>
     public class EventQueue {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]

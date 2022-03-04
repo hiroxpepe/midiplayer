@@ -97,6 +97,7 @@ namespace MidiPlayer {
             set {
                 _soundFontPath = value;
                 _soundFontInfo = new SoundFontInfo(_soundFontPath);
+                Log.Info("Synth set soundFontPath.");
             }
         }
 
@@ -105,6 +106,7 @@ namespace MidiPlayer {
             set {
                 _midiFilePath = value;
                 _standardMidiFile = new StandardMidiFile(_midiFilePath);
+                Log.Info("Synth set midiFilePath.");
             }
         }
 

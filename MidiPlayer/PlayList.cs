@@ -6,6 +6,7 @@ namespace MidiPlayer {
     /// playlist for synth
     /// </summary>
     public class PlayList {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
