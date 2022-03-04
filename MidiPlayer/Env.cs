@@ -74,13 +74,21 @@ namespace MidiPlayer {
 
         public static string SoundFontPath {
             get {
-                return $"{SoundFontDir}/{SoundFontName}"; // TODO: Win64
+                return $"{SoundFontDir}/{SoundFontName}";
+            }
+            set {
+                SoundFontDir = value.ToDirectoryName();
+                SoundFontName = value.ToFileName();
             }
         }
 
         public static string MidiFilePath {
             get {
-                return $"{MidiFileDir}/{MidiFileName}"; // TODO: Win64
+                return $"{MidiFileDir}/{MidiFileName}";
+            }
+            set {
+                MidiFileDir = value.ToDirectoryName();
+                MidiFileName = value.ToFileName();
             }
         }
 

@@ -157,8 +157,7 @@ namespace MidiPlayer.Droid {
                     }
                     Log.Info($"selected: {_soundFontPath}");
                     Synth.SoundFontPath = _soundFontPath;
-                    Env.SoundFontDir = _soundFontPath.ToDirectoryName();
-                    Env.SoundFontName = _soundFontPath.ToFileName();
+                    Env.SoundFontPath = _soundFontPath;
                     Title = $"MidiPlayer: {_midiFilePath.ToFileName()} {_soundFontPath.ToFileName()}";
                     break;
                 case (int) Request.MidiFile:
@@ -169,8 +168,7 @@ namespace MidiPlayer.Droid {
                     }
                     Log.Info($"selected: {_midiFilePath}");
                     Synth.MidiFilePath = _midiFilePath;
-                    Env.MidiFileDir = _midiFilePath.ToDirectoryName();
-                    Env.MidiFileName = _midiFilePath.ToFileName();
+                    Env.MidiFilePath = _midiFilePath;
                     Title = $"MidiPlayer: {_midiFilePath.ToFileName()} {_soundFontPath.ToFileName()}";
                     break;
                 case (int) Request.AddPlayList:
@@ -181,8 +179,7 @@ namespace MidiPlayer.Droid {
                     }
                     Log.Info($"selected: {midiFilePath}");
                     _playList.Add(midiFilePath); // add to playlist
-                    Env.MidiFileDir = midiFilePath.ToDirectoryName();
-                    Env.MidiFileName = midiFilePath.ToFileName();
+                    Env.MidiFilePath = midiFilePath;
                     break;
                 default:
                     break;

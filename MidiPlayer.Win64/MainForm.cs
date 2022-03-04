@@ -35,14 +35,31 @@ namespace MidiPlayer.Win64 {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // EventHandler
 
+        /// <summary>
+        /// MainForm load.
+        /// </summary>
         void MainForm_Load(object sender, EventArgs e) {
             Conf.Load();
             initializeControl();
 
+            // load previous setting.
+            if (Env.ExistsSoundFont && Env.ExistsMidiFile) {
+                Synth.SoundFontPath = Env.SoundFontPath;
+                Synth.MidiFilePath = Env.MidiFilePath;
+                _soundFontPath = Env.SoundFontPath;
+                _midiFilePath = Env.MidiFilePath;
+            }
+
+            /// <summary>
+            /// add a callback function to be called when the synth is playback.
+            /// </summary>
             Synth.Playbacking += (IntPtr data, IntPtr evt) => {
                 return Synth.HandleEvent(data, evt);
             };
 
+            /// <summary>
+            /// add a callback function to be called when the synth started.
+            /// </summary>
             Synth.Started += () => {
                 Log.Info("Started called.");
                 Invoke((MethodInvoker) (() => {
@@ -54,6 +71,9 @@ namespace MidiPlayer.Win64 {
                 }));
             };
 
+            /// <summary>
+            /// add a callback function to be called when the synth ended.
+            /// </summary>
             Synth.Ended += () => {
                 Log.Info("Ended called.");
                 if (!_playList.Ready) {
@@ -66,6 +86,9 @@ namespace MidiPlayer.Win64 {
                 }
             };
 
+            /// <summary>
+            /// add a callback function to be called when the synth updated.
+            /// </summary>
             Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
                 var track = (Synth.Track) sender;
                 Invoke(updateList(track));
@@ -78,10 +101,12 @@ namespace MidiPlayer.Win64 {
                 if (Synth.Playing) {
                     stopSong();
                 }
+                _openFileDialog.InitialDirectory = Env.SoundFontDir;
                 var dialog = _openFileDialog.ShowDialog();
                 if (dialog == DialogResult.OK) {
                     _soundFontPath = Path.GetFullPath(_openFileDialog.FileName);
                     Synth.SoundFontPath = _soundFontPath;
+                    Env.SoundFontPath = _soundFontPath;
                 }
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -94,10 +119,12 @@ namespace MidiPlayer.Win64 {
                 if (Synth.Playing) {
                     stopSong();
                 }
+                _openFileDialog.InitialDirectory = Env.MidiFileDir;
                 var dialog = _openFileDialog.ShowDialog();
                 if (dialog == DialogResult.OK) {
                     _midiFilePath = Path.GetFullPath(_openFileDialog.FileName);
                     Synth.MidiFilePath = _midiFilePath;
+                    Env.MidiFilePath = _midiFilePath;
                 }
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -129,6 +156,9 @@ namespace MidiPlayer.Win64 {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb, verb phrases]
 
+        /// <summary>
+        /// play the song.
+        /// </summary>
         async void playSong() {
             try {
                 await Task.Run(() => {
@@ -145,19 +175,28 @@ namespace MidiPlayer.Win64 {
             }
         }
 
+        /// <summary>
+        /// stop the song.
+        /// </summary>
         async void stopSong() {
             try {
                 await Task.Run(() => Synth.Stop());
-                Invoke((MethodInvoker) (() => {
-                    Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
-                        _listView.Items[x].SubItems[0].ForeColor = Color.Black;
-                    });
-                }));
+                if (_listView.Items.Count != 0) {
+                    Invoke((MethodInvoker) (() => {
+                        Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
+                            _listView.Items[x].SubItems[0].ForeColor = Color.Black;
+                        });
+                    }));
+                }
+                Conf.Save(); // TODO: save
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
         }
 
+        /// <summary>
+        /// a callback function to be called when the synth updated.
+        /// </summary>
         MethodInvoker updateList(Synth.Track track) {
             const int _column1Idx = 0;
             var trackIdx = track.Index - 1; // exclude conductor track;
@@ -182,6 +221,9 @@ namespace MidiPlayer.Win64 {
             };
         }
 
+        /// <summary>
+        /// initialize UI control.
+        /// </summary>
         void initializeControl() {
             // initialize ListView
             _listView.FullRowSelect = true;
