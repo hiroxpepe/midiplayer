@@ -9,73 +9,48 @@ namespace MidiPlayer {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Fields [nouns, noun phrases]
-
-        static string _soundFontDir = "Music";
-
-        static string _midiFileDir = "Music";
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Properties [noun, noun phrase, adjective] 
 
         public static string SoundFontDir {
-            get {
-                if (!Conf.Value.Synth.SoundFontDir.Equals("undefined")) {
-                    _soundFontDir = Conf.Value.Synth.SoundFontDir;
-                }
-                return _soundFontDir;
-            }
-            set {
-                Conf.Value.Synth.SoundFontDir = value;
-            }
+            get => Conf.Value.Synth.SoundFontDir;
+            set => Conf.Value.Synth.SoundFontDir = value;
         }
 
         public static string MidiFileDir {
-            get {
-                if (!Conf.Value.Synth.MidiFileDir.Equals("undefined")) {
-                    _midiFileDir = Conf.Value.Synth.MidiFileDir;
-                }
-                return _midiFileDir;
-            }
-            set {
-                Conf.Value.Synth.MidiFileDir = value;
-            }
+            get => Conf.Value.Synth.MidiFileDir;
+            set => Conf.Value.Synth.MidiFileDir = value;
         }
 
         public static string SoundFontDirForIntent {
             get {
-                return _soundFontDir.Replace("/storage/emulated/0/", "").Replace("/", "%2F");
+                if (!ExistsSoundFont) {
+                    return "Music";
+                }
+                return SoundFontDir.Replace("/storage/emulated/0/", "").Replace("/", "%2F");
             }
         }
 
         public static string MidiFileDirForIntent {
             get {
-                return _midiFileDir.Replace("/storage/emulated/0/", "").Replace("/", "%2F");
+                if (!ExistsMidiFile) {
+                    return "Music";
+                }
+                return MidiFileDir.Replace("/storage/emulated/0/", "").Replace("/", "%2F");
             }
         }
 
         public static string SoundFontName {
-            get {
-                return Conf.Value.Synth.SoundFontName;
-            }
-            set {
-                Conf.Value.Synth.SoundFontName = value;
-            }
+            get => Conf.Value.Synth.SoundFontName;
+            set => Conf.Value.Synth.SoundFontName = value;
         }
 
         public static string MidiFileName {
-            get {
-                return Conf.Value.Synth.MidiFileName;
-            }
-            set {
-                Conf.Value.Synth.MidiFileName = value;
-            }
+            get => Conf.Value.Synth.MidiFileName;
+            set => Conf.Value.Synth.MidiFileName = value;
         }
 
         public static string SoundFontPath {
-            get {
-                return $"{SoundFontDir}/{SoundFontName}";
-            }
+            get => $"{SoundFontDir}/{SoundFontName}";
             set {
                 SoundFontDir = value.ToDirectoryName();
                 SoundFontName = value.ToFileName();
@@ -83,9 +58,7 @@ namespace MidiPlayer {
         }
 
         public static string MidiFilePath {
-            get {
-                return $"{MidiFileDir}/{MidiFileName}";
-            }
+            get => $"{MidiFileDir}/{MidiFileName}";
             set {
                 MidiFileDir = value.ToDirectoryName();
                 MidiFileName = value.ToFileName();
@@ -93,15 +66,11 @@ namespace MidiPlayer {
         }
 
         public static bool ExistsSoundFont {
-            get {
-                return File.Exists(SoundFontPath);
-            }
+            get => File.Exists(SoundFontPath);
         }
 
         public static bool ExistsMidiFile {
-            get {
-                return File.Exists(MidiFilePath);
-            }
+            get => File.Exists(MidiFilePath);
         }
     }
 }
