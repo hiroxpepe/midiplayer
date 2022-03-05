@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace MidiPlayer {
+namespace MidiPlayerTest {
     /// <summary>
     /// PrivateObject for MSTest
     /// </summary>

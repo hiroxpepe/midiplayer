@@ -2,13 +2,15 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
-namespace MidiPlayer.Test {
+using MidiPlayer;
+
+namespace MidiPlayerTest {
     [TestClass()]
     public class PlayListTests {
 #nullable enable
         [TestMethod()]
         public void NextTest1() {
-            var target = new PlayList();
+            PlayList target = new();
             target.Add("file1.mid");
             target.Add("file2.mid");
             target.Add("file3.mid");

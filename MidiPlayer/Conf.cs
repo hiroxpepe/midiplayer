@@ -49,13 +49,13 @@ namespace MidiPlayer {
                 Log.Debug("Conf midiFileDir: " + _json.App.Synth.MidiFileDir);
                 Log.Debug("Conf midiFileName: " + _json.App.Synth.MidiFileName);
             } else {
-                Synth synth = new Synth();
+                Synth synth = new();
                 synth.SoundFontDir = "undefined";
                 synth.MidiFileDir = "undefined";
-                App app = new App();
+                App app = new();
                 app.PlayList = null;
                 app.Synth = synth;
-                _json = new Json();
+                _json = new();
                 _json.App = app;
             }
         }

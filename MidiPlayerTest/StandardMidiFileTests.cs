@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using System.Collections.Generic;
 
-namespace MidiPlayer.Midi.Test {
+namespace MidiPlayerTest.Midi {
     [TestClass()]
     public class StandardMidiFileTests {
 #nullable enable

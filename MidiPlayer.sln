@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayer", "MidiPlayer\Mi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayer.FluidSynth", "MidiPlayer.FluidSynth\MidiPlayer.FluidSynth.csproj", "{D63EE98D-8A01-440E-8E7A-B924B41FAFA6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayerTests", "MidiPlayerTests\MidiPlayerTests.csproj", "{0C4ED722-5C23-4C5B-A478-A8D9279C413C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayerTest", "MidiPlayerTest\MidiPlayerTest.csproj", "{0C4ED722-5C23-4C5B-A478-A8D9279C413C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiPlayer.Win64", "MidiPlayer.Win64\MidiPlayer.Win64.csproj", "{A99AAD96-61C9-481B-8156-DBCD279A742A}"
 EndProject

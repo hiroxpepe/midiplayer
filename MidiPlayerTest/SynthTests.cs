@@ -6,7 +6,9 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using static System.Threading.Thread;
 
-namespace MidiPlayer.Test {
+using MidiPlayer;
+
+namespace MidiPlayerTest {
     [TestClass()]
     public class SynthTests {
 #nullable enable
