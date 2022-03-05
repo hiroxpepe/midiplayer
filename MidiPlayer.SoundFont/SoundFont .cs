@@ -23,19 +23,19 @@ namespace MidiPlayer.SoundFont {
         public SoundFontInfo(string target) {
             try {
                 _soundFont = new NAudio.SoundFont.SoundFont(target);
-                var map = new Map<int, List<Voice>>();
+                Map<int, List<Voice>> map = new();
                 _soundFont.Presets.ToList().ForEach(x => {
                     if (!map.ContainsKey(x.Bank)) {
-                        var newList = new List<Voice>();
+                        List<Voice> newList = new();
                         newList.Add(new Voice() { Prog = x.PatchNumber, Name = x.Name });
                         map.Add(x.Bank, newList); // new bank and new voice
                     } else {
                         map[x.Bank].Add(new Voice() { Prog = x.PatchNumber, Name = x.Name }); // exists bank and new voice
                     }
                 });
-                this._map = new Map<int, List<Voice>>();
+                _map = new();
                 map.OrderBy(x => x.Key).ToList().ForEach(x => { // sort bank
-                    this._map.Add(x.Key, x.Value.OrderBy(_x => _x.Prog).ToList()); // sort prog
+                    _map.Add(x.Key, x.Value.OrderBy(_x => _x.Prog).ToList()); // sort prog
                 });
             } catch (Exception ex) {
                 Log.Error(ex.Message);

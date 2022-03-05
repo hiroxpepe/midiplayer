@@ -317,7 +317,7 @@ namespace MidiPlayer {
             // static Constructor
 
             static Multi() {
-                _trackMap = new Map<int, Track>();
+                _trackMap = new();
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////

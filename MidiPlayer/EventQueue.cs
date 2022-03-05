@@ -18,14 +18,14 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
-        static Map<int, Queue<Data>> _queueMap = new Map<int, Queue<Data>>();
+        static Map<int, Queue<Data>> _queueMap = new();
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Constructor
 
         static EventQueue() {
-            _queueMap = new Map<int, Queue<Data>>();
-            Enumerable.Range(0, 16).ToList().ForEach(x => _queueMap.Add(x, new Queue<Data>()));
+            _queueMap = new();
+            Enumerable.Range(0, 16).ToList().ForEach(x => _queueMap.Add(x, new()));
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
