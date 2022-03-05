@@ -2,7 +2,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
-namespace MidiPlayer.SoundFont.Tests {
+using MidiPlayer.SoundFont;
+
+namespace MidiPlayerTest.SoundFont {
     [TestClass()]
     public class SoundFontInfoTests {
 #nullable enable

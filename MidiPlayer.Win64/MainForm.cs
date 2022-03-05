@@ -29,7 +29,7 @@ namespace MidiPlayer.Win64 {
         public MainForm() {
             InitializeComponent();
             DoubleBuffered = true;
-            _playList = new PlayList();
+            _playList = new();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,22 +230,22 @@ namespace MidiPlayer.Win64 {
             _listView.GridLines = true;
             _listView.Sorting = SortOrder.None; // do not sort automatically.
             _listView.View = View.Details;
-            var column1 = new ColumnHeader();
+            ColumnHeader column1 = new();
             column1.Text = "On";
             column1.Width = 35;
-            var column2 = new ColumnHeader();
+            ColumnHeader column2 = new();
             column2.Text = "Name";
             column2.Width = 115;
-            var column3 = new ColumnHeader();
+            ColumnHeader column3 = new();
             column3.Text = "Voice";
             column3.Width = 115;
-            var column4 = new ColumnHeader();
+            ColumnHeader column4 = new();
             column4.Text = "Chan";
             column4.Width = 45;
-            var column5 = new ColumnHeader();
+            ColumnHeader column5 = new();
             column5.Text = "Bank";
             column5.Width = 45;
-            var column6 = new ColumnHeader();
+            ColumnHeader column6 = new();
             column6.Text = "Prog";
             column6.Width = 45;
             ColumnHeader[] columnHeaderArray = { column1, column2, column3, column4, column5, column6 };

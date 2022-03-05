@@ -11,7 +11,7 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        List<string> _targetList = new List<string>();
+        List<string> _targetList = new();
 
         int _idx;
 

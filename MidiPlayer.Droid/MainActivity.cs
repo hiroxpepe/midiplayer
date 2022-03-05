@@ -34,7 +34,7 @@ namespace MidiPlayer.Droid {
         // Constructor
 
         public MainActivity() {
-            _playList = new PlayList();
+            _playList = new();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -253,7 +253,7 @@ namespace MidiPlayer.Droid {
         void buttonSendSynth_1_Click(object sender, EventArgs e) {
             Log.Info("buttonSendSynth_1 clicked.");
             try {
-                var data = new Data() {
+                Data data = new() {
                     Prog = FindViewById<NumberPicker>(Resource.Id.number_picker_prog_1).Value,
                     Pan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan_1).Value,
                     Vol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol_1).Value,
