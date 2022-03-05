@@ -2,12 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-
+    <LangVersion>9</LangVersion>
     <IsPackable>false</IsPackable>
-
-    <AssemblyName>MidiPlayer.Test</AssemblyName>
-
-    <RootNamespace>MidiPlayer.Test</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
