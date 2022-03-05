@@ -38,13 +38,17 @@ namespace MidiPlayer {
         }
 
         public static void Debug(string target) {
+#if DEBUG
             LogEventInfo eventInfo = new LogEventInfo(LogLevel.Debug, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
+#endif
         }
 
         public static void Trace(string target) {
+#if DEBUG
             LogEventInfo eventInfo = new LogEventInfo(LogLevel.Trace, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
+#endif
         }
     }
 }

@@ -44,10 +44,10 @@ namespace MidiPlayer {
                 using var stream = new StreamReader(ConfEnv.ConfPath);
                 _json = loadJson(stream.ReadToEnd().ToMemoryStream());
                 Log.Info("Conf loaded.");
-                Log.Info("Conf soundFontDir: " + _json.App.Synth.SoundFontDir);
-                Log.Info("Conf soundFontName: " + _json.App.Synth.SoundFontName);
-                Log.Info("Conf midiFileDir: " + _json.App.Synth.MidiFileDir);
-                Log.Info("Conf midiFileName: " + _json.App.Synth.MidiFileName);
+                Log.Debug("Conf soundFontDir: " + _json.App.Synth.SoundFontDir);
+                Log.Debug("Conf soundFontName: " + _json.App.Synth.SoundFontName);
+                Log.Debug("Conf midiFileDir: " + _json.App.Synth.MidiFileDir);
+                Log.Debug("Conf midiFileName: " + _json.App.Synth.MidiFileName);
             } else {
                 Synth synth = new Synth();
                 synth.SoundFontDir = "undefined";
@@ -70,10 +70,10 @@ namespace MidiPlayer {
             using var stream = new FileStream(ConfEnv.ConfPath, FileMode.Create, FileAccess.Write);
             saveJson(stream);
             Log.Info("Conf saved.");
-            Log.Info("Conf soundFontDir: " + _json.App.Synth.SoundFontDir);
-            Log.Info("Conf soundFontName: " + _json.App.Synth.SoundFontName);
-            Log.Info("Conf midiFileDir: " + _json.App.Synth.MidiFileDir);
-            Log.Info("Conf midiFileName: " + _json.App.Synth.MidiFileName);
+            Log.Debug("Conf soundFontDir: " + _json.App.Synth.SoundFontDir);
+            Log.Debug("Conf soundFontName: " + _json.App.Synth.SoundFontName);
+            Log.Debug("Conf midiFileDir: " + _json.App.Synth.MidiFileDir);
+            Log.Debug("Conf midiFileName: " + _json.App.Synth.MidiFileName);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

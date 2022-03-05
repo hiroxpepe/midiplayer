@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <DefineConstants>RUNTIME_LINUX</DefineConstants>
+    <DefineConstants>RUNTIME_WINDOWS</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
