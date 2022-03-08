@@ -9,7 +9,6 @@ using Android.Runtime;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
-using Android.Widget;
 
 using System;
 using System.Threading.Tasks;
@@ -186,87 +185,12 @@ namespace MidiPlayer.Droid {
             }
         }
 
-        void buttonLoadSoundFont_Click(object sender, EventArgs e) {
-            Log.Info("buttonLoadSoundFont clicked.");
-            try {
-                if (Synth.Playing) {
-                    stopSong();
-                }
-                callIntent(Env.SoundFontDirForIntent, (int) Request.SoundFont);
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-
-        void buttonLoadMidiFile_Click(object sender, EventArgs e) {
-            Log.Info("buttonLoadMidiFile clicked.");
-            try {
-                if (Synth.Playing) {
-                    stopSong();
-                }
-                callIntent(Env.MidiFileDirForIntent, (int) Request.MidiFile);
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-
-        void buttonStart_Click(object sender, EventArgs e) {
-            Log.Info("buttonStart clicked.");
-            try {
-                if (!_midiFilePath.HasValue()) { // FIXME: case sounFdont
-                    Log.Warn("midiFilePath has no value.");
-                    return;
-                }
-                playSong();
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-
-        void buttonStop_Click(object sender, EventArgs e) {
-            Log.Info("buttonStop clicked.");
-            try {
-                stopSong();
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-
-        void buttonAddPlaylist_Click(object sender, EventArgs e) {
-            Log.Info("buttonAddPlaylist clicked.");
-            try {
-                callIntent(Env.MidiFileDir, (int) Request.AddPlayList);
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-
-        void buttonDeletePlaylist_Click(object sender, EventArgs e) {
-            Log.Info("buttonDeletePlaylist clicked.");
-            try {
-                _playList.Clear();
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-
-        void buttonSendSynth_1_Click(object sender, EventArgs e) {
-            Log.Info("buttonSendSynth_1 clicked.");
-            try {
-                Data data = new() {
-                    Prog = FindViewById<NumberPicker>(Resource.Id.number_picker_prog_1).Value,
-                    Pan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan_1).Value,
-                    Vol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol_1).Value,
-                };
-                EventQueue.Enqueue((int) MidiChannel.ch1, data);
-            } catch (Exception ex) {
-                Log.Error(ex.Message);
-            }
-        }
-
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb, verb phrases]
 
+        /// <summary>
+        /// request permissions.
+        /// </summary>
         void requestPermissions() {
             if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != (int) Permission.Granted) {
                 ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadExternalStorage }, 0);
