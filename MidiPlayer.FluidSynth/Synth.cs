@@ -21,6 +21,11 @@ namespace MidiPlayer {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Const [nouns]
+
+        const float SYNTH_GAIN = 0.5f;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
         static fluid_settings_t _setting = IntPtr.Zero;
@@ -159,6 +164,7 @@ namespace MidiPlayer {
                 }
                 _setting = new_fluid_settings();
                 _synth = new_fluid_synth(_setting);
+                fluid_synth_set_gain(_synth, SYNTH_GAIN);
                 _player = new_fluid_player(_synth);
                 Log.Info($"try to load the sound font: {SoundFontPath}");
                 if (fluid_is_soundfont(SoundFontPath) != 1) {
@@ -189,10 +195,12 @@ namespace MidiPlayer {
                 } else {
                     Log.Info($"loaded the midi file: {MidiFilePath}");
                 }
+                _adriver = new_fluid_audio_driver(_setting, _synth);
                 _ready = true;
                 Log.Info("init :)");
             } catch (Exception ex) {
                 Log.Error(ex.Message);
+                // FIXME: terminate Fluidsynth.
             }
         }
 
@@ -205,7 +213,6 @@ namespace MidiPlayer {
                         return;
                     }
                 }
-                _adriver = new_fluid_audio_driver(_setting, _synth);
                 fluid_player_play(_player);
                 Log.Info("start :)");
                 _onStarted();
