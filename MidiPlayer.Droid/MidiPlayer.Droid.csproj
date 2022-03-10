@@ -68,6 +68,7 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ListItem.cs" />
     <Compile Include="MainActivity.EventCallback.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="MainActivity.Component.cs" />
@@ -387,6 +388,15 @@
       <Project>{c772ad89-14ee-40cb-91ef-f96debeb6f35}</Project>
       <Name>MidiPlayer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\list_item.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\list_title.xml">
+      <Generator>MSBuild:UpdateGeneratedFiles</Generator>
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
