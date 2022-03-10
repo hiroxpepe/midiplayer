@@ -1,6 +1,7 @@
 ﻿
 using Android.Support.V7.App;
 using Android.Widget;
+using System.Collections.Generic;
 
 namespace MidiPlayer.Droid {
     /// <summary>
@@ -48,6 +49,20 @@ namespace MidiPlayer.Droid {
             numberPickerVol_1.Value = 104;
             var buttonSendSynth_1 = FindViewById<Button>(Resource.Id.button_send_synth_1);
             buttonSendSynth_1.Click += buttonSendSynth_1_Click;
+
+            // list view title
+            var titleList = new List<ListTitle>();
+            titleList.Add(new ListTitle() { Name = "NAME", Instrument = "INSTRUMENT" });
+            var titleListView = FindViewById<ListView>(Resource.Id.list_view_title);
+            titleListView.Adapter = new ListTitleAdapter(this, 0, titleList);
+
+            // list view truck
+            var truckList = new List<ListItem>();
+            for (var i = 0; i < 16; i++) {
+                truckList.Add(new ListItem() { Name = "Name_" + i, Instrument = "Instrument_" + i });
+            }
+            var ltruckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
+            ltruckListView.Adapter = new ListItemAdapter(this, 0 ,truckList);
         }
     }
 }
