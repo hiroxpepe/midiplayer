@@ -189,5 +189,21 @@
                 android:padding="0dp"
             />
         </LinearLayout>
+        <ListView
+            android:id="@+id/list_view_title"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_toRightOf ="@id/linear_layout_fader_1"
+            android:layout_weight="1"
+            android:background="@android:color/holo_blue_light"
+        />
+        <ListView
+            android:id="@+id/list_view_truck"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf ="@id/linear_layout_fader_1"
+            android:layout_below="@id/list_view_title"
+            android:layout_weight="1"
+        />
     </RelativeLayout>
 </RelativeLayout>

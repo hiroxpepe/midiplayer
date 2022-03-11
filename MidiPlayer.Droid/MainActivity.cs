@@ -9,8 +9,12 @@ using Android.Runtime;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
+using Android.Widget;
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
@@ -29,11 +33,16 @@ namespace MidiPlayer.Droid {
 
         PlayList _playList;
 
+        List<ListItem> _truckList;
+
+        Task _timer;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
         public MainActivity() {
             _playList = new();
+            _truckList = new();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,13 +93,25 @@ namespace MidiPlayer.Droid {
                 MainThread.BeginInvokeOnMainThread(() => {
                     Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
                 });
+                // refresh the viewlist in a few seconds.
+                _timer = new Task(async () => {
+                    while (true) {
+                        var truckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
+                        var listItemAdapter = (ListItemAdapter) truckListView.Adapter;
+                        RunOnUiThread(() => {
+                            listItemAdapter.NotifyDataSetChanged();
+                        });
+                        await Task.Delay(2000);
+                    }
+                });
+                _timer.Start();
             };
 
             /// <summary>
             /// add a callback function to be called when the synth ended.
             /// </summary>
             Synth.Ended += () => {
-                Log.Info("Ended called.");
+            Log.Info("Ended called.");
                 if (!_playList.Ready) {
                     Synth.Stop();
                     Synth.Start();
@@ -99,6 +120,14 @@ namespace MidiPlayer.Droid {
                     Synth.MidiFilePath = _playList.Next;
                     Synth.Start();
                 }
+            };
+
+            /// <summary>
+            /// add a callback function to be called when the synth updated.
+            /// </summary>
+            Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
+                var track = (Synth.Track) sender;
+                updateList(track);
             };
         }
 
@@ -256,6 +285,17 @@ namespace MidiPlayer.Droid {
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// a callback function to be called when the synth updated.
+        /// </summary>
+        void updateList(Synth.Track track) {
+            var trackIdx = track.Index - 1; // exclude conductor track;
+            //Log.Info($"index: {trackIdx} name:  {track.Name} Voice: {Synth.GetVoice(track.Index)} Chan: {track.Channel}");
+            var listItem = _truckList[trackIdx];
+            listItem.Name = track.Name;
+            listItem.Instrument = Synth.GetVoice(track.Index);
         }
 
         /// <summary>
