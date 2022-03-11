@@ -35,6 +35,8 @@ namespace MidiPlayer.Droid {
 
         List<ListItem> _truckList;
 
+        Task _timer;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
@@ -91,13 +93,25 @@ namespace MidiPlayer.Droid {
                 MainThread.BeginInvokeOnMainThread(() => {
                     Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
                 });
+                // refresh the viewlist in a few seconds.
+                _timer = new Task(async () => {
+                    while (true) {
+                        var truckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
+                        var listItemAdapter = (ListItemAdapter) truckListView.Adapter;
+                        RunOnUiThread(() => {
+                            listItemAdapter.NotifyDataSetChanged();
+                        });
+                        await Task.Delay(2000);
+                    }
+                });
+                _timer.Start();
             };
 
             /// <summary>
             /// add a callback function to be called when the synth ended.
             /// </summary>
             Synth.Ended += () => {
-                Log.Info("Ended called.");
+            Log.Info("Ended called.");
                 if (!_playList.Ready) {
                     Synth.Stop();
                     Synth.Start();
@@ -282,6 +296,10 @@ namespace MidiPlayer.Droid {
             var listItem = _truckList[trackIdx];
             listItem.Name = track.Name;
             listItem.Instrument = Synth.GetVoice(track.Index);
+
+            //var truckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
+            //var listItemAdapter = (ListItemAdapter) truckListView.Adapter;
+            //listItemAdapter.NotifyDataSetChanged();
         }
 
         /// <summary>
