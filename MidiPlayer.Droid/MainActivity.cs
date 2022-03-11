@@ -292,14 +292,10 @@ namespace MidiPlayer.Droid {
         /// </summary>
         void updateList(Synth.Track track) {
             var trackIdx = track.Index - 1; // exclude conductor track;
-            Log.Info($"index: {trackIdx} name:  {track.Name} Voice: {Synth.GetVoice(track.Index)} Chan: {track.Channel}");
+            //Log.Info($"index: {trackIdx} name:  {track.Name} Voice: {Synth.GetVoice(track.Index)} Chan: {track.Channel}");
             var listItem = _truckList[trackIdx];
             listItem.Name = track.Name;
             listItem.Instrument = Synth.GetVoice(track.Index);
-
-            //var truckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
-            //var listItemAdapter = (ListItemAdapter) truckListView.Adapter;
-            //listItemAdapter.NotifyDataSetChanged();
         }
 
         /// <summary>

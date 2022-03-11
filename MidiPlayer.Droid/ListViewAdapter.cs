@@ -84,7 +84,6 @@ namespace MidiPlayer.Droid {
         // public Methods [verb, verb phrases]
 
         public override View GetView(int position, View convertView, ViewGroup parent) {
-            Log.Info("GetView " + System.DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));
             ViewHolder viewHolder;
             if (convertView == null) {
                 convertView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item, parent, false);
@@ -96,12 +95,10 @@ namespace MidiPlayer.Droid {
             } else {
                 viewHolder = (ViewHolder) convertView.GetTag(Resource.String.view_holder_tag);
             }
-            if (Count != 0) {
-                ListItem listItem = GetItem(position);
-                viewHolder.CheckBox.Checked = listItem.Checked;
-                viewHolder.TextViewName.Text = listItem.Name;
-                viewHolder.TextViewInstrument.Text = listItem.Instrument;
-            }
+            ListItem listItem = GetItem(position);
+            viewHolder.CheckBox.Checked = listItem.Checked;
+            viewHolder.TextViewName.Text = listItem.Name;
+            viewHolder.TextViewInstrument.Text = listItem.Instrument;
             NotifyDataSetChanged();
             return convertView;
         }
