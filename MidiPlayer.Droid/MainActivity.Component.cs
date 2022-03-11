@@ -62,7 +62,14 @@ namespace MidiPlayer.Droid {
                 truckList.Add(new ListItem() { Name = "Name_" + i, Instrument = "Instrument_" + i });
             }
             var ltruckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
-            ltruckListView.Adapter = new ListItemAdapter(this, 0 ,truckList);
+            var adapter = new ListItemAdapter(this, 0, truckList);
+            ltruckListView.Adapter = adapter;
+            ltruckListView.ItemClick += (object sender, Android.Widget.AdapterView.ItemClickEventArgs e) => {
+                var item = ltruckListView.GetItemAtPosition(e.Position);
+                ListItem listItem = item.Cast<ListItem>();
+                Log.Info("e.Position: " + e.Position);
+                Log.Info("selected Name: " + listItem.Name);
+            };
         }
     }
 }
