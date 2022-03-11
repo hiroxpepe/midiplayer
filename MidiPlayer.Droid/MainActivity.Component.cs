@@ -58,7 +58,6 @@ namespace MidiPlayer.Droid {
             titleListView.Adapter = new ListTitleAdapter(this, 0, titleList);
 
             // list view truck
-            //var truckList = new List<ListItem>();
             for (var i = 0; i < 16; i++) {
                 _truckList.Add(new ListItem() { Name = "------", Instrument = "------"});
             }
@@ -68,8 +67,7 @@ namespace MidiPlayer.Droid {
             truckListView.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
                 var item = truckListView.GetItemAtPosition(e.Position);
                 ListItem listItem = item.Cast<ListItem>();
-                Log.Info("e.Position: " + e.Position);
-                Log.Info("selected Name: " + listItem.Name);
+                // TODO:
             };
         }
     }
