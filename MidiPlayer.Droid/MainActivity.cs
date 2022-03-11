@@ -282,14 +282,6 @@ namespace MidiPlayer.Droid {
             var listItem = _truckList[trackIdx];
             listItem.Name = track.Name;
             listItem.Instrument = Synth.GetVoice(track.Index);
-
-            var truckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
-            var listItemAdapter = (ArrayAdapter<ListItem>) truckListView.Adapter;
-            Log.Info($"1 count: {listItemAdapter.Count}");
-            listItemAdapter.Clear();
-            listItemAdapter.AddAll(_truckList);
-            Log.Info($"2 count: {listItemAdapter.Count}");
-            listItemAdapter.NotifyDataSetChanged();
         }
 
         /// <summary>

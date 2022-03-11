@@ -102,6 +102,7 @@ namespace MidiPlayer.Droid {
                 viewHolder.TextViewName.Text = listItem.Name;
                 viewHolder.TextViewInstrument.Text = listItem.Instrument;
             }
+            NotifyDataSetChanged();
             return convertView;
         }
 
