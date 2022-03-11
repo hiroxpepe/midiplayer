@@ -1,6 +1,7 @@
 ﻿
 using Android.Support.V7.App;
 using Android.Widget;
+
 using System.Collections.Generic;
 
 namespace MidiPlayer.Droid {
@@ -52,20 +53,20 @@ namespace MidiPlayer.Droid {
 
             // list view title
             var titleList = new List<ListTitle>();
-            titleList.Add(new ListTitle() { Name = "NAME", Instrument = "INSTRUMENT" });
+            titleList.Add(new ListTitle() { Name = "Name", Instrument = "Voice" });
             var titleListView = FindViewById<ListView>(Resource.Id.list_view_title);
             titleListView.Adapter = new ListTitleAdapter(this, 0, titleList);
 
             // list view truck
-            var truckList = new List<ListItem>();
+            //var truckList = new List<ListItem>();
             for (var i = 0; i < 16; i++) {
-                truckList.Add(new ListItem() { Name = "Name_" + i, Instrument = "Instrument_" + i });
+                _truckList.Add(new ListItem() { Name = "------", Instrument = "------"});
             }
-            var ltruckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
-            var adapter = new ListItemAdapter(this, 0, truckList);
-            ltruckListView.Adapter = adapter;
-            ltruckListView.ItemClick += (object sender, Android.Widget.AdapterView.ItemClickEventArgs e) => {
-                var item = ltruckListView.GetItemAtPosition(e.Position);
+            var truckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
+            var listItemAdapter = new ListItemAdapter(this, 0, _truckList);
+            truckListView.Adapter = listItemAdapter;
+            truckListView.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
+                var item = truckListView.GetItemAtPosition(e.Position);
                 ListItem listItem = item.Cast<ListItem>();
                 Log.Info("e.Position: " + e.Position);
                 Log.Info("selected Name: " + listItem.Name);

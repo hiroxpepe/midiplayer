@@ -96,10 +96,12 @@ namespace MidiPlayer.Droid {
             } else {
                 viewHolder = (ViewHolder) convertView.GetTag(Resource.String.view_holder_tag);
             }
-            ListItem listItem = GetItem(position);
-            viewHolder.CheckBox.Checked = listItem.Checked;
-            viewHolder.TextViewName.Text = listItem.Name;
-            viewHolder.TextViewInstrument.Text = listItem.Instrument;
+            if (Count != 0) {
+                ListItem listItem = GetItem(position);
+                viewHolder.CheckBox.Checked = listItem.Checked;
+                viewHolder.TextViewName.Text = listItem.Name;
+                viewHolder.TextViewInstrument.Text = listItem.Instrument;
+            }
             return convertView;
         }
 
