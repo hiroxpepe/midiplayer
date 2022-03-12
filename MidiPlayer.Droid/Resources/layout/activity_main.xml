@@ -125,7 +125,28 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_orange_light"
                 android:layout_gravity="center"
-                android:layout_weight="3"
+                android:layout_weight="1"
+            />
+            <TextView
+                android:text="MIDI"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_purple"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+            />
+            <TextView
+                android:id="@+id/text_view_channel"
+                android:text="---"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_green_light"
+                android:layout_gravity="center"
+                android:layout_weight="1"
             />
         </TableRow>
         <TableRow
