@@ -43,7 +43,7 @@ namespace MidiPlayer.Droid {
 
         PlayList _playList;
 
-        List<ListItem> _truckList;
+        List<ListItem> _itemList;
 
         Task _refreshTimer;
 
@@ -52,7 +52,7 @@ namespace MidiPlayer.Droid {
 
         public MainActivity() {
             _playList = new();
-            _truckList = new();
+            _itemList = new();
             _refreshTimer = createRefreshTask();
         }
 
@@ -298,7 +298,7 @@ namespace MidiPlayer.Droid {
         void updateList(Synth.Track track) {
             var trackIdx = track.Index - 1; // exclude conductor track;
             //Log.Info($"index: {trackIdx} name:  {track.Name} Voice: {Synth.GetVoice(track.Index)} Chan: {track.Channel}");
-            var listItem = _truckList[trackIdx];
+            var listItem = _itemList[trackIdx];
             listItem.Name = track.Name;
             listItem.Instrument = Synth.GetVoice(track.Index);
         }
@@ -308,8 +308,8 @@ namespace MidiPlayer.Droid {
         /// </summary>
         Task createRefreshTask() {
             return new(async () => {
-                var truckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
-                var listItemAdapter = (ListItemAdapter) truckListView.Adapter;
+                var itemListView = FindViewById<ListView>(Resource.Id.list_view_item);
+                var listItemAdapter = (ListItemAdapter) itemListView.Adapter;
                 while (true) {
                     RunOnUiThread(() => {
                         listItemAdapter.NotifyDataSetChanged();
