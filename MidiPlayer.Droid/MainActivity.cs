@@ -121,6 +121,15 @@ namespace MidiPlayer.Droid {
                 var track = (Synth.Track) sender;
                 updateList(track);
             };
+
+            /// <summary>
+            /// add a callback function to be called when the mixer updated.
+            /// </summary>
+            Mixer.Selected += (object sender, PropertyChangedEventArgs e) => {
+                if (e.PropertyName is nameof(Mixer.Current)) {
+                    loadFader();
+                }
+            };
         }
 
         /// <summary>
@@ -317,6 +326,30 @@ namespace MidiPlayer.Droid {
                     await Task.Delay(VIEW_REFRESH_TIME);
                 }
             });
+        }
+
+        /// <summary>
+        /// load the current fader value to control value.
+        /// </summary>
+        void loadFader() {
+            saveFader();
+            var fader = Mixer.GetCurrent();
+            FindViewById<TextView>(Resource.Id.text_view_no).Text = (Mixer.Current + 1).ToString(); // mixer is 0 base.
+            FindViewById<NumberPicker>(Resource.Id.number_picker_prog).Value = fader.Program;
+            FindViewById<NumberPicker>(Resource.Id.number_picker_pan).Value = fader.Pan;
+            FindViewById<NumberPicker>(Resource.Id.number_picker_vol).Value = fader.Volume;
+            FindViewById<CheckBox>(Resource.Id.check_box_mute).Checked = !fader.Sounds;
+        }
+
+        /// <summary>
+        /// save control value as the previous fader value.
+        /// </summary>
+        void saveFader() {
+            var fader = Mixer.GetPrevious();
+            fader.Program = FindViewById<NumberPicker>(Resource.Id.number_picker_prog).Value;
+            fader.Pan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan).Value;
+            fader.Volume = FindViewById<NumberPicker>(Resource.Id.number_picker_vol).Value;
+            fader.Sounds = !FindViewById<CheckBox>(Resource.Id.check_box_mute).Checked;
         }
 
         /// <summary>

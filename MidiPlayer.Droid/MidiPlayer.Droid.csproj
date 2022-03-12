@@ -68,6 +68,7 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MixingPanel.cs" />
     <Compile Include="ListViewAdapter.cs" />
     <Compile Include="MainActivity.EventCallback.cs" />
     <Compile Include="MainActivity.cs" />

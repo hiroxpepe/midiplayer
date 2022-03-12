@@ -5671,37 +5671,34 @@ namespace MidiPlayer.Droid
 			public const int button_load_soundfont = 2131230816;
 			
 			// aapt resource value: 0x7F080061
-			public const int button_mute_1 = 2131230817;
+			public const int button_send_synth = 2131230817;
 			
 			// aapt resource value: 0x7F080062
-			public const int button_send_synth_1 = 2131230818;
+			public const int button_start = 2131230818;
 			
 			// aapt resource value: 0x7F080063
-			public const int button_start = 2131230819;
+			public const int button_stop = 2131230819;
 			
 			// aapt resource value: 0x7F080064
-			public const int button_stop = 2131230820;
+			public const int cache_measures = 2131230820;
 			
 			// aapt resource value: 0x7F080065
-			public const int cache_measures = 2131230821;
+			public const int cancel_button = 2131230821;
 			
 			// aapt resource value: 0x7F080066
-			public const int cancel_button = 2131230822;
+			public const int center = 2131230822;
 			
 			// aapt resource value: 0x7F080067
-			public const int center = 2131230823;
+			public const int center_horizontal = 2131230823;
 			
 			// aapt resource value: 0x7F080068
-			public const int center_horizontal = 2131230824;
+			public const int center_vertical = 2131230824;
 			
 			// aapt resource value: 0x7F080069
-			public const int center_vertical = 2131230825;
+			public const int chain = 2131230825;
 			
 			// aapt resource value: 0x7F08006A
-			public const int chain = 2131230826;
-			
-			// aapt resource value: 0x7F08006B
-			public const int chains = 2131230827;
+			public const int chains = 2131230826;
 			
 			// aapt resource value: 0x7F08006C
 			public const int checkbox = 2131230828;
@@ -5711,6 +5708,9 @@ namespace MidiPlayer.Droid
 			
 			// aapt resource value: 0x7F08006E
 			public const int @checked = 2131230830;
+			
+			// aapt resource value: 0x7F08006B
+			public const int check_box_mute = 2131230827;
 			
 			// aapt resource value: 0x7F08006F
 			public const int chip = 2131230831;
@@ -6253,13 +6253,13 @@ namespace MidiPlayer.Droid
 			public const int NO_DEBUG = 2131230726;
 			
 			// aapt resource value: 0x7F08011F
-			public const int number_picker_pan_1 = 2131231007;
+			public const int number_picker_pan = 2131231007;
 			
 			// aapt resource value: 0x7F080120
-			public const int number_picker_prog_1 = 2131231008;
+			public const int number_picker_prog = 2131231008;
 			
 			// aapt resource value: 0x7F080121
-			public const int number_picker_vol_1 = 2131231009;
+			public const int number_picker_vol = 2131231009;
 			
 			// aapt resource value: 0x7F080122
 			public const int off = 2131231010;
@@ -6612,23 +6612,23 @@ namespace MidiPlayer.Droid
 			// aapt resource value: 0x7F080191
 			public const int textEnd = 2131231121;
 			
-			// aapt resource value: 0x7F08019D
-			public const int textinput_counter = 2131231133;
-			
 			// aapt resource value: 0x7F08019E
-			public const int textinput_error = 2131231134;
+			public const int textinput_counter = 2131231134;
 			
 			// aapt resource value: 0x7F08019F
-			public const int textinput_helper_text = 2131231135;
+			public const int textinput_error = 2131231135;
 			
 			// aapt resource value: 0x7F0801A0
-			public const int textinput_placeholder = 2131231136;
+			public const int textinput_helper_text = 2131231136;
 			
 			// aapt resource value: 0x7F0801A1
-			public const int textinput_prefix_text = 2131231137;
+			public const int textinput_placeholder = 2131231137;
 			
 			// aapt resource value: 0x7F0801A2
-			public const int textinput_suffix_text = 2131231138;
+			public const int textinput_prefix_text = 2131231138;
+			
+			// aapt resource value: 0x7F0801A3
+			public const int textinput_suffix_text = 2131231139;
 			
 			// aapt resource value: 0x7F080192
 			public const int textSpacerNoButtons = 2131231122;
@@ -6658,31 +6658,34 @@ namespace MidiPlayer.Droid
 			public const int text_view_item_name = 2131231130;
 			
 			// aapt resource value: 0x7F08019B
-			public const int text_view_title_instrument = 2131231131;
+			public const int text_view_no = 2131231131;
 			
 			// aapt resource value: 0x7F08019C
-			public const int text_view_title_name = 2131231132;
+			public const int text_view_title_instrument = 2131231132;
 			
-			// aapt resource value: 0x7F0801A3
-			public const int time = 2131231139;
+			// aapt resource value: 0x7F08019D
+			public const int text_view_title_name = 2131231133;
 			
 			// aapt resource value: 0x7F0801A4
-			public const int title = 2131231140;
+			public const int time = 2131231140;
 			
 			// aapt resource value: 0x7F0801A5
-			public const int titleDividerNoCustom = 2131231141;
+			public const int title = 2131231141;
 			
 			// aapt resource value: 0x7F0801A6
-			public const int title_template = 2131231142;
+			public const int titleDividerNoCustom = 2131231142;
 			
 			// aapt resource value: 0x7F0801A7
-			public const int toggle = 2131231143;
+			public const int title_template = 2131231143;
 			
 			// aapt resource value: 0x7F0801A8
-			public const int top = 2131231144;
+			public const int toggle = 2131231144;
 			
 			// aapt resource value: 0x7F0801A9
-			public const int topPanel = 2131231145;
+			public const int top = 2131231145;
+			
+			// aapt resource value: 0x7F0801AA
+			public const int topPanel = 2131231146;
 			
 			// aapt resource value: 0x7F08000C
 			public const int TOP_END = 2131230732;
@@ -6690,83 +6693,83 @@ namespace MidiPlayer.Droid
 			// aapt resource value: 0x7F08000D
 			public const int TOP_START = 2131230733;
 			
-			// aapt resource value: 0x7F0801AA
-			public const int touch_outside = 2131231146;
-			
 			// aapt resource value: 0x7F0801AB
-			public const int transitionToEnd = 2131231147;
+			public const int touch_outside = 2131231147;
 			
 			// aapt resource value: 0x7F0801AC
-			public const int transitionToStart = 2131231148;
+			public const int transitionToEnd = 2131231148;
 			
 			// aapt resource value: 0x7F0801AD
-			public const int transition_current_scene = 2131231149;
+			public const int transitionToStart = 2131231149;
 			
 			// aapt resource value: 0x7F0801AE
-			public const int transition_layout_save = 2131231150;
+			public const int transition_current_scene = 2131231150;
 			
 			// aapt resource value: 0x7F0801AF
-			public const int transition_position = 2131231151;
+			public const int transition_layout_save = 2131231151;
 			
 			// aapt resource value: 0x7F0801B0
-			public const int transition_scene_layoutid_cache = 2131231152;
+			public const int transition_position = 2131231152;
 			
 			// aapt resource value: 0x7F0801B1
-			public const int transition_transform = 2131231153;
+			public const int transition_scene_layoutid_cache = 2131231153;
 			
 			// aapt resource value: 0x7F0801B2
-			public const int triangle = 2131231154;
+			public const int transition_transform = 2131231154;
 			
 			// aapt resource value: 0x7F0801B3
-			public const int @unchecked = 2131231155;
+			public const int triangle = 2131231155;
 			
 			// aapt resource value: 0x7F0801B4
-			public const int uniform = 2131231156;
+			public const int @unchecked = 2131231156;
 			
 			// aapt resource value: 0x7F0801B5
-			public const int unlabeled = 2131231157;
+			public const int uniform = 2131231157;
 			
 			// aapt resource value: 0x7F0801B6
-			public const int up = 2131231158;
+			public const int unlabeled = 2131231158;
 			
 			// aapt resource value: 0x7F0801B7
-			public const int useLogo = 2131231159;
+			public const int up = 2131231159;
 			
 			// aapt resource value: 0x7F0801B8
-			public const int view_offset_helper = 2131231160;
+			public const int useLogo = 2131231160;
 			
 			// aapt resource value: 0x7F0801B9
-			public const int view_title_select = 2131231161;
+			public const int view_offset_helper = 2131231161;
 			
 			// aapt resource value: 0x7F0801BA
-			public const int view_tree_lifecycle_owner = 2131231162;
+			public const int view_title_select = 2131231162;
 			
 			// aapt resource value: 0x7F0801BB
-			public const int view_tree_saved_state_registry_owner = 2131231163;
+			public const int view_tree_lifecycle_owner = 2131231163;
 			
 			// aapt resource value: 0x7F0801BC
-			public const int view_tree_view_model_store_owner = 2131231164;
+			public const int view_tree_saved_state_registry_owner = 2131231164;
 			
 			// aapt resource value: 0x7F0801BD
-			public const int visible = 2131231165;
+			public const int view_tree_view_model_store_owner = 2131231165;
 			
 			// aapt resource value: 0x7F0801BE
-			public const int visible_removing_fragment_view_tag = 2131231166;
-			
-			// aapt resource value: 0x7F0801C0
-			public const int withinBounds = 2131231168;
+			public const int visible = 2131231166;
 			
 			// aapt resource value: 0x7F0801BF
-			public const int withText = 2131231167;
+			public const int visible_removing_fragment_view_tag = 2131231167;
 			
 			// aapt resource value: 0x7F0801C1
-			public const int wrap = 2131231169;
+			public const int withinBounds = 2131231169;
+			
+			// aapt resource value: 0x7F0801C0
+			public const int withText = 2131231168;
 			
 			// aapt resource value: 0x7F0801C2
-			public const int wrap_content = 2131231170;
+			public const int wrap = 2131231170;
 			
 			// aapt resource value: 0x7F0801C3
-			public const int zero_corner_chip = 2131231171;
+			public const int wrap_content = 2131231171;
+			
+			// aapt resource value: 0x7F0801C4
+			public const int zero_corner_chip = 2131231172;
 			
 			static Id()
 			{

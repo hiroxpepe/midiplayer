@@ -97,15 +97,15 @@ namespace MidiPlayer.Droid {
         }
 
         /// <summary>
-        /// buttonSendSynth_1 Click.
+        /// buttonSendSynth Click.
         /// </summary>
-        void buttonSendSynth_1_Click(object sender, EventArgs e) {
-            Log.Info("buttonSendSynth_1 clicked.");
+        void buttonSendSynth_Click(object sender, EventArgs e) {
+            Log.Info("buttonSendSynth clicked.");
             try {
                 Data data = new() {
-                    Prog = FindViewById<NumberPicker>(Resource.Id.number_picker_prog_1).Value,
-                    Pan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan_1).Value,
-                    Vol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol_1).Value,
+                    Prog = FindViewById<NumberPicker>(Resource.Id.number_picker_prog).Value,
+                    Pan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan).Value,
+                    Vol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol).Value,
                 };
                 EventQueue.Enqueue((int) MidiChannel.ch1, data);
             } catch (Exception ex) {

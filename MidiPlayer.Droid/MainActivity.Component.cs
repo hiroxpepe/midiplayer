@@ -36,20 +36,20 @@ namespace MidiPlayer.Droid {
             var buttonDeletePlaylist = FindViewById<Button>(Resource.Id.button_delete_playlist);
             buttonDeletePlaylist.Click += buttonDeletePlaylist_Click;
 
-            // fader1
-            var numberPickerProg_1 = FindViewById<NumberPicker>(Resource.Id.number_picker_prog_1);
-            numberPickerProg_1.MinValue = 1;
-            numberPickerProg_1.MaxValue = 128;
-            var numberPickerPan_1 = FindViewById<NumberPicker>(Resource.Id.number_picker_pan_1);
-            numberPickerPan_1.MinValue = 1;
-            numberPickerPan_1.MaxValue = 128;
-            numberPickerPan_1.Value = 65;
-            var numberPickerVol_1 = FindViewById<NumberPicker>(Resource.Id.number_picker_vol_1);
-            numberPickerVol_1.MinValue = 1;
-            numberPickerVol_1.MaxValue = 128;
-            numberPickerVol_1.Value = 104;
-            var buttonSendSynth_1 = FindViewById<Button>(Resource.Id.button_send_synth_1);
-            buttonSendSynth_1.Click += buttonSendSynth_1_Click;
+            // fader
+            var numberPickerProg = FindViewById<NumberPicker>(Resource.Id.number_picker_prog);
+            numberPickerProg.MinValue = 1;
+            numberPickerProg.MaxValue = 128;
+            var numberPickerPan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan);
+            numberPickerPan.MinValue = 1;
+            numberPickerPan.MaxValue = 128;
+            numberPickerPan.Value = 65;
+            var numberPickerVol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol);
+            numberPickerVol.MinValue = 1;
+            numberPickerVol.MaxValue = 128;
+            numberPickerVol.Value = 104;
+            var buttonSendSynth = FindViewById<Button>(Resource.Id.button_send_synth);
+            buttonSendSynth.Click += buttonSendSynth_Click;
 
             // list view title
             var titleList = new List<ListTitle>();
@@ -68,6 +68,8 @@ namespace MidiPlayer.Droid {
                 var item = itemListView.GetItemAtPosition(e.Position);
                 ListItem listItem = item.Cast<ListItem>();
                 // TODO:
+                Log.Info($"setected: {e.Position}");
+                Mixer.Current = e.Position;
             };
         }
     }
