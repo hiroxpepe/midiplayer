@@ -9,7 +9,6 @@ using Android.Runtime;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Android.Support.V7.App;
-using Android.Widget;
 
 using System;
 using System.Collections.Generic;
@@ -310,6 +309,7 @@ namespace MidiPlayer.Droid {
             var listItem = _itemList[trackIdx];
             listItem.Name = track.Name;
             listItem.Instrument = Synth.GetVoice(track.Index);
+            listItem.Channel = track.Channel.ToString();
         }
 
         /// <summary>
@@ -317,8 +317,7 @@ namespace MidiPlayer.Droid {
         /// </summary>
         Task createRefreshTask() {
             return new(async () => {
-                var itemListView = FindViewById<ListView>(Resource.Id.list_view_item);
-                var listItemAdapter = (ListItemAdapter) itemListView.Adapter;
+                var listItemAdapter = (ListItemAdapter) _itemListView.Adapter;
                 while (true) {
                     RunOnUiThread(() => {
                         listItemAdapter.NotifyDataSetChanged();
@@ -334,11 +333,13 @@ namespace MidiPlayer.Droid {
         void loadFader() {
             saveFader();
             var fader = Mixer.GetCurrent();
-            FindViewById<TextView>(Resource.Id.text_view_no).Text = (Mixer.Current + 1).ToString(); // mixer is 0 base.
-            FindViewById<NumberPicker>(Resource.Id.number_picker_prog).Value = fader.Program;
-            FindViewById<NumberPicker>(Resource.Id.number_picker_pan).Value = fader.Pan;
-            FindViewById<NumberPicker>(Resource.Id.number_picker_vol).Value = fader.Volume;
-            FindViewById<CheckBox>(Resource.Id.check_box_mute).Checked = !fader.Sounds;
+            _textViewNo.Text = (Mixer.Current + 1).ToString(); // mixer is 0 base.
+            ListItem listItem = _itemListView.GetItemAtPosition(Mixer.Current).Cast<ListItem>();
+            _textViewChannel.Text = listItem.Channel;
+            _numberPickerProg.Value = fader.Program;
+            _numberPickerPan.Value = fader.Pan;
+            _numberPickerVol.Value = fader.Volume;
+            _checkBoxMute.Checked = !fader.Sounds;
         }
 
         /// <summary>
@@ -346,10 +347,13 @@ namespace MidiPlayer.Droid {
         /// </summary>
         void saveFader() {
             var fader = Mixer.GetPrevious();
-            fader.Program = FindViewById<NumberPicker>(Resource.Id.number_picker_prog).Value;
-            fader.Pan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan).Value;
-            fader.Volume = FindViewById<NumberPicker>(Resource.Id.number_picker_vol).Value;
-            fader.Sounds = !FindViewById<CheckBox>(Resource.Id.check_box_mute).Checked;
+            if (int.TryParse(_textViewChannel.Text, out int channel)) {
+                fader.Channel = channel;
+                fader.Program = _numberPickerProg.Value;
+                fader.Pan = _numberPickerPan.Value;
+                fader.Volume = _numberPickerVol.Value;
+                fader.Sounds = !_checkBoxMute.Checked;
+            }
         }
 
         /// <summary>

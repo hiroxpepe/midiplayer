@@ -90,7 +90,7 @@ namespace MidiPlayer {
                 var value = fluid_midi_event_get_value(evt);
                 var program = fluid_midi_event_get_program(evt);
                 if (type != NOTE_ON && type != NOTE_OFF) { // not note on or note off
-                    Log.Debug($"type: {type} channel: {channel} control: {control} value: {value} program: {program}");
+                    //Log.Debug($"type: {type} channel: {channel} control: {control} value: {value} program: {program}");
                 }
                 Task.Run(() => {
                     if (type == NOTE_ON) { // NOTE_ON = 144

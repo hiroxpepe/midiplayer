@@ -3,6 +3,7 @@ using Android.Support.V7.App;
 using Android.Widget;
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MidiPlayer.Droid {
     /// <summary>
@@ -12,62 +13,89 @@ namespace MidiPlayer.Droid {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Const [nouns]
+
+        const int MIDI_TRACK_BASE = 0;
+        const int MIDI_TRACK_COUNT = 16;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Fields [nouns, noun phrases]
+
+        Button _buttonloadSoundFont;
+        Button _buttonloadMidiFile;
+        Button _buttonStart;
+        Button _buttonStop;
+        Button _buttonAddPlaylist;
+        Button _buttonDeletePlaylist;
+        Button _buttonSendSynth;
+        TextView _textViewNo;
+        TextView _textViewChannel;
+        NumberPicker _numberPickerProg;
+        NumberPicker _numberPickerPan;
+        NumberPicker _numberPickerVol;
+        CheckBox _checkBoxMute;
+        ListView _titleListView;
+        ListView _itemListView;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb, verb phrases]
 
         /// <summary>
         /// initialize the component.
         /// </summary>
         void initializeComponent() {
-            var buttonloadSoundFont = FindViewById<Button>(Resource.Id.button_load_soundfont);
-            buttonloadSoundFont.Click += buttonLoadSoundFont_Click;
+            _buttonloadSoundFont = FindViewById<Button>(Resource.Id.button_load_soundfont);
+            _buttonloadSoundFont.Click += buttonLoadSoundFont_Click;
 
-            var buttonloadMidiFile = FindViewById<Button>(Resource.Id.button_load_midifile);
-            buttonloadMidiFile.Click += buttonLoadMidiFile_Click;
+            _buttonloadMidiFile = FindViewById<Button>(Resource.Id.button_load_midifile);
+            _buttonloadMidiFile.Click += buttonLoadMidiFile_Click;
 
-            var buttonStart = FindViewById<Button>(Resource.Id.button_start);
-            buttonStart.Click += buttonStart_Click;
+            _buttonStart = FindViewById<Button>(Resource.Id.button_start);
+            _buttonStart.Click += buttonStart_Click;
 
-            var buttonStop = FindViewById<Button>(Resource.Id.button_stop);
-            buttonStop.Click += buttonStop_Click;
+            _buttonStop = FindViewById<Button>(Resource.Id.button_stop);
+            _buttonStop.Click += buttonStop_Click;
 
-            var buttonAddPlaylist = FindViewById<Button>(Resource.Id.button_add_playlist);
-            buttonAddPlaylist.Click += buttonAddPlaylist_Click;
+            _buttonAddPlaylist = FindViewById<Button>(Resource.Id.button_add_playlist);
+            _buttonAddPlaylist.Click += buttonAddPlaylist_Click;
 
-            var buttonDeletePlaylist = FindViewById<Button>(Resource.Id.button_delete_playlist);
-            buttonDeletePlaylist.Click += buttonDeletePlaylist_Click;
+            _buttonDeletePlaylist = FindViewById<Button>(Resource.Id.button_delete_playlist);
+            _buttonDeletePlaylist.Click += buttonDeletePlaylist_Click;
 
             // fader
-            var numberPickerProg = FindViewById<NumberPicker>(Resource.Id.number_picker_prog);
-            numberPickerProg.MinValue = 1;
-            numberPickerProg.MaxValue = 128;
-            var numberPickerPan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan);
-            numberPickerPan.MinValue = 1;
-            numberPickerPan.MaxValue = 128;
-            numberPickerPan.Value = 65;
-            var numberPickerVol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol);
-            numberPickerVol.MinValue = 1;
-            numberPickerVol.MaxValue = 128;
-            numberPickerVol.Value = 104;
-            var buttonSendSynth = FindViewById<Button>(Resource.Id.button_send_synth);
-            buttonSendSynth.Click += buttonSendSynth_Click;
+            _textViewNo = FindViewById<TextView>(Resource.Id.text_view_no);
+            _textViewChannel = FindViewById<TextView>(Resource.Id.text_view_channel);
+            _numberPickerProg = FindViewById<NumberPicker>(Resource.Id.number_picker_prog);
+            _numberPickerProg.MinValue = 1;
+            _numberPickerProg.MaxValue = 128;
+            _numberPickerPan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan);
+            _numberPickerPan.MinValue = 1;
+            _numberPickerPan.MaxValue = 128;
+            _numberPickerPan.Value = 65;
+            _numberPickerVol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol);
+            _numberPickerVol.MinValue = 1;
+            _numberPickerVol.MaxValue = 128;
+            _numberPickerVol.Value = 104;
+            _checkBoxMute = FindViewById<CheckBox>(Resource.Id.check_box_mute);
+            _buttonSendSynth = FindViewById<Button>(Resource.Id.button_send_synth);
+            _buttonSendSynth.Click += buttonSendSynth_Click;
 
             // list view title
             var titleList = new List<ListTitle>();
-            titleList.Add(new ListTitle() { Name = "Name", Instrument = "Voice" });
-            var titleListView = FindViewById<ListView>(Resource.Id.list_view_title);
-            titleListView.Adapter = new ListTitleAdapter(this, 0, titleList);
+            titleList.Add(new ListTitle() { Name = "Name", Instrument = "Voice", Channel = "Ch" });
+            _titleListView = FindViewById<ListView>(Resource.Id.list_view_title);
+            _titleListView.Adapter = new ListTitleAdapter(this, 0, titleList);
 
             // list view item
-            for (var i = 0; i < 16; i++) {
-                _itemList.Add(new ListItem() { Name = "------", Instrument = "------"});
-            }
-            var itemListView = FindViewById<ListView>(Resource.Id.list_view_item);
+            Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
+                _itemList.Add(new ListItem() { Name = "------", Instrument = "------", Channel = "---" });
+            });
+            _itemListView = FindViewById<ListView>(Resource.Id.list_view_item);
             var listItemAdapter = new ListItemAdapter(this, 0, _itemList);
-            itemListView.Adapter = listItemAdapter;
-            itemListView.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
-                var item = itemListView.GetItemAtPosition(e.Position);
+            _itemListView.Adapter = listItemAdapter;
+            _itemListView.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
+                var item = _itemListView.GetItemAtPosition(e.Position);
                 ListItem listItem = item.Cast<ListItem>();
-                // TODO:
                 Log.Info($"setected: {e.Position}");
                 Mixer.Current = e.Position;
             };

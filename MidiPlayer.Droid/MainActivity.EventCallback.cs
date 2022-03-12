@@ -1,6 +1,5 @@
 ﻿
 using Android.Support.V7.App;
-using Android.Widget;
 
 using System;
 
@@ -102,12 +101,15 @@ namespace MidiPlayer.Droid {
         void buttonSendSynth_Click(object sender, EventArgs e) {
             Log.Info("buttonSendSynth clicked.");
             try {
+                var midiChannel = int.Parse(_textViewChannel.Text);
+                Log.Info($"send a data to MIDI {midiChannel} channel.");
+                Log.Info($"prog: {_numberPickerProg.Value} pan: {_numberPickerPan.Value} vol: {_numberPickerVol.Value}.");
                 Data data = new() {
-                    Prog = FindViewById<NumberPicker>(Resource.Id.number_picker_prog).Value,
-                    Pan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan).Value,
-                    Vol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol).Value,
+                    Prog = _numberPickerProg.Value,
+                    Pan = _numberPickerPan.Value,
+                    Vol = _numberPickerVol.Value,
                 };
-                EventQueue.Enqueue((int) MidiChannel.ch1, data);
+                EventQueue.Enqueue(midiChannel, data);
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
