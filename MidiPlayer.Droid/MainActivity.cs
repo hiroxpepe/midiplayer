@@ -14,7 +14,6 @@ using Android.Widget;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
@@ -23,6 +22,11 @@ namespace MidiPlayer.Droid {
     [Activity(Label = "@string/app_name", Theme = "@style/Base.Theme.MaterialComponents.Light.DarkActionBar.Bridge", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ScreenOrientation = ScreenOrientation.Portrait)]
     public partial class MainActivity : AppCompatActivity {
 #nullable enable
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Const [nouns]
+
+        const int VIEW_REFRESH_TIME = 2000; // msec.
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
@@ -35,7 +39,7 @@ namespace MidiPlayer.Droid {
 
         List<ListItem> _truckList;
 
-        Task _timer;
+        Task _refreshTimer;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
@@ -43,6 +47,7 @@ namespace MidiPlayer.Droid {
         public MainActivity() {
             _playList = new();
             _truckList = new();
+            _refreshTimer = createRefreshTask();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,15 +73,7 @@ namespace MidiPlayer.Droid {
 
             initializeComponent();
             Conf.Load();
-
-            // load previous setting.
-            if (Env.ExistsSoundFont && Env.ExistsMidiFile) {
-                Synth.SoundFontPath = Env.SoundFontPath;
-                Synth.MidiFilePath = Env.MidiFilePath;
-                Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
-                _soundFontPath = Env.SoundFontPath;
-                _midiFilePath = Env.MidiFilePath;
-            }
+            loadPreviousSetting();
 
             /// <summary>
             /// add a callback function to be called when the synth is playback.
@@ -93,25 +90,14 @@ namespace MidiPlayer.Droid {
                 MainThread.BeginInvokeOnMainThread(() => {
                     Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
                 });
-                // refresh the viewlist in a few seconds.
-                _timer = new Task(async () => {
-                    while (true) {
-                        var truckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
-                        var listItemAdapter = (ListItemAdapter) truckListView.Adapter;
-                        RunOnUiThread(() => {
-                            listItemAdapter.NotifyDataSetChanged();
-                        });
-                        await Task.Delay(2000);
-                    }
-                });
-                _timer.Start();
+                _refreshTimer.Start();
             };
 
             /// <summary>
             /// add a callback function to be called when the synth ended.
             /// </summary>
             Synth.Ended += () => {
-            Log.Info("Ended called.");
+                Log.Info("Ended called.");
                 if (!_playList.Ready) {
                     Synth.Stop();
                     Synth.Start();
@@ -254,6 +240,19 @@ namespace MidiPlayer.Droid {
         }
 
         /// <summary>
+        /// load previous setting.
+        /// </summary>
+        void loadPreviousSetting() {
+            if (Env.ExistsSoundFont && Env.ExistsMidiFile) {
+                Synth.SoundFontPath = Env.SoundFontPath;
+                Synth.MidiFilePath = Env.MidiFilePath;
+                Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
+                _soundFontPath = Env.SoundFontPath;
+                _midiFilePath = Env.MidiFilePath;
+            }
+        }
+
+        /// <summary>
         /// play the song.
         /// </summary>
         async void playSong() {
@@ -296,6 +295,22 @@ namespace MidiPlayer.Droid {
             var listItem = _truckList[trackIdx];
             listItem.Name = track.Name;
             listItem.Instrument = Synth.GetVoice(track.Index);
+        }
+
+        /// <summary>
+        /// refresh the view in a few seconds.
+        /// </summary>
+        Task createRefreshTask() {
+            return new(async () => {
+                var truckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
+                var listItemAdapter = (ListItemAdapter) truckListView.Adapter;
+                while (true) {
+                    RunOnUiThread(() => {
+                        listItemAdapter.NotifyDataSetChanged();
+                    });
+                    await Task.Delay(VIEW_REFRESH_TIME);
+                }
+            });
         }
 
         /// <summary>

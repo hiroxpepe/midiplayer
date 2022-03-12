@@ -19,6 +19,7 @@ namespace MidiPlayer.Droid {
     /// an Adapter class for ListView. 
     /// </summary>
     public class ListTitleAdapter : ArrayAdapter<ListTitle> {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
@@ -72,6 +73,7 @@ namespace MidiPlayer.Droid {
     /// an Adapter class for ListView. 
     /// </summary>
     public class ListItemAdapter : ArrayAdapter<ListItem> {
+#nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
