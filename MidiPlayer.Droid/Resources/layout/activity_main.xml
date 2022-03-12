@@ -103,7 +103,7 @@
         <TableRow
             android:id="@+id/table_row_track"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:layout_below="@id/list_view_item"
             android:background="@android:color/holo_blue_light">
             <TextView
@@ -113,6 +113,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_red_light"
+                android:layout_gravity="center"
                 android:layout_weight="1"
             />
             <TextView
@@ -122,6 +123,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_orange_light"
+                android:layout_gravity="center"
                 android:layout_weight="3"
             />
         </TableRow>
@@ -138,6 +140,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_orange_light"
+                android:layout_gravity="center"
                 android:layout_weight="1"
             />
             <TextView
@@ -147,6 +150,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_green_light"
+                android:layout_gravity="center"
                 android:layout_weight="1"
             />
             <TextView
@@ -156,6 +160,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_blue_light"
+                android:layout_gravity="center"
                 android:layout_weight="1"
             />
             <TextView
@@ -165,37 +170,41 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@android:color/holo_red_light"
+                android:layout_gravity="center"
                 android:layout_weight="1"
             />
         </TableRow>
         <TableRow
             android:id="@+id/table_row_control"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="50dp"
             android:layout_below="@id/table_row_title"
             android:background="@android:color/holo_red_light">
             <NumberPicker
                 android:id="@+id/number_picker_prog_1"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="45dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_orange_light"
+                android:layout_gravity="center"
                 android:layout_weight="1"
             />
             <NumberPicker
                 android:id="@+id/number_picker_pan_1"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="45dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_green_light"
+                android:layout_gravity="center"
                 android:layout_weight="1"
             />
             <NumberPicker
                 android:id="@+id/number_picker_vol_1"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="45dp"
                 android:padding="4dp"
                 android:background="@android:color/holo_blue_light"
+                android:layout_gravity="center"
                 android:layout_weight="1"
             />
             <Button
@@ -206,6 +215,7 @@
                 android:textSize="12dp"
                 android:textStyle="bold" 
                 android:padding="0dp"
+                android:layout_gravity="center"
                 android:layout_weight="1"
             />
         </TableRow>
