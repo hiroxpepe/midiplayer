@@ -117,7 +117,8 @@
                 android:layout_weight="1"
             />
             <TextView
-                android:text="No"
+                android:id="@+id/text_view_no"
+                android:text="---"
                 android:textSize="12dp"
                 android:textStyle="bold"
                 android:layout_width="0dp"
@@ -169,7 +170,7 @@
                 android:textStyle="bold"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@android:color/holo_red_light"
+                android:background="@android:color/holo_purple"
                 android:layout_gravity="center"
                 android:layout_weight="1"
             />
@@ -181,7 +182,7 @@
             android:layout_below="@id/table_row_title"
             android:background="@android:color/holo_red_light">
             <NumberPicker
-                android:id="@+id/number_picker_prog_1"
+                android:id="@+id/number_picker_prog"
                 android:layout_width="0dp"
                 android:layout_height="45dp"
                 android:padding="4dp"
@@ -190,7 +191,7 @@
                 android:layout_weight="1"
             />
             <NumberPicker
-                android:id="@+id/number_picker_pan_1"
+                android:id="@+id/number_picker_pan"
                 android:layout_width="0dp"
                 android:layout_height="45dp"
                 android:padding="4dp"
@@ -199,7 +200,7 @@
                 android:layout_weight="1"
             />
             <NumberPicker
-                android:id="@+id/number_picker_vol_1"
+                android:id="@+id/number_picker_vol"
                 android:layout_width="0dp"
                 android:layout_height="45dp"
                 android:padding="4dp"
@@ -207,20 +208,17 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
             />
-            <Button
-                android:id="@+id/button_mute_1"
+            <CheckBox
+                android:id="@+id/check_box_mute"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:text="Mute"
-                android:textSize="12dp"
-                android:textStyle="bold" 
                 android:padding="0dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
             />
         </TableRow>
         <Button
-            android:id="@+id/button_send_synth_1"
+            android:id="@+id/button_send_synth"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:text="Done"
