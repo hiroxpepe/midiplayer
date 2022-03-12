@@ -7,203 +7,227 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_material_dark">
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/relative_layout_upper"
-        android:minWidth="2px"
-        android:minHeight="20px"
+        android:orientation="horizontal"
         android:paddingTop="2dp"
-        android:paddingBottom="3dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
+        android:paddingBottom="2dp"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/holo_orange_light">
         <Button
             android:id="@+id/button_load_soundfont"
-            android:text="sf"
-            android:textSize="25px"
+            android:text="Sound"
+            android:textSize="10dp"
             android:textStyle="bold"
-            android:layout_width="50dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
         />
         <Button
             android:id="@+id/button_load_midifile"
-            android:text="midi"
-            android:textSize="25px"
+            android:text="Song"
+            android:textSize="12dp"
             android:textStyle="bold"
-            android:layout_width="50dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/button_load_soundfont"
+            android:layout_weight="1"
         />
         <Button
             android:id="@+id/button_start"
             android:text="Start"
-            android:textSize="20px"
+            android:textSize="10dp"
             android:textStyle="bold"
-            android:layout_width="50dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/button_load_midifile"
+            android:layout_weight="1"
          />
         <Button
             android:id="@+id/button_stop"
             android:text="Stop"
-            android:textSize="25px"
+            android:textSize="12dp"
             android:textStyle="bold"
-            android:layout_width="50dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/button_start"
+            android:layout_weight="1"
          />
         <Button
             android:id="@+id/button_add_playlist"
             android:text="Add"
-            android:textSize="25px"
+            android:textSize="12dp"
             android:textStyle="bold"
-            android:layout_width="50dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/button_stop"
+            android:layout_weight="1"
          />
         <Button
             android:id="@+id/button_delete_playlist"
             android:text="Del"
-            android:textSize="25px"
-            android:textStyle="bold"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-            android:layout_width="50dp"
+            android:textSize="12dp"
+            android:textStyle="bold"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/button_add_playlist"
+            android:layout_weight="1"
          />
-    </RelativeLayout>
+    </LinearLayout>
     <RelativeLayout
         android:id="@+id/relative_layout_lower"
-        android:minWidth="25px"
-        android:minHeight="25px"
         android:paddingTop="2dp"
-        android:paddingBottom="3dp"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
+        android:paddingBottom="2dp"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/relative_layout_upper"
         android:background="@android:color/darker_gray">
-        <!-- fader1 -->
-        <LinearLayout
-            android:id="@+id/linear_layout_fader_1"
-            android:orientation="vertical"
-            android:minWidth="25px"
-            android:minHeight="25px"
-            android:layout_width="35dp"
-            android:layout_height="wrap_content"
-            android:paddingTop="0dp"
-            android:paddingBottom="0dp"
-            android:paddingStart="2dp"
-            android:paddingEnd="2dp"
-            android:background="@android:color/holo_red_light">
-            <TextView
-                android:id="@+id/text_view_ch_1"
-                android:text="1"
-                android:textSize="24px"
-                android:textStyle="bold"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="0dp"
-                android:paddingBottom="0dp"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                android:background="@android:color/holo_red_light"
-            />
-            <TextView
-                android:id="@+id/text_view_prog_1"
-                android:text="PRG"
-                android:textSize="24px"
-                android:textStyle="bold"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="0dp"
-                android:paddingBottom="0dp"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                android:background="@android:color/holo_orange_light"
-            />
-            <NumberPicker
-                android:id="@+id/number_picker_prog_1"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:padding="4dp"
-                android:background="@android:color/holo_orange_light"
-            />
-            <TextView
-                android:id="@+id/text_view_pan_1"
-                android:text="PAN"
-                android:textSize="24px"
-                android:textStyle="bold"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="0dp"
-                android:paddingBottom="0dp"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                android:background="@android:color/holo_green_light"
-            />
-            <NumberPicker
-                android:id="@+id/number_picker_pan_1"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:padding="4dp"
-                android:background="@android:color/holo_green_light"
-            />
-            <TextView
-                android:id="@+id/text_view_vol_1"
-                android:text="VOL"
-                android:textSize="24px"
-                android:textStyle="bold"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="0dp"
-                android:paddingBottom="0dp"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                android:background="@android:color/holo_blue_light"
-            />
-            <NumberPicker
-                android:id="@+id/number_picker_vol_1"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:padding="4dp"
-                android:background="@android:color/holo_blue_light"
-            />
-            <Button
-                android:id="@+id/button_mute_1"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:text="M"
-                android:textSize="24px"
-                android:textStyle="bold" 
-                android:padding="0dp"
-            />
-            <Button
-                android:id="@+id/button_send_synth_1"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:text="S"
-                android:textSize="24px"
-                android:textStyle="bold" 
-                android:padding="0dp"
-            />
-        </LinearLayout>
+        <!-- list-view title -->
         <ListView
             android:id="@+id/list_view_title"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_toRightOf ="@id/linear_layout_fader_1"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:color/holo_blue_light"
         />
+        <!-- list-view item -->
         <ListView
-            android:id="@+id/list_view_truck"
+            android:id="@+id/list_view_item"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_toRightOf ="@id/linear_layout_fader_1"
+            android:layout_height="300dp"
             android:layout_below="@id/list_view_title"
             android:layout_weight="1"
+            android:background="@android:color/holo_purple"
+        />
+        <!-- track info -->
+        <TableRow
+            android:id="@+id/table_row_track"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_below="@id/list_view_item"
+            android:background="@android:color/holo_blue_light">
+            <TextView
+                android:text="Track"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_red_light"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+            />
+            <TextView
+                android:text="No"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_orange_light"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+            />
+        </TableRow>
+        <TableRow
+            android:id="@+id/table_row_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/table_row_track"
+            android:background="@android:color/holo_blue_light">
+            <TextView
+                android:text="PRG"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_orange_light"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+            />
+            <TextView
+                android:text="PAN"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_green_light"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+            />
+            <TextView
+                android:text="VOL"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_blue_light"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+            />
+            <TextView
+                android:text="MUTE"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_red_light"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+            />
+        </TableRow>
+        <TableRow
+            android:id="@+id/table_row_control"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@id/table_row_title"
+            android:background="@android:color/holo_red_light">
+            <NumberPicker
+                android:id="@+id/number_picker_prog_1"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:padding="4dp"
+                android:background="@android:color/holo_orange_light"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+            />
+            <NumberPicker
+                android:id="@+id/number_picker_pan_1"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:padding="4dp"
+                android:background="@android:color/holo_green_light"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+            />
+            <NumberPicker
+                android:id="@+id/number_picker_vol_1"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:padding="4dp"
+                android:background="@android:color/holo_blue_light"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+            />
+            <Button
+                android:id="@+id/button_mute_1"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:text="Mute"
+                android:textSize="12dp"
+                android:textStyle="bold" 
+                android:padding="0dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+            />
+        </TableRow>
+        <Button
+            android:id="@+id/button_send_synth_1"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Done"
+            android:textSize="12dp"
+            android:textStyle="bold" 
+            android:padding="0dp"
+            android:layout_below="@id/table_row_control"
         />
     </RelativeLayout>
 </RelativeLayout>
