@@ -25,6 +25,19 @@ namespace MidiPlayer {
 
         const float SYNTH_GAIN = 0.5f;
 
+        const int MIDI_TRACK_BASE = 0;
+        const int MIDI_TRACK_COUNT = 16;
+
+        const int NOTE_ON = 144;
+        const int NOTE_OFF = 128;
+        const int PROGRAM_CHANGE = 192;
+        const int CONTROL_CHANGE = 176;
+
+        const int BANK_SELECT_MSB = 0;
+        const int BANK_SELECT_LSB = 32;
+        const int VOLUME_MSB = 7;
+        const int PAN_MSB = 10;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
@@ -63,9 +76,9 @@ namespace MidiPlayer {
 
         static Synth() {
             _onPlaybacking += (void_ptr data, fluid_midi_event_t evt) => {
-                Enumerable.Range(0, 16).ToList().ForEach(x => {
+                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
                     var eventData = EventQueue.Dequeue(x);
-                    if (!(eventData is null)) {
+                    if (eventData is not null) {
                         fluid_synth_program_change(_synth, x, eventData.Prog);
                         fluid_synth_cc(_synth, x, (int) ControlChange.Pan, eventData.Pan);
                         fluid_synth_cc(_synth, x, (int) ControlChange.Volume, eventData.Vol);
@@ -76,17 +89,17 @@ namespace MidiPlayer {
                 var control = fluid_midi_event_get_control(evt);
                 var value = fluid_midi_event_get_value(evt);
                 var program = fluid_midi_event_get_program(evt);
-                if (type != 128 && type != 144) { // not note on or note off
+                if (type != NOTE_ON && type != NOTE_OFF) { // not note on or note off
                     Log.Debug($"_type: {type} _channel: {channel} _control: {control} _value: {value} _program: {program}");
                 }
                 Task.Run(() => {
-                    if (type == 144) { // NOTE_ON = 144
+                    if (type == NOTE_ON) { // NOTE_ON = 144
                         Multi.ApplyNoteOn(channel);
-                    } else if (type == 128) { // NOTE_OFF = 128
+                    } else if (type == NOTE_OFF) { // NOTE_OFF = 128
                         Multi.ApplyNoteOff(channel);
-                    } else if (type == 192) { // PROGRAM_CHANGE = 192
+                    } else if (type == PROGRAM_CHANGE) { // PROGRAM_CHANGE = 192
                         Multi.ApplyProgramChange(channel, program);
-                    } else if (type == 176) { // CONTROL_CHANGE = 176
+                    } else if (type == CONTROL_CHANGE) { // CONTROL_CHANGE = 176
                         Multi.ApplyControlChange(channel, control, value);
                     }
                 });
@@ -185,7 +198,7 @@ namespace MidiPlayer {
                     return;
                 }
                 Multi.StandardMidiFile = _standardMidiFile;
-                Enumerable.Range(0, 16).ToList().ForEach(x => {
+                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
                     Multi.Get(x).PropertyChanged += onPropertyChanged;
                 });
                 int result = fluid_player_add(_player, MidiFilePath);
@@ -312,6 +325,7 @@ namespace MidiPlayer {
         // inner Classes
 
         static class Multi {
+#nullable enable
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // static Fields [nouns, noun phrases]
@@ -379,19 +393,19 @@ namespace MidiPlayer {
                 // PAN_MSB         = 10
                 //     _type: 176, _control: 10, _value:  64 
                 switch (control) {
-                    case 0: // BANK_SELECT_MSB
+                    case BANK_SELECT_MSB: // BANK_SELECT_MSB
                         if (channel == 9) { // Drum
                             _trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Bank = value + 1); // 128
                         }
                         break;
-                    case 32: // BANK_SELECT_LSB
+                    case BANK_SELECT_LSB: // BANK_SELECT_LSB
                         if (channel != 9) { // not Drum
                             _trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Bank = value);
                         }
                         break;
-                    case 7: // VOLUME_MSB
+                    case VOLUME_MSB: // VOLUME_MSB
                         break;
-                    case 10: // PAN_MSB
+                    case PAN_MSB: // PAN_MSB
                         break;
                     default:
                         break;
@@ -408,7 +422,7 @@ namespace MidiPlayer {
 
             static void init() {
                 _trackMap.Clear();
-                Enumerable.Range(0, 16).ToList().ForEach(x => _trackMap.Add(x, new Track(x)));
+                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => _trackMap.Add(x, new Track(x)));
                 var list = _standardMidiFile.MidiChannelList;
                 _trackMap[0].Name = _standardMidiFile.GetTrackName(0);
                 for (var idx = 0; idx < MidiChannelList.Count; idx++) {
@@ -419,6 +433,7 @@ namespace MidiPlayer {
         }
 
         public class Track : INotifyPropertyChanged {
+#nullable enable
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [nouns, noun phrases]
