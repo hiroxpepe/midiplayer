@@ -30,4 +30,14 @@
         android:layout_height="wrap_content"
         android:background="@android:color/holo_orange_light"
     />
+    <View android:layout_width="1dp" 
+        android:layout_height="match_parent"
+        android:background="#999999"
+    />
+    <TextView
+        android:id="@+id/text_view_item_channel"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_red_light"
+    />
 </LinearLayout>

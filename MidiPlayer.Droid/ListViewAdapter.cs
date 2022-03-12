@@ -13,6 +13,7 @@ namespace MidiPlayer.Droid {
     public class ListTitle {
         public string Name;
         public string Instrument;
+        public string Channel;
     }
 
     /// <summary>
@@ -36,8 +37,9 @@ namespace MidiPlayer.Droid {
             if (convertView == null) {
                 convertView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_title, parent, false);
                 viewHolder = new();
-                viewHolder.TextViewName = (TextView) convertView.FindViewById(Resource.Id.text_view_title_name);
-                viewHolder.TextViewInstrument = (TextView) convertView.FindViewById(Resource.Id.text_view_title_instrument);
+                viewHolder.TextViewName = convertView.FindViewById<TextView>(Resource.Id.text_view_title_name);
+                viewHolder.TextViewInstrument = convertView.FindViewById<TextView>(Resource.Id.text_view_title_instrument);
+                viewHolder.TextViewChannel = convertView.FindViewById<TextView>(Resource.Id.text_view_title_channel);
                 convertView.SetTag(Resource.String.view_holder_tag, viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.GetTag(Resource.String.view_holder_tag);
@@ -45,6 +47,7 @@ namespace MidiPlayer.Droid {
             ListTitle listTitle = GetItem(position);
             viewHolder.TextViewName.Text = listTitle.Name;
             viewHolder.TextViewInstrument.Text = listTitle.Instrument;
+            viewHolder.TextViewChannel.Text = listTitle.Channel;
             return convertView;
         }
 
@@ -57,6 +60,7 @@ namespace MidiPlayer.Droid {
         class ViewHolder : Java.Lang.Object {
             public TextView TextViewName;
             public TextView TextViewInstrument;
+            public TextView TextViewChannel;
         }
     }
 
@@ -67,6 +71,7 @@ namespace MidiPlayer.Droid {
         public bool Checked;
         public string Name;
         public string Instrument;
+        public string Channel;
     }
 
     /// <summary>
@@ -90,9 +95,10 @@ namespace MidiPlayer.Droid {
             if (convertView == null) {
                 convertView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item, parent, false);
                 viewHolder = new();
-                viewHolder.CheckBox = (CheckBox) convertView.FindViewById(Resource.Id.checkbox_item_select);
-                viewHolder.TextViewName = (TextView) convertView.FindViewById(Resource.Id.text_view_item_name);
-                viewHolder.TextViewInstrument = (TextView) convertView.FindViewById(Resource.Id.text_view_item_instrument);
+                viewHolder.CheckBox = convertView.FindViewById<CheckBox>(Resource.Id.checkbox_item_select);
+                viewHolder.TextViewName = convertView.FindViewById<TextView>(Resource.Id.text_view_item_name);
+                viewHolder.TextViewInstrument = convertView.FindViewById<TextView>(Resource.Id.text_view_item_instrument);
+                viewHolder.TextViewChannel = convertView.FindViewById<TextView>(Resource.Id.text_view_item_channel);
                 convertView.SetTag(Resource.String.view_holder_tag, viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.GetTag(Resource.String.view_holder_tag);
@@ -101,6 +107,7 @@ namespace MidiPlayer.Droid {
             viewHolder.CheckBox.Checked = listItem.Checked;
             viewHolder.TextViewName.Text = listItem.Name;
             viewHolder.TextViewInstrument.Text = listItem.Instrument;
+            viewHolder.TextViewChannel.Text = listItem.Channel;
             NotifyDataSetChanged();
             return convertView;
         }
@@ -115,6 +122,7 @@ namespace MidiPlayer.Droid {
             public CheckBox CheckBox;
             public TextView TextViewName;
             public TextView TextViewInstrument;
+            public TextView TextViewChannel;
         }
     }
 
