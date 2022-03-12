@@ -57,15 +57,15 @@ namespace MidiPlayer.Droid {
             var titleListView = FindViewById<ListView>(Resource.Id.list_view_title);
             titleListView.Adapter = new ListTitleAdapter(this, 0, titleList);
 
-            // list view truck
+            // list view item
             for (var i = 0; i < 16; i++) {
-                _truckList.Add(new ListItem() { Name = "------", Instrument = "------"});
+                _itemList.Add(new ListItem() { Name = "------", Instrument = "------"});
             }
-            var truckListView = FindViewById<ListView>(Resource.Id.list_view_truck);
-            var listItemAdapter = new ListItemAdapter(this, 0, _truckList);
-            truckListView.Adapter = listItemAdapter;
-            truckListView.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
-                var item = truckListView.GetItemAtPosition(e.Position);
+            var itemListView = FindViewById<ListView>(Resource.Id.list_view_item);
+            var listItemAdapter = new ListItemAdapter(this, 0, _itemList);
+            itemListView.Adapter = listItemAdapter;
+            itemListView.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
+                var item = itemListView.GetItemAtPosition(e.Position);
                 ListItem listItem = item.Cast<ListItem>();
                 // TODO:
             };
