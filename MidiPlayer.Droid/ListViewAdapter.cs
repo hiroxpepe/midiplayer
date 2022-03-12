@@ -37,9 +37,9 @@ namespace MidiPlayer.Droid {
             if (convertView == null) {
                 convertView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_title, parent, false);
                 viewHolder = new();
-                viewHolder.TextViewName = (TextView) convertView.FindViewById(Resource.Id.text_view_title_name);
-                viewHolder.TextViewInstrument = (TextView) convertView.FindViewById(Resource.Id.text_view_title_instrument);
-                viewHolder.TextViewChannel = (TextView) convertView.FindViewById(Resource.Id.text_view_title_channel);
+                viewHolder.TextViewName = convertView.FindViewById<TextView>(Resource.Id.text_view_title_name);
+                viewHolder.TextViewInstrument = convertView.FindViewById<TextView>(Resource.Id.text_view_title_instrument);
+                viewHolder.TextViewChannel = convertView.FindViewById<TextView>(Resource.Id.text_view_title_channel);
                 convertView.SetTag(Resource.String.view_holder_tag, viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.GetTag(Resource.String.view_holder_tag);
@@ -95,10 +95,10 @@ namespace MidiPlayer.Droid {
             if (convertView == null) {
                 convertView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item, parent, false);
                 viewHolder = new();
-                viewHolder.CheckBox = (CheckBox) convertView.FindViewById(Resource.Id.checkbox_item_select);
-                viewHolder.TextViewName = (TextView) convertView.FindViewById(Resource.Id.text_view_item_name);
-                viewHolder.TextViewInstrument = (TextView) convertView.FindViewById(Resource.Id.text_view_item_instrument);
-                viewHolder.TextViewChannel = (TextView) convertView.FindViewById(Resource.Id.text_view_item_channel);
+                viewHolder.CheckBox = convertView.FindViewById<CheckBox>(Resource.Id.checkbox_item_select);
+                viewHolder.TextViewName = convertView.FindViewById<TextView>(Resource.Id.text_view_item_name);
+                viewHolder.TextViewInstrument = convertView.FindViewById<TextView>(Resource.Id.text_view_item_instrument);
+                viewHolder.TextViewChannel = convertView.FindViewById<TextView>(Resource.Id.text_view_item_channel);
                 convertView.SetTag(Resource.String.view_holder_tag, viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.GetTag(Resource.String.view_holder_tag);
