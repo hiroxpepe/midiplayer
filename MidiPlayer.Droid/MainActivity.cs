@@ -19,7 +19,13 @@ using Xamarin.Essentials;
 
 namespace MidiPlayer.Droid {
 
-    [Activity(Label = "@string/app_name", Theme = "@style/Base.Theme.MaterialComponents.Light.DarkActionBar.Bridge", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, ScreenOrientation = ScreenOrientation.Portrait)]
+    [Activity(
+        Label = "@string/app_name", 
+        Theme = "@style/Base.Theme.MaterialComponents.Light.DarkActionBar.Bridge", 
+        MainLauncher = true, 
+        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, 
+        ScreenOrientation = ScreenOrientation.Portrait
+    )]
     public partial class MainActivity : AppCompatActivity {
 #nullable enable
 
@@ -54,7 +60,7 @@ namespace MidiPlayer.Droid {
         // EventHandler
 
         /// <summary>
-        /// Activity OnRequestPermissionsResult().
+        /// Activity OnRequestPermissionsResult.
         /// </summary>
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults) {
             Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -62,7 +68,7 @@ namespace MidiPlayer.Droid {
         }
 
         /// <summary>
-        /// Activity OnCreate()
+        /// Activity OnCreate.
         /// </summary>
         protected override void OnCreate(Bundle? savedInstanceState) {
             base.OnCreate(savedInstanceState);
@@ -253,7 +259,7 @@ namespace MidiPlayer.Droid {
         }
 
         /// <summary>
-        /// play the song.
+        /// play a song.
         /// </summary>
         async void playSong() {
             try {
