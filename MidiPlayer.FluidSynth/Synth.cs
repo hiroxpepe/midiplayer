@@ -76,14 +76,6 @@ namespace MidiPlayer {
 
         static Synth() {
             _onPlaybacking += (void_ptr data, fluid_midi_event_t evt) => {
-                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
-                    var eventData = EventQueue.Dequeue(x);
-                    if (eventData is not null) {
-                        fluid_synth_program_change(_synth, x, eventData.Prog);
-                        fluid_synth_cc(_synth, x, (int) ControlChange.Pan, eventData.Pan);
-                        fluid_synth_cc(_synth, x, (int) ControlChange.Volume, eventData.Vol);
-                    }
-                });
                 var type = fluid_midi_event_get_type(evt);
                 var channel = fluid_midi_event_get_channel(evt);
                 var control = fluid_midi_event_get_control(evt);
@@ -101,6 +93,17 @@ namespace MidiPlayer {
                         Multi.ApplyProgramChange(channel, program);
                     } else if (type == CONTROL_CHANGE) { // CONTROL_CHANGE = 176
                         Multi.ApplyControlChange(channel, control, value);
+                    }
+                });
+                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
+                    var eventData = EventQueue.Dequeue(x);
+                    if (eventData is not null) {
+                        fluid_synth_program_change(_synth, x, eventData.Prog);
+                        fluid_synth_cc(_synth, x, (int) ControlChange.Pan, eventData.Pan);
+                        fluid_synth_cc(_synth, x, (int) ControlChange.Volume, eventData.Vol);
+                        Task.Run(() => {
+                            Multi.ApplyProgramChange(x, eventData.Prog);
+                        });
                     }
                 });
                 return fluid_synth_handle_midi_event(data, evt);
