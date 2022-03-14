@@ -108,6 +108,7 @@ namespace MidiPlayer.Droid {
                     Prog = _numberPickerProg.Value,
                     Pan = _numberPickerPan.Value,
                     Vol = _numberPickerVol.Value,
+                    Mute = _checkBoxMute.Checked
                 };
                 EventQueue.Enqueue(midiChannel, data);
             } catch (Exception ex) {

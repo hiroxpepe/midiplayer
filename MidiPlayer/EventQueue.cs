@@ -54,6 +54,8 @@ namespace MidiPlayer {
 
         int _vol;
 
+        bool _mute;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, noun phrase, adjective] 
 
@@ -70,6 +72,11 @@ namespace MidiPlayer {
         public int Vol {
             get => _vol - 1;
             set => _vol = value;
+        }
+
+        public bool Mute {
+            get => _mute;
+            set => _mute = value;
         }
     }
 }
