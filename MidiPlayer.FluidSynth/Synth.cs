@@ -250,6 +250,8 @@ namespace MidiPlayer {
                 }
                 final();
                 Log.Info("stop :|");
+                GC.Collect();
+                Log.Info("GC.Collect.");
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
