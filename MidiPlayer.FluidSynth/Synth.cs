@@ -415,8 +415,10 @@ namespace MidiPlayer {
                         }
                         break;
                     case VOLUME_MSB: // VOLUME_MSB
+                        _trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Volume = value);
                         break;
                     case PAN_MSB: // PAN_MSB
+                        _trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Pan = value);
                         break;
                     default:
                         break;
@@ -460,6 +462,10 @@ namespace MidiPlayer {
             int _bank = 0;
 
             int _program = 0;
+
+            int _volume = 104;
+
+            int _pan = 64;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Constructor
@@ -529,6 +535,22 @@ namespace MidiPlayer {
                 set {
                     _program = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Program)));
+                }
+            }
+
+            public int Volume {
+                get => _volume;
+                set {
+                    _volume = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Volume)));
+                }
+            }
+
+            public int Pan {
+                get => _pan;
+                set {
+                    _pan = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Pan)));
                 }
             }
         }

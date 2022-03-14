@@ -79,6 +79,13 @@ namespace MidiPlayer.Droid {
         public static Fader GetPrevious() {
             return _mixer[_previous];
         }
+
+        /// <summary>
+        /// get a fader by index.
+        /// </summary>
+        public static Fader GetBy(int index) {
+            return _mixer[index];
+        }
     }
 
     /// <summary>
