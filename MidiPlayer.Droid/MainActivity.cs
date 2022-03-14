@@ -79,6 +79,7 @@ namespace MidiPlayer.Droid {
             initializeComponent();
             Conf.Load();
             loadPreviousSetting();
+            _refreshTimer.Start();
 
             /// <summary>
             /// add a callback function to be called when the synth is playback.
@@ -95,7 +96,6 @@ namespace MidiPlayer.Droid {
                 MainThread.BeginInvokeOnMainThread(() => {
                     Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
                 });
-                _refreshTimer.Start();
             };
 
             /// <summary>
