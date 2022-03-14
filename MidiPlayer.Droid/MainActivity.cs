@@ -361,13 +361,16 @@ namespace MidiPlayer.Droid {
         /// FIXME: delete
         /// </summary>
         static void logMemoryInro() {
-            var maxMemory = Java.Lang.Runtime.GetRuntime().MaxMemory();
-            var freeMemory = Java.Lang.Runtime.GetRuntime().FreeMemory();
-            var totalMemory = Java.Lang.Runtime.GetRuntime().TotalMemory();
-            Log.Debug($"maxMemory: {maxMemory.ToMegabytes()}MB");
-            Log.Debug($"freeMemory: {freeMemory.ToMegabytes()}MB");
-            Log.Debug($"totalMemory: {totalMemory.ToMegabytes()}MB");
-            // TODO: Mono runtime.
+            // JVM runtime.
+            var jvmMaxMemory = Java.Lang.Runtime.GetRuntime().MaxMemory();
+            var jvmFreeMemory = Java.Lang.Runtime.GetRuntime().FreeMemory();
+            var jvmTotalMemory = Java.Lang.Runtime.GetRuntime().TotalMemory();
+            Log.Debug($"JVM maxMemory: {jvmMaxMemory.ToMegabytes()}MB");
+            Log.Debug($"JVM freeMemory: {jvmFreeMemory.ToMegabytes()}MB");
+            Log.Debug($"JVM totalMemory: {jvmTotalMemory.ToMegabytes()}MB");
+            // Mono runtime.
+            var monoTotalMemory = GC.GetTotalMemory(false);
+            Log.Debug($"Mono totalMemory: {monoTotalMemory.ToMegabytes()}MB");
         }
     }
 }
