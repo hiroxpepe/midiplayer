@@ -312,6 +312,12 @@ namespace MidiPlayer.Droid {
             listItem.Name = track.Name;
             listItem.Instrument = Synth.GetVoice(track.Index);
             listItem.Channel = track.Channel.ToString();
+
+            // update a fader.
+            Fader fader = Mixer.GetBy(trackIdx);
+            fader.Program = track.Program + 1; // zero base to one base;
+            fader.Pan = track.Pan + 1; // zero base to one base;
+            fader.Volume = track.Volume + 1; // zero base to one base;
         }
 
         /// <summary>
