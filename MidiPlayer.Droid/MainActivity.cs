@@ -13,6 +13,7 @@ using Android.Support.V7.App;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
@@ -96,6 +97,7 @@ namespace MidiPlayer.Droid {
                 MainThread.BeginInvokeOnMainThread(() => {
                     Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
                 });
+                initializeListItem();
             };
 
             /// <summary>
@@ -324,6 +326,16 @@ namespace MidiPlayer.Droid {
                     });
                     await Task.Delay(VIEW_REFRESH_TIME);
                 }
+            });
+        }
+
+        /// <summary>
+        /// initialize listItem.
+        /// </summary>
+        void initializeListItem() {
+            Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
+                var listItem = _itemList[x];
+                listItem.Name = "------"; listItem.Instrument = "------"; listItem.Channel = "---";
             });
         }
 
