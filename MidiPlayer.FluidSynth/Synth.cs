@@ -38,6 +38,8 @@ namespace MidiPlayer {
         const int VOLUME_MSB = 7;
         const int PAN_MSB = 10;
 
+        const int MUTE_VOLUME = 0;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
@@ -100,7 +102,11 @@ namespace MidiPlayer {
                     if (eventData is not null) {
                         fluid_synth_program_change(_synth, x, eventData.Prog);
                         fluid_synth_cc(_synth, x, (int) ControlChange.Pan, eventData.Pan);
-                        fluid_synth_cc(_synth, x, (int) ControlChange.Volume, eventData.Vol);
+                        if (eventData.Mute) {
+                            fluid_synth_cc(_synth, x, (int) ControlChange.Volume, MUTE_VOLUME);
+                        } else {
+                            fluid_synth_cc(_synth, x, (int) ControlChange.Volume, eventData.Vol);
+                        }
                         Task.Run(() => {
                             Multi.ApplyProgramChange(x, eventData.Prog);
                         });
