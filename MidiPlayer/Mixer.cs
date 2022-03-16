@@ -2,12 +2,12 @@
 using System.ComponentModel;
 using System.Linq;
 
-namespace MidiPlayer.Droid {
+namespace MidiPlayer {
 
     /// <summary>
     /// Mixer object.
     /// </summary>
-    static class Mixer {
+    public static class Mixer {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ namespace MidiPlayer.Droid {
     /// <summary>
     /// Fader class.
     /// </summary>
-    class Fader {
+    public class Fader {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
