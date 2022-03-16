@@ -124,11 +124,36 @@ namespace MidiPlayer.Droid {
             };
 
             /// <summary>
-            /// add a callback function to be called when the mixer updated.
+            /// add a callback function to be called when the mixer selected.
             /// </summary>
             Mixer.Selected += (object sender, PropertyChangedEventArgs e) => {
                 if (e.PropertyName is nameof(Mixer.Current)) {
                     loadFader();
+                }
+            };
+
+            /// <summary>
+            /// add a callback function to be called when the mixer updated.
+            /// </summary>
+            Mixer.Updated += (object sender, PropertyChangedEventArgs e) => {
+                return;
+                // FIXME:
+                if ((((Mixer.Fader) sender).Index == Mixer.Current)) {
+                    if (e.PropertyName is nameof(Mixer.Fader.Name)) {
+                        Log.Debug($"fadar {Mixer.Current}'s Name is updated.");
+                    }
+                    if (e.PropertyName is nameof(Mixer.Fader.Bank)) {
+                        Log.Debug($"fadar {Mixer.Current}'s Bank is updated.");
+                    }
+                    if (e.PropertyName is nameof(Mixer.Fader.Program)) {
+                        Log.Debug($"fadar {Mixer.Current}'s Program is updated.");
+                    }
+                    if (e.PropertyName is nameof(Mixer.Fader.Volume)) {
+                        Log.Debug($"fadar {Mixer.Current}'s Volume is updated.");
+                    }
+                    if (e.PropertyName is nameof(Mixer.Fader.Pan)) {
+                        Log.Debug($"fadar {Mixer.Current}'s Pan is updated.");
+                    }
                 }
             };
         }
@@ -314,7 +339,7 @@ namespace MidiPlayer.Droid {
             listItem.Channel = track.Channel.ToString();
 
             // update a fader.
-            Fader fader = Mixer.GetBy(trackIdx);
+            var fader = Mixer.GetBy(trackIdx);
             fader.Program = track.Program + 1; // zero base to one base;
             fader.Pan = track.Pan + 1; // zero base to one base;
             fader.Volume = track.Volume + 1; // zero base to one base;
