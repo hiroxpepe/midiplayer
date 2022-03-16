@@ -32,19 +32,32 @@ namespace MidiPlayer {
             _mixer = new();
             _current = 0;
             Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
-                _mixer.Add(x, new Fader(x));
+                Fader fader = new(x);
+                fader.Updated += Updated;
+                _mixer.Add(x, fader);
             });
         }
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // Events [verb, verb phrase] 
 
         /// <summary>
-        /// static selected event handler.
+        /// selected event handler.
         /// </summary>
+        /// <remarks>
+        /// called when Mixer's channel is clicked.<br/>
+        /// </remarks>
         public static event PropertyChangedEventHandler? Selected;
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// updated event handler.
+        /// </summary>
+        /// <remarks>
+        /// called when Fader's properties change.<br/>
+        /// </remarks>
+        public static event PropertyChangedEventHandler? Updated;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // public static Properties [noun, noun phrase, adjective]
 
         /// <summary>
@@ -63,7 +76,7 @@ namespace MidiPlayer {
             }
         }
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // public static Methods [verb, verb phrases]
 
         /// <summary>
@@ -86,117 +99,117 @@ namespace MidiPlayer {
         public static Fader GetBy(int index) {
             return _mixer[index];
         }
-    }
-
-    /// <summary>
-    /// Fader class.
-    /// </summary>
-    public class Fader {
-#nullable enable
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // Fields [nouns, noun phrases]
-
-        int _index = -1;
-
-        bool _sounds = true; // mute param.
-
-        string _name = "undefined";
-
-        int _channel = -1;
-
-        int _bank = 0;
-
-        int _program = 0;
-
-        int _volume = 104;
-
-        int _pan = 64; // center
-
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // Constructor
-
-        public Fader(int index) {
-            _index = index;
-        }
-
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // Events [verb, verb phrase] 
 
         /// <summary>
-        /// updated event handler.
+        /// Fader class.
         /// </summary>
-        public event PropertyChangedEventHandler? Updated;
+        public class Fader {
+#nullable enable
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // Properties [noun, noun phrase, adjective]
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Fields [nouns, noun phrases]
 
-        public int Index {
-            get => _index;
-            set {
-                _index = value;
-                Updated?.Invoke(this, new(nameof(Index)));
+            int _index = -1;
+
+            bool _sounds = true; // mute param.
+
+            string _name = "undefined";
+
+            int _channel = -1;
+
+            int _bank = 0;
+
+            int _program = 0;
+
+            int _volume = 104;
+
+            int _pan = 64; // center
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Constructor
+
+            public Fader(int index) {
+                _index = index;
             }
-        }
 
-        public bool Sounds {
-            get => _sounds;
-            set {
-                _sounds = value;
-                Updated?.Invoke(this, new(nameof(Sounds)));
-            }
-        }
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Events [verb, verb phrase] 
 
-        public string Name {
-            get => _name;
-            set {
-                _name = value;
-                Updated?.Invoke(this, new(nameof(Name)));
-            }
-        }
+            /// <summary>
+            /// updated event handler.
+            /// </summary>
+            public event PropertyChangedEventHandler? Updated;
 
-        public int Channel {
-            get => _channel;
-            set {
-                _channel = value;
-                Updated?.Invoke(this, new(nameof(Channel)));
-            }
-        }
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            // Properties [noun, noun phrase, adjective]
 
-        public int Bank {
-            get {
-                if (_channel == 9 && _bank != 128) {
-                    return 128; // Drum
+            public int Index {
+                get => _index;
+                set {
+                    _index = value; // TODO: Compare if the value is the same value as the previous.
+                    Updated?.Invoke(this, new(nameof(Index))); // FIXME: not Invoke if two values are the same.
                 }
-                return _bank;
             }
-            set {
-                _bank = value;
-                Updated?.Invoke(this, new(nameof(Bank)));
-            }
-        }
 
-        public int Program {
-            get => _program;
-            set {
-                _program = value;
-                Updated?.Invoke(this, new(nameof(Program)));
+            public bool Sounds {
+                get => _sounds;
+                set {
+                    _sounds = value; // TODO: Compare if the value is the same value as the previous.
+                    Updated?.Invoke(this, new(nameof(Sounds))); // FIXME: not Invoke if two values are the same.
+                }
             }
-        }
 
-        public int Volume {
-            get => _volume;
-            set {
-                _volume = value;
-                Updated?.Invoke(this, new(nameof(Volume)));
+            public string Name {
+                get => _name;
+                set {
+                    _name = value; // TODO: Compare if the value is the same value as the previous.
+                    Updated?.Invoke(this, new(nameof(Name))); // FIXME: not Invoke if two values are the same.
+                }
             }
-        }
 
-        public int Pan {
-            get => _pan;
-            set {
-                _pan = value;
-                Updated?.Invoke(this, new(nameof(Pan)));
+            public int Channel {
+                get => _channel;
+                set {
+                    _channel = value; // TODO: Compare if the value is the same value as the previous.
+                    Updated?.Invoke(this, new(nameof(Channel))); // FIXME: not Invoke if two values are the same.
+                }
+            }
+
+            public int Bank {
+                get {
+                    if (_channel == 9 && _bank != 128) {
+                        return 128; // Drum
+                    }
+                    return _bank;
+                }
+                set {
+                    _bank = value; // TODO: Compare if the value is the same value as the previous.
+                    Updated?.Invoke(this, new(nameof(Bank))); // FIXME: not Invoke if two values are the same.
+                }
+            }
+
+            public int Program {
+                get => _program;
+                set {
+                    _program = value; // TODO: Compare if the value is the same value as the previous.
+                    Updated?.Invoke(this, new(nameof(Program))); // FIXME: not Invoke if two values are the same.
+                }
+            }
+
+            public int Volume {
+                get => _volume;
+                set {
+                    _volume = value; // TODO: Compare if the value is the same value as the previous.
+                    Updated?.Invoke(this, new(nameof(Volume))); // FIXME: not Invoke if two values are the same.
+                }
+            }
+
+            public int Pan {
+                get => _pan;
+                set {
+                    _pan = value; // TODO: Compare if the value is the same value as the previous.
+                    Updated?.Invoke(this, new(nameof(Pan))); // FIXME: not Invoke if two values are the same.
+                }
             }
         }
     }
