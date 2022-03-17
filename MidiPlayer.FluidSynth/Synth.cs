@@ -208,7 +208,7 @@ namespace MidiPlayer {
                 }
                 Multi.StandardMidiFile = _standardMidiFile;
                 Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
-                    Multi.Get(x).PropertyChanged += onPropertyChanged;
+                    Multi.GetBy(x).PropertyChanged += onPropertyChanged;
                 });
                 int result = fluid_player_add(_player, MidiFilePath);
                 if (result == FLUID_FAILED) {
@@ -273,12 +273,12 @@ namespace MidiPlayer {
         }
 
         public static int GetChannel(int track) {
-            var channel = Multi.Get(track).Channel;
+            var channel = Multi.GetBy(track).Channel;
             return channel;
         }
 
         public static int GetBank(int track) {
-            var bank = Multi.Get(track).Bank;
+            var bank = Multi.GetBy(track).Bank;
             if (bank == -1) { // unset BANK_SELECT_LSB = 32
                 bank = 0;
             }
@@ -286,7 +286,7 @@ namespace MidiPlayer {
         }
 
         public static int GetProgram(int track) {
-            var program = Multi.Get(track).Program;
+            var program = Multi.GetBy(track).Program;
             return program;
         }
 
@@ -298,12 +298,12 @@ namespace MidiPlayer {
         }
 
         public static string GetTrackName(int track) {
-            var name = Multi.Get(track).Name;
+            var name = Multi.GetBy(track).Name;
             return name;
         }
 
         public static bool IsSounded(int channel) {
-            return Multi.Get(channel).Sounds;
+            return Multi.GetBy(channel).Sounds;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -425,7 +425,10 @@ namespace MidiPlayer {
                 }
             }
 
-            public static Track Get(int index) {
+            /// <summary>
+            /// get a trak by index.
+            /// </summary>
+            public static Track GetBy(int index) {
                 var track = _trackMap[index];
                 return track;
             }
@@ -470,7 +473,7 @@ namespace MidiPlayer {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Constructor
 
-            public Track(int index) {
+            internal Track(int index) {
                 _index = index;
             }
 

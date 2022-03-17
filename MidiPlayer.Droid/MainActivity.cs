@@ -136,23 +136,21 @@ namespace MidiPlayer.Droid {
             /// add a callback function to be called when the mixer updated.
             /// </summary>
             Mixer.Updated += (object sender, PropertyChangedEventArgs e) => {
-                return;
-                // FIXME:
                 if ((((Mixer.Fader) sender).Index == Mixer.Current)) {
                     if (e.PropertyName is nameof(Mixer.Fader.Name)) {
-                        Log.Debug($"fadar {Mixer.Current}'s Name is updated.");
+                        Log.Debug($"fadar {Mixer.Current} Name is updated.");
                     }
                     if (e.PropertyName is nameof(Mixer.Fader.Bank)) {
-                        Log.Debug($"fadar {Mixer.Current}'s Bank is updated.");
+                        Log.Debug($"fadar {Mixer.Current} Bank is updated.");
                     }
                     if (e.PropertyName is nameof(Mixer.Fader.Program)) {
-                        Log.Debug($"fadar {Mixer.Current}'s Program is updated.");
+                        Log.Debug($"fadar {Mixer.Current} Program is updated.");
                     }
                     if (e.PropertyName is nameof(Mixer.Fader.Volume)) {
-                        Log.Debug($"fadar {Mixer.Current}'s Volume is updated.");
+                        Log.Debug($"fadar {Mixer.Current} Volume is updated.");
                     }
                     if (e.PropertyName is nameof(Mixer.Fader.Pan)) {
-                        Log.Debug($"fadar {Mixer.Current}'s Pan is updated.");
+                        Log.Debug($"fadar {Mixer.Current} Pan is updated.");
                     }
                 }
             };
@@ -391,7 +389,7 @@ namespace MidiPlayer.Droid {
         void saveFader() {
             var fader = Mixer.GetPrevious();
             if (int.TryParse(_textViewChannel.Text, out int channel)) {
-                fader.Channel = channel;
+                fader.Channel = channel; // MEMO:
                 fader.Program = _numberPickerProg.Value;
                 fader.Pan = _numberPickerPan.Value;
                 fader.Volume = _numberPickerVol.Value;

@@ -19,21 +19,43 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
+        /// <summary>
+        /// a Dictionary object that holds faders.
+        /// </summary>
         static Map<int, Fader> _mixer;
 
+        /// <summary>
+        /// the current index value of the selected fader.
+        /// </summary>
         static int _current;
 
+        /// <summary>
+        /// the index value of the previously selected fader.
+        /// </summary>
         static int _previous;
+
+        /// <summary>
+        /// func object to be called when a fader is selected.
+        /// </summary>
+        static PropertyChangedEventHandler _onSelected;
+
+        /// <summary>
+        /// func object to be called when a fader is updated.
+        /// </summary>
+        static PropertyChangedEventHandler _onUpdated;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Constructor
 
+        /// <summary>
+        /// static constructor.
+        /// </summary>
         static Mixer() {
             _mixer = new();
             _current = 0;
             Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
                 Fader fader = new(x);
-                fader.Updated += Updated;
+                fader.Updated += onUpdate;
                 _mixer.Add(x, fader);
             });
         }
@@ -47,7 +69,10 @@ namespace MidiPlayer {
         /// <remarks>
         /// called when Mixer's channel is clicked.<br/>
         /// </remarks>
-        public static event PropertyChangedEventHandler? Selected;
+        public static event PropertyChangedEventHandler? Selected {
+            add => _onSelected += value;
+            remove => _onSelected -= value;
+        }
 
         /// <summary>
         /// updated event handler.
@@ -55,7 +80,10 @@ namespace MidiPlayer {
         /// <remarks>
         /// called when Fader's properties change.<br/>
         /// </remarks>
-        public static event PropertyChangedEventHandler? Updated;
+        public static event PropertyChangedEventHandler? Updated {
+            add => _onUpdated += value;
+            remove => _onUpdated -= value;
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public static Properties [noun, noun phrase, adjective]
@@ -72,7 +100,7 @@ namespace MidiPlayer {
                 _previous = _current;
                 _current = value;
                 Log.Info($"current: {_current}");
-                Selected?.Invoke(null, new(nameof(Current)));
+                _onSelected(null, new(nameof(Current)));
             }
         }
 
@@ -100,6 +128,19 @@ namespace MidiPlayer {
             return _mixer[index];
         }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // private static Methods [verb, verb phrases]
+
+        /// <summary>
+        /// called when a fader value is updated.
+        /// </summary>
+        static void onUpdate(object sender, PropertyChangedEventArgs e) {
+            _onUpdated(sender, e);
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // inner Classes
+
         /// <summary>
         /// Fader class.
         /// </summary>
@@ -109,26 +150,53 @@ namespace MidiPlayer {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [nouns, noun phrases]
 
+            /// <summary>
+            /// an index value of a fader.
+            /// </summary>
             int _index = -1;
 
-            bool _sounds = true; // mute param.
+            /// <summary>
+            /// a value of whether the fader is on or off.
+            /// </summary>
+            bool _sounds = true; // mute parameter.
 
+            /// <summary>
+            /// a midi channel number of a fader.
+            /// </summary>
             string _name = "undefined";
 
+            /// <summary>
+            /// 
+            /// </summary>
             int _channel = -1;
 
+            /// <summary>
+            /// a midi bank number of a fader.
+            /// </summary>
             int _bank = 0;
 
+            /// <summary>
+            /// a midi program number of a fader.
+            /// </summary>
             int _program = 0;
 
+            /// <summary>
+            /// a midi volume value of a fader.
+            /// </summary>
             int _volume = 104;
 
+            /// <summary>
+            /// a midi pan value of a fader.
+            /// </summary>
             int _pan = 64; // center
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Constructor
 
-            public Fader(int index) {
+            /// <summary>
+            /// internal constructor.
+            /// </summary>
+            internal Fader(int index) {
                 _index = index;
             }
 
@@ -138,43 +206,66 @@ namespace MidiPlayer {
             /// <summary>
             /// updated event handler.
             /// </summary>
-            public event PropertyChangedEventHandler? Updated;
+            internal event PropertyChangedEventHandler? Updated;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, noun phrase, adjective]
 
+            /// <summary>
+            /// an index value of a fader.
+            /// </summary>
             public int Index {
                 get => _index;
                 set {
-                    _index = value; // TODO: Compare if the value is the same value as the previous.
-                    Updated?.Invoke(this, new(nameof(Index))); // FIXME: not Invoke if two values are the same.
+                    if (value != _index) {
+                        _index = value;
+                        Updated?.Invoke(this, new(nameof(Index)));
+                    }
                 }
             }
 
+            /// <summary>
+            /// a value of whether the fader is on or off.
+            /// </summary>
             public bool Sounds {
                 get => _sounds;
                 set {
-                    _sounds = value; // TODO: Compare if the value is the same value as the previous.
-                    Updated?.Invoke(this, new(nameof(Sounds))); // FIXME: not Invoke if two values are the same.
+                    if (value != _sounds) {
+                        _sounds = value;
+                        Updated?.Invoke(this, new(nameof(Sounds)));
+                    }
                 }
             }
 
+            /// <summary>
+            /// a midi track name of a fader.
+            /// </summary>
             public string Name {
                 get => _name;
                 set {
-                    _name = value; // TODO: Compare if the value is the same value as the previous.
-                    Updated?.Invoke(this, new(nameof(Name))); // FIXME: not Invoke if two values are the same.
+                    if (value != _name) {
+                        _name = value;
+                        Updated?.Invoke(this, new(nameof(Name)));
+                    }
                 }
             }
 
+            /// <summary>
+            /// a midi channel number of a fader.
+            /// </summary>
             public int Channel {
                 get => _channel;
                 set {
-                    _channel = value; // TODO: Compare if the value is the same value as the previous.
-                    Updated?.Invoke(this, new(nameof(Channel))); // FIXME: not Invoke if two values are the same.
+                    if (value != _channel) {
+                        _channel = value;
+                        Updated?.Invoke(this, new(nameof(Channel)));
+                    }
                 }
             }
 
+            /// <summary>
+            /// a midi bank number of a fader.
+            /// </summary>
             public int Bank {
                 get {
                     if (_channel == 9 && _bank != 128) {
@@ -183,32 +274,49 @@ namespace MidiPlayer {
                     return _bank;
                 }
                 set {
-                    _bank = value; // TODO: Compare if the value is the same value as the previous.
-                    Updated?.Invoke(this, new(nameof(Bank))); // FIXME: not Invoke if two values are the same.
+                    if (value != _bank) {
+                        _bank = value;
+                        Updated?.Invoke(this, new(nameof(Bank)));
+                    }
                 }
             }
 
+            /// <summary>
+            /// a midi program number of a fader.
+            /// </summary>
             public int Program {
                 get => _program;
                 set {
-                    _program = value; // TODO: Compare if the value is the same value as the previous.
-                    Updated?.Invoke(this, new(nameof(Program))); // FIXME: not Invoke if two values are the same.
+                    if (value != _program) {
+                        _program = value;
+                        Updated?.Invoke(this, new(nameof(Program)));
+                    }
                 }
             }
 
+            /// <summary>
+            /// a midi volume value of a fader.
+            /// </summary>
             public int Volume {
                 get => _volume;
                 set {
-                    _volume = value; // TODO: Compare if the value is the same value as the previous.
-                    Updated?.Invoke(this, new(nameof(Volume))); // FIXME: not Invoke if two values are the same.
+                    if (value != _volume) {
+                        _volume = value;
+                        Updated?.Invoke(this, new(nameof(Volume)));
+                    }
                 }
             }
 
+            /// <summary>
+            /// a midi pan value of a fader.
+            /// </summary>
             public int Pan {
                 get => _pan;
                 set {
-                    _pan = value; // TODO: Compare if the value is the same value as the previous.
-                    Updated?.Invoke(this, new(nameof(Pan))); // FIXME: not Invoke if two values are the same.
+                    if (value != _pan) {
+                        _pan = value;
+                        Updated?.Invoke(this, new(nameof(Pan)));
+                    }
                 }
             }
         }
