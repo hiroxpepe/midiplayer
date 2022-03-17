@@ -68,15 +68,31 @@ namespace MidiPlayer.Droid {
             _numberPickerProg = FindViewById<NumberPicker>(Resource.Id.number_picker_prog);
             _numberPickerProg.MinValue = 1;
             _numberPickerProg.MaxValue = 128;
+            _numberPickerProg.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
+                var fader = Mixer.GetCurrent();
+                fader.Program = _numberPickerProg.Value;
+            };
             _numberPickerPan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan);
             _numberPickerPan.MinValue = 1;
             _numberPickerPan.MaxValue = 128;
             _numberPickerPan.Value = 65;
+            _numberPickerPan.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
+                var fader = Mixer.GetCurrent();
+                fader.Pan = _numberPickerPan.Value;
+            };
             _numberPickerVol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol);
             _numberPickerVol.MinValue = 1;
             _numberPickerVol.MaxValue = 128;
             _numberPickerVol.Value = 104;
+            _numberPickerVol.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
+                var fader = Mixer.GetCurrent();
+                fader.Volume = _numberPickerVol.Value;
+            };
             _checkBoxMute = FindViewById<CheckBox>(Resource.Id.check_box_mute);
+            _checkBoxMute.CheckedChange += (object sender, CheckBox.CheckedChangeEventArgs e) => {
+                var fader = Mixer.GetCurrent();
+                fader.Sounds = !_checkBoxMute.Checked;
+            };
             _buttonSendSynth = FindViewById<Button>(Resource.Id.button_send_synth);
             _buttonSendSynth.Click += buttonSendSynth_Click;
 
