@@ -27,6 +27,9 @@ namespace MidiPlayer {
         /// <summary>
         /// the current index value of the selected fader.
         /// </summary>
+        /// <remarks>
+        /// base index value is 0.
+        /// </remarks>
         static int _current;
 
         /// <summary>
@@ -92,7 +95,7 @@ namespace MidiPlayer {
         /// get selected fader number.
         /// </summary>
         /// <remarks>
-        /// base is 0 value.
+        /// base index value is 0.
         /// </remarks>
         public static int Current {
             get => _current;
@@ -122,7 +125,7 @@ namespace MidiPlayer {
         }
 
         /// <summary>
-        /// get a fader by index.
+        /// get a fader by 0 based index value.
         /// </summary>
         public static Fader GetBy(int index) {
             return _mixer[index];
@@ -151,8 +154,11 @@ namespace MidiPlayer {
             // Fields [nouns, noun phrases]
 
             /// <summary>
-            /// an index value of a fader.
+            /// a track index value of a fader.
             /// </summary>
+            /// <remarks>
+            /// base index value is 0, maxim value is MIDI_TRACK_COUNT.
+            /// </remarks>
             int _index = -1;
 
             /// <summary>
@@ -166,28 +172,43 @@ namespace MidiPlayer {
             string _name = "undefined";
 
             /// <summary>
-            /// 
+            /// a midi channel number of a fader.
             /// </summary>
+            /// <remarks>
+            /// base index value is 0, maxim value is MIDI_TRACK_COUNT.
+            /// </remarks>
             int _channel = -1;
 
             /// <summary>
             /// a midi bank number of a fader.
             /// </summary>
-            int _bank = 0;
+            /// <remarks>
+            /// minimum value is 0, maxim value is 127.
+            /// </remarks>
+            int _bank = -1;
 
             /// <summary>
             /// a midi program number of a fader.
             /// </summary>
+            /// <remarks>
+            /// minimum value is 0, maxim value is 127.
+            /// </remarks>
             int _program = 0;
 
             /// <summary>
             /// a midi volume value of a fader.
             /// </summary>
+            /// <remarks>
+            /// minimum value is 0, maxim value is 127.
+            /// </remarks>
             int _volume = 104;
 
             /// <summary>
             /// a midi pan value of a fader.
             /// </summary>
+            /// <remarks>
+            /// full left value is 0, center value is 64, full right value is 127.
+            /// </remarks>
             int _pan = 64; // center
 
             ///////////////////////////////////////////////////////////////////////////////////////////
@@ -212,8 +233,11 @@ namespace MidiPlayer {
             // Properties [noun, noun phrase, adjective]
 
             /// <summary>
-            /// an index value of a fader.
+            /// a track index value of a fader.
             /// </summary>
+            /// <remarks>
+            /// base index is 0, maxim is MIDI_TRACK_COUNT value.
+            /// </remarks>
             public int Index {
                 get => _index;
                 set {
@@ -222,6 +246,17 @@ namespace MidiPlayer {
                         Updated?.Invoke(this, new(nameof(Index)));
                     }
                 }
+            }
+
+            /// <summary>
+            /// a track index value of a fader.
+            /// </summary>
+            /// <remarks>
+            /// one-based value of Index.
+            /// </remarks>
+            public int IndexAsOneBased {
+                get => Index + 1;
+                set => Index = value - 1;
             }
 
             /// <summary>
@@ -253,6 +288,9 @@ namespace MidiPlayer {
             /// <summary>
             /// a midi channel number of a fader.
             /// </summary>
+            /// <remarks>
+            /// base index value is 0, maxim value is MIDI_TRACK_COUNT.
+            /// </remarks>
             public int Channel {
                 get => _channel;
                 set {
@@ -264,8 +302,22 @@ namespace MidiPlayer {
             }
 
             /// <summary>
+            /// a midi channel number of a fader.
+            /// </summary>
+            /// <remarks>
+            /// one-based value of Channel.
+            /// </remarks>
+            public int ChannelAsOneBased {
+                get => Channel + 1;
+                set => Channel = value - 1;
+            }
+
+            /// <summary>
             /// a midi bank number of a fader.
             /// </summary>
+            /// <remarks>
+            /// minimum value is 0, maxim value is 127.
+            /// </remarks>
             public int Bank {
                 get {
                     if (_channel == 9 && _bank != 128) {
@@ -282,8 +334,22 @@ namespace MidiPlayer {
             }
 
             /// <summary>
+            /// a midi bank number of a fader.
+            /// </summary>
+            /// <remarks>
+            /// one-based value of Bank.
+            /// </remarks>
+            public int BankAsOneBased {
+                get => Bank + 1;
+                set => Bank = value - 1;
+            }
+
+            /// <summary>
             /// a midi program number of a fader.
             /// </summary>
+            /// <remarks>
+            /// minimum value is 0, maxim value is 127.
+            /// </remarks>
             public int Program {
                 get => _program;
                 set {
@@ -295,8 +361,22 @@ namespace MidiPlayer {
             }
 
             /// <summary>
+            /// a midi program number of a fader.
+            /// </summary>
+            /// <remarks>
+            /// one-based value of Program.
+            /// </remarks>
+            public int ProgramAsOneBased {
+                get => Program + 1;
+                set => Program = value - 1;
+            }
+
+            /// <summary>
             /// a midi volume value of a fader.
             /// </summary>
+            /// <remarks>
+            /// minimum value is 0, maxim value is 127.
+            /// </remarks>
             public int Volume {
                 get => _volume;
                 set {
@@ -308,8 +388,22 @@ namespace MidiPlayer {
             }
 
             /// <summary>
+            /// a midi volume value of a fader.
+            /// </summary>
+            /// <remarks>
+            /// one-based value of Volume.
+            /// </remarks>
+            public int VolumeAsOneBased {
+                get => Volume + 1;
+                set => Volume = value - 1;
+            }
+
+            /// <summary>
             /// a midi pan value of a fader.
             /// </summary>
+            /// <remarks>
+            /// full left value is 0, center value is 64, full right value is 127.
+            /// </remarks>
             public int Pan {
                 get => _pan;
                 set {
@@ -318,6 +412,17 @@ namespace MidiPlayer {
                         Updated?.Invoke(this, new(nameof(Pan)));
                     }
                 }
+            }
+
+            /// <summary>
+            /// a midi pan value of a fader.
+            /// </summary>
+            /// <remarks>
+            /// one-based value of Pan.
+            /// </remarks>
+            public int PanAsOneBased {
+                get => Pan + 1;
+                set => Pan = value - 1;
             }
         }
     }

@@ -97,18 +97,18 @@ namespace MidiPlayer {
                         Multi.ApplyControlChange(channel, control, value);
                     }
                 });
-                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
-                    var eventData = EventQueue.Dequeue(x);
+                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(trackIdx => {
+                    var eventData = EventQueue.Dequeue(trackIdx);
                     if (eventData is not null) {
-                        fluid_synth_program_change(_synth, x, eventData.Prog);
-                        fluid_synth_cc(_synth, x, (int) ControlChange.Pan, eventData.Pan);
+                        fluid_synth_program_change(_synth, trackIdx, eventData.Program);
+                        fluid_synth_cc(_synth, trackIdx, (int) ControlChange.Pan, eventData.Pan);
                         if (eventData.Mute) {
-                            fluid_synth_cc(_synth, x, (int) ControlChange.Volume, MUTE_VOLUME);
+                            fluid_synth_cc(_synth, trackIdx, (int) ControlChange.Volume, MUTE_VOLUME);
                         } else {
-                            fluid_synth_cc(_synth, x, (int) ControlChange.Volume, eventData.Vol);
+                            fluid_synth_cc(_synth, trackIdx, (int) ControlChange.Volume, eventData.Volume);
                         }
                         Task.Run(() => {
-                            Multi.ApplyProgramChange(x, eventData.Prog);
+                            Multi.ApplyProgramChange(trackIdx, eventData.Program);
                         });
                     }
                 });

@@ -16,6 +16,12 @@ namespace MidiPlayer {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Const [nouns]
+
+        const int MIDI_TRACK_BASE = 0;
+        const int MIDI_TRACK_COUNT = 16;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
         static Map<int, Queue<Data>> _queueMap = new();
@@ -25,18 +31,20 @@ namespace MidiPlayer {
 
         static EventQueue() {
             _queueMap = new();
-            Enumerable.Range(0, 16).ToList().ForEach(x => _queueMap.Add(x, new()));
+            Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(
+                trackIdx => _queueMap.Add(trackIdx, new())
+            );
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public static Methods [verb, verb phrases]
 
-        public static void Enqueue(int idx, Data value) {
-            _queueMap[idx].Enqueue(value);
+        public static void Enqueue(int trackIdx, Data value) {
+            _queueMap[trackIdx].Enqueue(value);
         }
 
-        public static Data Dequeue(int idx) {
-            return _queueMap[idx].Count == 0 ? null : _queueMap[idx].Dequeue();
+        public static Data Dequeue(int trackIdx) {
+            return _queueMap[trackIdx].Count == 0 ? null : _queueMap[trackIdx].Dequeue();
         }
     }
 
@@ -48,20 +56,27 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, noun phrase, adjective] 
 
-        int _prog;
+        int _channel;
+
+        int _program;
 
         int _pan;
 
-        int _vol;
+        int _volume;
 
         bool _mute;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, noun phrase, adjective] 
 
-        public int Prog {
-            get => _prog - 1;
-            set => _prog = value;
+        public int Channel {
+            get => _channel - 1;
+            set => _channel = value;
+        }
+
+        public int Program {
+            get => _program - 1;
+            set => _program = value;
         }
 
         public int Pan {
@@ -69,9 +84,9 @@ namespace MidiPlayer {
             set => _pan = value;
         }
 
-        public int Vol {
-            get => _vol - 1;
-            set => _vol = value;
+        public int Volume {
+            get => _volume - 1;
+            set => _volume = value;
         }
 
         public bool Mute {
