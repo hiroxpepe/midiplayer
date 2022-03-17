@@ -97,18 +97,18 @@ namespace MidiPlayer {
                         Multi.ApplyControlChange(channel, control, value);
                     }
                 });
-                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
-                    var eventData = EventQueue.Dequeue(x);
+                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(trackIdx => {
+                    var eventData = EventQueue.Dequeue(trackIdx);
                     if (eventData is not null) {
-                        fluid_synth_program_change(_synth, x, eventData.Prog);
-                        fluid_synth_cc(_synth, x, (int) ControlChange.Pan, eventData.Pan);
+                        fluid_synth_program_change(_synth, trackIdx, eventData.Program);
+                        fluid_synth_cc(_synth, trackIdx, (int) ControlChange.Pan, eventData.Pan);
                         if (eventData.Mute) {
-                            fluid_synth_cc(_synth, x, (int) ControlChange.Volume, MUTE_VOLUME);
+                            fluid_synth_cc(_synth, trackIdx, (int) ControlChange.Volume, MUTE_VOLUME);
                         } else {
-                            fluid_synth_cc(_synth, x, (int) ControlChange.Volume, eventData.Vol);
+                            fluid_synth_cc(_synth, trackIdx, (int) ControlChange.Volume, eventData.Volume);
                         }
                         Task.Run(() => {
-                            Multi.ApplyProgramChange(x, eventData.Prog);
+                            Multi.ApplyProgramChange(trackIdx, eventData.Program);
                         });
                     }
                 });
@@ -353,13 +353,13 @@ namespace MidiPlayer {
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // static Properties [noun, noun phrase, adjective]
+            // internal static Properties [noun, noun phrase, adjective]
 
-            public static List<Track> List {
+            internal static List<Track> List {
                 get => _trackMap.Select(x => x.Value).ToList();
             }
 
-            public static StandardMidiFile StandardMidiFile {
+            internal static StandardMidiFile StandardMidiFile {
                 get => _standardMidiFile;
                 set {
                     _standardMidiFile = value;
@@ -368,33 +368,33 @@ namespace MidiPlayer {
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // public static Methods [verb, verb phrases]
+            // internal static Methods [verb, verb phrases]
 
             /// <summary>
             /// NOTE_ON = 144
             /// </summary>
-            public static void ApplyNoteOn(int channel) {
+            internal static void ApplyNoteOn(int channel) {
                 _trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Sounds = true);
             }
 
             /// <summary>
             /// NOTE_OFF = 128
             /// </summary>
-            public static void ApplyNoteOff(int channel) {
+            internal static void ApplyNoteOff(int channel) {
                 _trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Sounds = false);
             }
 
             /// <summary>
             /// PROGRAM_CHANGE = 192
             /// </summary>
-            public static void ApplyProgramChange(int channel, int program) {
+            internal static void ApplyProgramChange(int channel, int program) {
                 _trackMap.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Program = program);
             }
 
             /// <summary>
             /// CONTROL_CHANGE = 176
             /// </summary>
-            public static void ApplyControlChange(int channel, int control, int value) {
+            internal static void ApplyControlChange(int channel, int control, int value) {
                 // BANK_SELECT_MSB =  0 [-- drums: 127 --]
                 //     _type: 176, _control:  0, _value: 127
                 // BANK_SELECT_LSB = 32
@@ -428,7 +428,7 @@ namespace MidiPlayer {
             /// <summary>
             /// get a trak by index.
             /// </summary>
-            public static Track GetBy(int index) {
+            internal static Track GetBy(int index) {
                 var track = _trackMap[index];
                 return track;
             }

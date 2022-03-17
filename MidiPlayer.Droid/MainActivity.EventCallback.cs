@@ -105,9 +105,9 @@ namespace MidiPlayer.Droid {
                 Log.Info($"send a data to MIDI {midiChannel} channel.");
                 Log.Info($"prog: {_numberPickerProg.Value} pan: {_numberPickerPan.Value} vol: {_numberPickerVol.Value}.");
                 Data data = new() {
-                    Prog = _numberPickerProg.Value,
+                    Program = _numberPickerProg.Value,
                     Pan = _numberPickerPan.Value,
-                    Vol = _numberPickerVol.Value,
+                    Volume = _numberPickerVol.Value,
                     Mute = _checkBoxMute.Checked
                 };
                 EventQueue.Enqueue(midiChannel, data);
