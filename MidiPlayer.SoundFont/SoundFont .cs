@@ -61,13 +61,13 @@ namespace MidiPlayer.SoundFont {
         class Voice {
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // Properties [noun, noun phrase, adjective] 
+            // internal Properties [noun, noun phrase, adjective] 
 
-            public int Prog {
+            internal int Prog {
                 get; set;
             }
 
-            public string Name {
+            internal string Name {
                 get; set;
             }
         }

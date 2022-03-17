@@ -18,11 +18,14 @@ namespace MidiPlayer {
         static Json _json = null;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Properties [noun, noun phrase, adjective] 
+        // internal static Properties [noun, noun phrase, adjective] 
 
-        public static bool Ready {
+        internal static bool Ready {
             get => !(_json is null);
         }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // public static Properties [noun, noun phrase, adjective] 
 
         public static App Value {
             get {
