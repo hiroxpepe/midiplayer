@@ -70,7 +70,6 @@
   <ItemGroup>
     <AndroidEnvironment Include="env.conf" />
     <Compile Include="ListViewAdapter.cs" />
-    <Compile Include="MainActivity.EventCallback.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="MainActivity.Component.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
