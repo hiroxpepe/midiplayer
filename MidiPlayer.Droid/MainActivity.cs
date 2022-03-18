@@ -118,9 +118,42 @@ namespace MidiPlayer.Droid {
             /// <summary>
             /// add a callback function to be called when the synth updated.
             /// </summary>
+            /// <remarks>
+            /// update listitem values by track values.
+            /// </remarks>
             Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
                 var track = (Synth.Track) sender;
-                updateList(track);
+                ListItem listItem = _itemList[track.IndexWithExcludingConductor];
+                listItem.Name = track.Name;
+                listItem.Instrument = Synth.GetVoice(track.Index);
+                listItem.Channel = track.ChannelAsOneBased.ToString();
+            };
+
+            /// <summary>
+            /// add a callback function to be called when the synth updated.
+            /// </summary>
+            /// <remarks>
+            /// update fader values by track values.
+            /// </remarks>
+            Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
+                var track = (Synth.Track) sender;
+                Mixer.Fader fader = Mixer.GetBy(track.IndexWithExcludingConductor);
+                if (e.PropertyName is nameof(Synth.Track.Channel)) {
+                    Log.Debug($"Synth.Updated: track {track.Index} Channel is {track.Channel}");
+                    fader.Channel = track.Channel;
+                }
+                if (e.PropertyName is nameof(Synth.Track.Program)) {
+                    Log.Debug($"Synth.Updated: track {track.Index} Program is {track.Program}");
+                    fader.Program = track.Program;
+                }
+                if (e.PropertyName is nameof(Synth.Track.Pan)) {
+                    Log.Debug($"Synth.Updated: track {track.Index} Pan is {track.Pan}");
+                    fader.Pan = track.Pan;
+                }
+                if (e.PropertyName is nameof(Synth.Track.Volume)) {
+                    Log.Debug($"Synth.Updated: track {track.Index} Volume is {track.Volume}");
+                    fader.Volume = track.Volume;
+                }
             };
 
             /// <summary>
@@ -128,7 +161,13 @@ namespace MidiPlayer.Droid {
             /// </summary>
             Mixer.Selected += (object sender, PropertyChangedEventArgs e) => {
                 if (e.PropertyName is nameof(Mixer.Current)) {
-                    loadFader();
+                    Mixer.Fader fader = Mixer.GetCurrent();
+                    _textViewNo.Text = fader.IndexAsOneBased.ToString();
+                    _textViewChannel.Text = fader.ChannelAsOneBased.ToString();
+                    _numberPickerProg.Value = fader.ProgramAsOneBased;
+                    _numberPickerPan.Value = fader.Pan;
+                    _numberPickerVol.Value = fader.Volume;
+                    _checkBoxMute.Checked = !fader.Sounds;
                 }
             };
 
@@ -136,21 +175,23 @@ namespace MidiPlayer.Droid {
             /// add a callback function to be called when the mixer updated.
             /// </summary>
             Mixer.Updated += (object sender, PropertyChangedEventArgs e) => {
-                if ((((Mixer.Fader) sender).Index == Mixer.Current)) {
+                var fader = (Mixer.Fader) sender;
+                if (fader.Index == Mixer.Current) {
+                    Log.Debug($"Mixer.Updated: mixer.current {Mixer.Current}: fader.Index {fader.Index}");
                     if (e.PropertyName is nameof(Mixer.Fader.Name)) {
-                        Log.Debug($"fadar {Mixer.Current} Name is updated.");
+                        Log.Debug($"fadar {fader.Index} Name is {fader.Name}");
                     }
                     if (e.PropertyName is nameof(Mixer.Fader.Bank)) {
-                        Log.Debug($"fadar {Mixer.Current} Bank is updated.");
+                        Log.Debug($"fadar {fader.Index} Bank is {fader.Bank}");
                     }
                     if (e.PropertyName is nameof(Mixer.Fader.Program)) {
-                        Log.Debug($"fadar {Mixer.Current} Program is updated.");
+                        Log.Debug($"fadar {fader.Index} Program is {fader.Program}");
                     }
                     if (e.PropertyName is nameof(Mixer.Fader.Volume)) {
-                        Log.Debug($"fadar {Mixer.Current} Volume is updated.");
+                        Log.Debug($"fadar {fader.Index} Volume is {fader.Volume}");
                     }
                     if (e.PropertyName is nameof(Mixer.Fader.Pan)) {
-                        Log.Debug($"fadar {Mixer.Current} Pan is updated.");
+                        Log.Debug($"fadar {fader.Index} Pan is {fader.Pan}");
                     }
                 }
             };
@@ -326,24 +367,6 @@ namespace MidiPlayer.Droid {
         }
 
         /// <summary>
-        /// a callback function to be called when the synth updated.
-        /// </summary>
-        void updateList(Synth.Track track) {
-            var trackIdx = track.Index - 1; // exclude conductor track;
-            //Log.Info($"index: {trackIdx} name:  {track.Name} Voice: {Synth.GetVoice(track.Index)} Chan: {track.Channel}");
-            var listItem = _itemList[trackIdx];
-            listItem.Name = track.Name;
-            listItem.Instrument = Synth.GetVoice(track.Index);
-            listItem.Channel = track.Channel.ToString();
-
-            // update a fader.
-            var fader = Mixer.GetBy(trackIdx);
-            fader.Program = track.Program + 1; // zero base to one base;
-            fader.Pan = track.Pan + 1; // zero base to one base;
-            fader.Volume = track.Volume + 1; // zero base to one base;
-        }
-
-        /// <summary>
         /// refresh the view in a few seconds.
         /// </summary>
         Task createRefreshTask() {
@@ -366,35 +389,6 @@ namespace MidiPlayer.Droid {
                 var listItem = _itemList[x];
                 listItem.Name = "------"; listItem.Instrument = "------"; listItem.Channel = "---";
             });
-        }
-
-        /// <summary>
-        /// load the current fader value to control value.
-        /// </summary>
-        void loadFader() {
-            saveFader();
-            var fader = Mixer.GetCurrent();
-            _textViewNo.Text = (Mixer.Current + 1).ToString(); // mixer is 0 base.
-            ListItem listItem = _itemListView.GetItemAtPosition(Mixer.Current).Cast<ListItem>();
-            _textViewChannel.Text = listItem.Channel;
-            _numberPickerProg.Value = fader.Program;
-            _numberPickerPan.Value = fader.Pan;
-            _numberPickerVol.Value = fader.Volume;
-            _checkBoxMute.Checked = !fader.Sounds;
-        }
-
-        /// <summary>
-        /// save control value as the previous fader value.
-        /// </summary>
-        void saveFader() {
-            var fader = Mixer.GetPrevious();
-            if (int.TryParse(_textViewChannel.Text, out int channel)) {
-                fader.Channel = channel; // MEMO:
-                fader.Program = _numberPickerProg.Value;
-                fader.Pan = _numberPickerPan.Value;
-                fader.Volume = _numberPickerVol.Value;
-                fader.Sounds = !_checkBoxMute.Checked;
-            }
         }
 
         /// <summary>
