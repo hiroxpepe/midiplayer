@@ -39,6 +39,7 @@ namespace MidiPlayer {
         const int PAN_MSB = 10;
 
         const int MUTE_VOLUME = 0;
+        const int TO_ONE_BASED = 1;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
@@ -59,7 +60,7 @@ namespace MidiPlayer {
 
         static Action _onEnded;
 
-        static Action<object, PropertyChangedEventArgs> _onUpdated;
+        static PropertyChangedEventHandler _onUpdated;
 
         static string _soundFontPath = string.Empty;
 
@@ -170,7 +171,7 @@ namespace MidiPlayer {
             remove => _onEnded -= value;
         }
 
-        public static event Action<object, PropertyChangedEventArgs> Updated {
+        public static event PropertyChangedEventHandler Updated {
             add => _onUpdated += value;
             remove => _onUpdated -= value;
         }
@@ -207,9 +208,6 @@ namespace MidiPlayer {
                     return;
                 }
                 Multi.StandardMidiFile = _standardMidiFile;
-                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
-                    Multi.GetBy(x).PropertyChanged += onPropertyChanged;
-                });
                 int result = fluid_player_add(_player, MidiFilePath);
                 if (result == FLUID_FAILED) {
                     Log.Error("failed to load the midi file.");
@@ -439,8 +437,9 @@ namespace MidiPlayer {
             static void init() {
                 _trackMap.Clear();
                 Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => _trackMap.Add(x, new Track(x)));
+                _trackMap[0].Name = _standardMidiFile.GetTrackName(0); // a song name.
+                Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => GetBy(x).Updated += onPropertyChanged);
                 var list = _standardMidiFile.MidiChannelList;
-                _trackMap[0].Name = _standardMidiFile.GetTrackName(0);
                 for (var idx = 0; idx < MidiChannelList.Count; idx++) {
                     _trackMap[idx + 1].Channel = list[idx]; // exclude conductor track;
                     _trackMap[idx + 1].Name = _standardMidiFile.GetTrackName(idx + 1);
@@ -448,7 +447,7 @@ namespace MidiPlayer {
             }
         }
 
-        public class Track : INotifyPropertyChanged {
+        public class Track {
 #nullable enable
 
             ///////////////////////////////////////////////////////////////////////////////////////////
@@ -478,29 +477,39 @@ namespace MidiPlayer {
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////
-            // Events [verb, verb phrase] 
+            //internal  Events [verb, verb phrase] 
 
             /// <summary>
             /// implementation for INotifyPropertyChanged
             /// </summary>
-            public event PropertyChangedEventHandler? PropertyChanged;
+            internal event PropertyChangedEventHandler? Updated;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Properties [noun, noun phrase, adjective]
 
+            /// <summary>
+            /// a track index value of an smf file.
+            /// </summary>
             public int Index {
                 get => _index;
                 set {
                     _index = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Index)));
+                    Updated?.Invoke(this, new(nameof(Index)));
                 }
+            }
+
+            /// <summary>
+            /// a track index value of an smf file exclude conductor track.
+            /// </summary>
+            public int IndexWithExcludingConductor {
+                get => Index - 1;
             }
 
             public bool Sounds {
                 get => _sounds;
                 set {
                     _sounds = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Sounds)));
+                    Updated?.Invoke(this, new(nameof(Sounds)));
                 }
             }
 
@@ -508,7 +517,7 @@ namespace MidiPlayer {
                 get => _name;
                 set {
                     _name = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+                    Updated?.Invoke(this, new(nameof(Name)));
                 }
             }
 
@@ -516,8 +525,15 @@ namespace MidiPlayer {
                 get => _channel;
                 set {
                     _channel = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Channel)));
+                    Updated?.Invoke(this, new(nameof(Channel)));
                 }
+            }
+
+            /// <summary>
+            /// a midi channel number of a track as one-based value.
+            /// </summary>
+            public int ChannelAsOneBased {
+                get => Channel + TO_ONE_BASED;
             }
 
             public int Bank {
@@ -529,7 +545,7 @@ namespace MidiPlayer {
                 }
                 set {
                     _bank = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Bank)));
+                    Updated?.Invoke(this, new(nameof(Bank)));
                 }
             }
 
@@ -537,7 +553,7 @@ namespace MidiPlayer {
                 get => _program;
                 set {
                     _program = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Program)));
+                    Updated?.Invoke(this, new(nameof(Program)));
                 }
             }
 
@@ -545,7 +561,7 @@ namespace MidiPlayer {
                 get => _volume;
                 set {
                     _volume = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Volume)));
+                    Updated?.Invoke(this, new(nameof(Volume)));
                 }
             }
 
@@ -553,7 +569,7 @@ namespace MidiPlayer {
                 get => _pan;
                 set {
                     _pan = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Pan)));
+                    Updated?.Invoke(this, new(nameof(Pan)));
                 }
             }
         }

@@ -24,7 +24,7 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
-        static Map<int, Queue<Data>> _queueMap = new();
+        static Map<int, Queue<Data>> _queueMap;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Constructor
@@ -70,22 +70,22 @@ namespace MidiPlayer {
         // Properties [noun, noun phrase, adjective] 
 
         public int Channel {
-            get => _channel - 1;
+            get => _channel;
             set => _channel = value;
         }
 
         public int Program {
-            get => _program - 1;
+            get => _program;
             set => _program = value;
         }
 
         public int Pan {
-            get => _pan - 1;
+            get => _pan;
             set => _pan = value;
         }
 
         public int Volume {
-            get => _volume - 1;
+            get => _volume;
             set => _volume = value;
         }
 

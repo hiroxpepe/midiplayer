@@ -70,7 +70,8 @@ namespace MidiPlayer.Droid {
             _numberPickerProg.MaxValue = 128;
             _numberPickerProg.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
                 var fader = Mixer.GetCurrent();
-                fader.Program = _numberPickerProg.Value;
+                Log.Debug($"_numberPickerProg.Value: {_numberPickerProg.Value}");
+                fader.ProgramAsOneBased = _numberPickerProg.Value;
             };
             _numberPickerPan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan);
             _numberPickerPan.MinValue = 1;
@@ -78,6 +79,7 @@ namespace MidiPlayer.Droid {
             _numberPickerPan.Value = 65;
             _numberPickerPan.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
                 var fader = Mixer.GetCurrent();
+                Log.Debug($"_numberPickerPan.Value: {_numberPickerPan.Value}");
                 fader.Pan = _numberPickerPan.Value;
             };
             _numberPickerVol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol);
@@ -86,6 +88,7 @@ namespace MidiPlayer.Droid {
             _numberPickerVol.Value = 104;
             _numberPickerVol.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
                 var fader = Mixer.GetCurrent();
+                Log.Debug($"_numberPickerVol.Value: {_numberPickerVol.Value}");
                 fader.Volume = _numberPickerVol.Value;
             };
             _checkBoxMute = FindViewById<CheckBox>(Resource.Id.check_box_mute);
@@ -110,9 +113,7 @@ namespace MidiPlayer.Droid {
             var listItemAdapter = new ListItemAdapter(this, 0, _itemList);
             _itemListView.Adapter = listItemAdapter;
             _itemListView.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
-                var item = _itemListView.GetItemAtPosition(e.Position);
-                ListItem listItem = item.Cast<ListItem>();
-                Log.Info($"setected: {e.Position}");
+                Log.Debug($"setected: {e.Position}");
                 Mixer.Current = e.Position;
             };
         }
