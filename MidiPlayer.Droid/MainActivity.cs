@@ -295,6 +295,9 @@ namespace MidiPlayer.Droid {
             }
         }
 
+        /// <summary>
+        /// call Intent.
+        /// </summary>
         void callIntent(string targetDir, int requestCode) {
             var intent = new Intent(Intent.ActionOpenDocument);
             var uri = Android.Net.Uri.Parse($"content://com.android.externalstorage.documents/document/primary%3A{targetDir}");
@@ -306,6 +309,9 @@ namespace MidiPlayer.Droid {
             StartActivityForResult(intent, requestCode);
         }
 
+        /// <summary>
+        /// get an actual path.
+        /// </summary>
         static string getActualPathBy(Intent data) {
             var uri = data.Data;
             string docId = DocumentsContract.GetDocumentId(uri);

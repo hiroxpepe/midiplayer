@@ -111,7 +111,7 @@ namespace MidiPlayer.Droid {
                     Volume = fader.Volume,
                     Mute = !fader.Sounds
                 };
-                EventQueue.Enqueue(fader.Channel, data); // FIXME: Channel to track.
+                EventQueue.Enqueue(fader.Index, data);
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
