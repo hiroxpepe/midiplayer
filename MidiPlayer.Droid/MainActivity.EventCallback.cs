@@ -101,16 +101,17 @@ namespace MidiPlayer.Droid {
         void buttonSendSynth_Click(object sender, EventArgs e) {
             Log.Info("buttonSendSynth clicked.");
             try {
-                var midiChannel = int.Parse(_textViewChannel.Text);
-                Log.Info($"send a data to MIDI {midiChannel} channel.");
-                Log.Info($"prog: {_numberPickerProg.Value} pan: {_numberPickerPan.Value} vol: {_numberPickerVol.Value}.");
+                Mixer.Fader fader = Mixer.GetCurrent();
+                Log.Debug($"track index {fader.Index}: send a data to MIDI {fader.Channel} channel.");
+                Log.Debug($"prog: {fader.Program} pan: {fader.Pan} vol: {fader.Volume}.");
                 Data data = new() {
-                    Program = _numberPickerProg.Value,
-                    Pan = _numberPickerPan.Value,
-                    Volume = _numberPickerVol.Value,
-                    Mute = _checkBoxMute.Checked
+                    Channel = fader.Channel,
+                    Program = fader.Program,
+                    Pan = fader.Pan,
+                    Volume = fader.Volume,
+                    Mute = !fader.Sounds
                 };
-                EventQueue.Enqueue(midiChannel, data);
+                EventQueue.Enqueue(fader.Channel, data); // FIXME: Channel to track.
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
