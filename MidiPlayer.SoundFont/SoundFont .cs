@@ -1,4 +1,18 @@
-﻿
+﻿/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,35 +21,38 @@ namespace MidiPlayer.SoundFont {
     /// <summary>
     /// class for soundfont information
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class SoundFontInfo {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        NAudio.SoundFont.SoundFont _soundFont;
+        NAudio.SoundFont.SoundFont _sound_font;
 
         Map<int, List<Voice>> _map;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
-        public SoundFontInfo(string target) {
+        public SoundFontInfo(string file_path) {
             try {
-                _soundFont = new NAudio.SoundFont.SoundFont(target);
+                _sound_font = new NAudio.SoundFont.SoundFont(file_path);
                 Map<int, List<Voice>> map = new();
-                _soundFont.Presets.ToList().ForEach(x => {
-                    if (!map.ContainsKey(x.Bank)) {
-                        List<Voice> newList = new();
-                        newList.Add(new Voice() { Prog = x.PatchNumber, Name = x.Name });
-                        map.Add(x.Bank, newList); // new bank and new voice
+                _sound_font.Presets.ToList().ForEach(x => {
+                    if (!map.ContainsKey(key: x.Bank)) {
+                        List<Voice> new_list = new();
+                        new_list.Add(item: new Voice() { Prog = x.PatchNumber, Name = x.Name });
+                        map.Add(key: x.Bank, value: new_list); // new bank and new voice
                     } else {
-                        map[x.Bank].Add(new Voice() { Prog = x.PatchNumber, Name = x.Name }); // exists bank and new voice
+                        map[x.Bank].Add(item: new Voice() { Prog = x.PatchNumber, Name = x.Name }); // exists bank and new voice
                     }
                 });
                 _map = new();
                 map.OrderBy(x => x.Key).ToList().ForEach(x => { // sort bank
-                    _map.Add(x.Key, x.Value.OrderBy(_x => _x.Prog).ToList()); // sort prog
+                    _map.Add(key: x.Key, value: x.Value.OrderBy(_x => _x.Prog).ToList()); // sort prog
                 });
             } catch (Exception ex) {
                 Log.Error(ex.Message);

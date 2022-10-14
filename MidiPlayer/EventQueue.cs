@@ -1,17 +1,28 @@
-﻿
+﻿/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MidiPlayer {
     /// <summary>
-    /// rename Dictionary to Map
-    /// </summary>
-    public class Map<K, V> : Dictionary<K, V> {
-    }
-
-    /// <summary>
     /// event queue class to send synth
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class EventQueue {
 #nullable enable
 
@@ -24,27 +35,27 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
-        static Map<int, Queue<Data>> _queueMap;
+        static Map<int, Queue<Data>> _queue_map;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Constructor
 
         static EventQueue() {
-            _queueMap = new();
-            Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(
-                trackIdx => _queueMap.Add(trackIdx, new())
+            _queue_map = new();
+            Enumerable.Range(start: MIDI_TRACK_BASE, count: MIDI_TRACK_COUNT).ToList().ForEach(
+                track_index => _queue_map.Add(key: track_index, value: new())
             );
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public static Methods [verb, verb phrases]
 
-        public static void Enqueue(int trackIdx, Data value) {
-            _queueMap[trackIdx].Enqueue(value);
+        public static void Enqueue(int track_index, Data value) {
+            _queue_map[track_index].Enqueue(item: value);
         }
 
-        public static Data Dequeue(int trackIdx) {
-            return _queueMap[trackIdx].Count == 0 ? null : _queueMap[trackIdx].Dequeue();
+        public static Data Dequeue(int track_index) {
+            return _queue_map[track_index].Count == 0 ? null : _queue_map[track_index].Dequeue();
         }
     }
 
@@ -93,5 +104,11 @@ namespace MidiPlayer {
             get => _mute;
             set => _mute = value;
         }
+    }
+
+    /// <summary>
+    /// rename Dictionary to Map
+    /// </summary>
+    public class Map<K, V> : Dictionary<K, V> {
     }
 }

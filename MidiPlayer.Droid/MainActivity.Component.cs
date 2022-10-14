@@ -1,4 +1,18 @@
-﻿
+﻿/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using Android.Support.V7.App;
 using Android.Widget;
 
@@ -10,6 +24,9 @@ namespace MidiPlayer.Droid {
     /// <summary>
     ///  partial class for initialize the component
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public partial class MainActivity : AppCompatActivity {
 #nullable enable
 
@@ -22,21 +39,21 @@ namespace MidiPlayer.Droid {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        Button _buttonloadSoundFont;
-        Button _buttonloadMidiFile;
-        Button _buttonStart;
-        Button _buttonStop;
-        Button _buttonAddPlaylist;
-        Button _buttonDeletePlaylist;
-        Button _buttonSendSynth;
-        TextView _textViewNo;
-        TextView _textViewChannel;
-        NumberPicker _numberPickerProg;
-        NumberPicker _numberPickerPan;
-        NumberPicker _numberPickerVol;
-        CheckBox _checkBoxMute;
-        ListView _titleListView;
-        ListView _itemListView;
+        Button _button_load_soundfont;
+        Button _button_load_midi_file;
+        Button _button_start;
+        Button _button_stop;
+        Button _button_add_playlist;
+        Button _button_delete_playlist;
+        Button _button_send_synth;
+        TextView _textview_no;
+        TextView _textview_channel;
+        NumberPicker _numberpicker_prog;
+        NumberPicker _numberpicker_pan;
+        NumberPicker _numberpicker_vol;
+        CheckBox _checkbox_mute;
+        ListView _listview_title;
+        ListView _listview_item;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private Methods [verb, verb phrases]
@@ -49,9 +66,9 @@ namespace MidiPlayer.Droid {
             /// <summary>
             /// buttonLoadSoundFont
             /// </summary>
-            _buttonloadSoundFont = FindViewById<Button>(Resource.Id.button_load_soundfont);
-            _buttonloadSoundFont.Click += (object sender, EventArgs e) => {
-                Log.Info("buttonLoadSoundFont clicked.");
+            _button_load_soundfont = FindViewById<Button>(Resource.Id.button_load_soundfont);
+            _button_load_soundfont.Click += (object sender, EventArgs e) => {
+                Log.Info("_button_load_soundfont clicked.");
                 try {
                     if (Synth.Playing) {
                         stopSong();
@@ -65,9 +82,9 @@ namespace MidiPlayer.Droid {
             /// <summary>
             /// buttonLoadMidiFile
             /// </summary>
-            _buttonloadMidiFile = FindViewById<Button>(Resource.Id.button_load_midifile);
-            _buttonloadMidiFile.Click += (object sender, EventArgs e) => {
-                Log.Info("buttonLoadMidiFile clicked.");
+            _button_load_midi_file = FindViewById<Button>(Resource.Id.button_load_midi_file);
+            _button_load_midi_file.Click += (object sender, EventArgs e) => {
+                Log.Info("_button_load_midi_file clicked.");
                 try {
                     if (Synth.Playing) {
                         stopSong();
@@ -81,11 +98,11 @@ namespace MidiPlayer.Droid {
             /// <summary>
             /// buttonStart
             /// </summary>
-            _buttonStart = FindViewById<Button>(Resource.Id.button_start);
-            _buttonStart.Click += (object sender, EventArgs e) => {
-                Log.Info("buttonStart clicked.");
+            _button_start = FindViewById<Button>(Resource.Id.button_start);
+            _button_start.Click += (object sender, EventArgs e) => {
+                Log.Info("_button_start clicked.");
                 try {
-                    if (!_midiFilePath.HasValue()) { // FIXME: case sounFdont
+                    if (!_midi_file_path.HasValue()) { // FIXME: case sounFdont
                         Log.Warn("midiFilePath has no value.");
                         return;
                     }
@@ -98,9 +115,9 @@ namespace MidiPlayer.Droid {
             /// <summary>
             /// buttonStop
             /// </summary>
-            _buttonStop = FindViewById<Button>(Resource.Id.button_stop);
-            _buttonStop.Click += (object sender, EventArgs e) => {
-                Log.Info("buttonStop clicked.");
+            _button_stop = FindViewById<Button>(Resource.Id.button_stop);
+            _button_stop.Click += (object sender, EventArgs e) => {
+                Log.Info("_button_stop clicked.");
                 try {
                     stopSong();
                 } catch (Exception ex) {
@@ -111,9 +128,9 @@ namespace MidiPlayer.Droid {
             /// <summary>
             /// buttonAddPlaylist
             /// </summary>
-            _buttonAddPlaylist = FindViewById<Button>(Resource.Id.button_add_playlist);
-            _buttonAddPlaylist.Click += (object sender, EventArgs e) => {
-                Log.Info("buttonAddPlaylist clicked.");
+            _button_add_playlist = FindViewById<Button>(Resource.Id.button_add_playlist);
+            _button_add_playlist.Click += (object sender, EventArgs e) => {
+                Log.Info("_button_add_playlist clicked.");
                 try {
                     callIntent(Env.MidiFileDir, (int) Request.AddPlayList);
                 } catch (Exception ex) {
@@ -124,11 +141,11 @@ namespace MidiPlayer.Droid {
             /// <summary>
             /// buttonDeletePlaylist
             /// </summary>
-            _buttonDeletePlaylist = FindViewById<Button>(Resource.Id.button_delete_playlist);
-            _buttonDeletePlaylist.Click += (object sender, EventArgs e) => {
-                Log.Info("buttonDeletePlaylist clicked.");
+            _button_delete_playlist = FindViewById<Button>(Resource.Id.button_delete_playlist);
+            _button_delete_playlist.Click += (object sender, EventArgs e) => {
+                Log.Info("_button_delete_playlist clicked.");
                 try {
-                    _playList.Clear();
+                    _playlist.Clear();
                 } catch (Exception ex) {
                     Log.Error(ex.Message);
                 }
@@ -137,9 +154,9 @@ namespace MidiPlayer.Droid {
             /// <summary>
             /// buttonSendSynth
             /// </summary>
-            _buttonSendSynth = FindViewById<Button>(Resource.Id.button_send_synth);
-            _buttonSendSynth.Click += (object sender, EventArgs e) => {
-                Log.Info("buttonSendSynth clicked.");
+            _button_send_synth = FindViewById<Button>(Resource.Id.button_send_synth);
+            _button_send_synth.Click += (object sender, EventArgs e) => {
+                Log.Info("_button_send_synth clicked.");
                 try {
                     Mixer.Fader fader = Mixer.GetCurrent();
                     Log.Debug($"track index {fader.Index}: send a data to MIDI {fader.Channel} channel.");
@@ -160,74 +177,74 @@ namespace MidiPlayer.Droid {
             /// <summary>
             /// textViewNo, textViewChannel
             /// </summary>
-            _textViewNo = FindViewById<TextView>(Resource.Id.text_view_no);
-            _textViewChannel = FindViewById<TextView>(Resource.Id.text_view_channel);
+            _textview_no = FindViewById<TextView>(Resource.Id.textview_no);
+            _textview_channel = FindViewById<TextView>(Resource.Id.textview_channel);
 
             /// <summary>
             /// numberPickerProg
             /// </summary>
-            _numberPickerProg = FindViewById<NumberPicker>(Resource.Id.number_picker_prog);
-            _numberPickerProg.MinValue = 1;
-            _numberPickerProg.MaxValue = 128;
-            _numberPickerProg.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
+            _numberpicker_prog = FindViewById<NumberPicker>(Resource.Id.numberpicker_prog);
+            _numberpicker_prog.MinValue = 1;
+            _numberpicker_prog.MaxValue = 128;
+            _numberpicker_prog.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
                 var fader = Mixer.GetCurrent();
-                Log.Debug($"_numberPickerProg.Value: {_numberPickerProg.Value}");
-                fader.ProgramAsOneBased = _numberPickerProg.Value;
+                Log.Debug($"_numberpicker_prog.Value: {_numberpicker_prog.Value}");
+                fader.ProgramAsOneBased = _numberpicker_prog.Value;
             };
 
             /// <summary>
-            /// numberPickerPan
+            /// _numberpicker_pan
             /// </summary>
-            _numberPickerPan = FindViewById<NumberPicker>(Resource.Id.number_picker_pan);
-            _numberPickerPan.MinValue = 1;
-            _numberPickerPan.MaxValue = 128;
-            _numberPickerPan.Value = 65;
-            _numberPickerPan.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
+            _numberpicker_pan = FindViewById<NumberPicker>(Resource.Id.numberpicker_pan);
+            _numberpicker_pan.MinValue = 1;
+            _numberpicker_pan.MaxValue = 128;
+            _numberpicker_pan.Value = 65;
+            _numberpicker_pan.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
                 var fader = Mixer.GetCurrent();
-                Log.Debug($"_numberPickerPan.Value: {_numberPickerPan.Value}");
-                fader.Pan = _numberPickerPan.Value;
+                Log.Debug($"_numberpicker_pan.Value: {_numberpicker_pan.Value}");
+                fader.Pan = _numberpicker_pan.Value;
             };
 
             /// <summary>
-            /// numberPickerVol
+            /// _numberpicker_vol
             /// </summary>
-            _numberPickerVol = FindViewById<NumberPicker>(Resource.Id.number_picker_vol);
-            _numberPickerVol.MinValue = 1;
-            _numberPickerVol.MaxValue = 128;
-            _numberPickerVol.Value = 104;
-            _numberPickerVol.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
+            _numberpicker_vol = FindViewById<NumberPicker>(Resource.Id.numberpicker_vol);
+            _numberpicker_vol.MinValue = 1;
+            _numberpicker_vol.MaxValue = 128;
+            _numberpicker_vol.Value = 104;
+            _numberpicker_vol.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
                 var fader = Mixer.GetCurrent();
-                Log.Debug($"_numberPickerVol.Value: {_numberPickerVol.Value}");
-                fader.Volume = _numberPickerVol.Value;
+                Log.Debug($"_numberpicker_vol.Value: {_numberpicker_vol.Value}");
+                fader.Volume = _numberpicker_vol.Value;
             };
 
             /// <summary>
-            /// checkBoxMute
+            /// _checkbox_mute
             /// </summary>
-            _checkBoxMute = FindViewById<CheckBox>(Resource.Id.check_box_mute);
-            _checkBoxMute.CheckedChange += (object sender, CheckBox.CheckedChangeEventArgs e) => {
+            _checkbox_mute = FindViewById<CheckBox>(Resource.Id.checkbox_mute);
+            _checkbox_mute.CheckedChange += (object sender, CheckBox.CheckedChangeEventArgs e) => {
                 var fader = Mixer.GetCurrent();
-                fader.Sounds = !_checkBoxMute.Checked;
+                fader.Sounds = !_checkbox_mute.Checked;
             };
 
             /// <summary>
-            /// titleListView
+            /// _listview_title
             /// </summary>
-            var titleList = new List<ListTitle>();
-            titleList.Add(new ListTitle() { Name = "Name", Instrument = "Voice", Channel = "Ch" });
-            _titleListView = FindViewById<ListView>(Resource.Id.list_view_title);
-            _titleListView.Adapter = new ListTitleAdapter(this, 0, titleList);
+            var listtitle_list = new List<ListTitle>();
+            listtitle_list.Add(new ListTitle() { Name = "Name", Instrument = "Voice", Channel = "Ch" });
+            _listview_title = FindViewById<ListView>(Resource.Id.listview_title);
+            _listview_title.Adapter = new ListTitleAdapter(this, 0, listtitle_list);
 
             /// <summary>
-            /// itemListView
+            /// _listview_item
             /// </summary>
             Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
-                _itemList.Add(new ListItem() { Name = "------", Instrument = "------", Channel = "---" });
+                _listitem_list.Add(new ListItem() { Name = "------", Instrument = "------", Channel = "---" });
             });
-            _itemListView = FindViewById<ListView>(Resource.Id.list_view_item);
-            var listItemAdapter = new ListItemAdapter(this, 0, _itemList);
-            _itemListView.Adapter = listItemAdapter;
-            _itemListView.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
+            _listview_item = FindViewById<ListView>(Resource.Id.listview_item);
+            var listitem_adapter = new ListItemAdapter(this, 0, _listitem_list);
+            _listview_item.Adapter = listitem_adapter;
+            _listview_item.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
                 Log.Debug($"setected: {e.Position}");
                 Mixer.Current = e.Position;
             };

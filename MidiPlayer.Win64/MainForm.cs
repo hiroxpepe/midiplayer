@@ -1,4 +1,18 @@
-﻿
+﻿/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -11,17 +25,20 @@ namespace MidiPlayer.Win64 {
     /// <summary>
     /// main form for the application.
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public partial class MainForm : Form {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        string _soundFontPath = "undefined";
+        string _soundfont_path = "undefined";
 
-        string _midiFilePath = "undefined";
+        string _midi_file_path = "undefined";
 
-        PlayList _playList;
+        PlayList _playlist;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
@@ -29,7 +46,7 @@ namespace MidiPlayer.Win64 {
         public MainForm() {
             InitializeComponent();
             DoubleBuffered = true;
-            _playList = new();
+            _playlist = new();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,8 +63,8 @@ namespace MidiPlayer.Win64 {
             if (Env.ExistsSoundFont && Env.ExistsMidiFile) {
                 Synth.SoundFontPath = Env.SoundFontPath;
                 Synth.MidiFilePath = Env.MidiFilePath;
-                _soundFontPath = Env.SoundFontPath;
-                _midiFilePath = Env.MidiFilePath;
+                _soundfont_path = Env.SoundFontPath;
+                _midi_file_path = Env.MidiFilePath;
             }
 
             /// <summary>
@@ -64,9 +81,9 @@ namespace MidiPlayer.Win64 {
                 Log.Info("Started called.");
                 Invoke((MethodInvoker) (() => {
                     Text = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
-                    _listView.Items.Clear();
+                    _listview.Items.Clear();
                     Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
-                        _listView.Items.Add(new ListViewItem(new string[] { "  ●", "--", "--", "--", "--", "--" }));
+                        _listview.Items.Add(new ListViewItem(new string[] { "  ●", "--", "--", "--", "--", "--" }));
                     });
                 }));
             };
@@ -76,12 +93,12 @@ namespace MidiPlayer.Win64 {
             /// </summary>
             Synth.Ended += () => {
                 Log.Info("Ended called.");
-                if (!_playList.Ready) {
+                if (!_playlist.Ready) {
                     Synth.Stop();
                     Synth.Start();
                 } else {
                     Synth.Stop();
-                    Synth.MidiFilePath = _playList.Next;
+                    Synth.MidiFilePath = _playlist.Next;
                     Synth.Start();
                 }
             };
@@ -101,12 +118,12 @@ namespace MidiPlayer.Win64 {
                 if (Synth.Playing) {
                     stopSong();
                 }
-                _openFileDialog.InitialDirectory = Env.SoundFontDir;
-                var dialog = _openFileDialog.ShowDialog();
+                _openfiledialog.InitialDirectory = Env.SoundFontDir;
+                var dialog = _openfiledialog.ShowDialog();
                 if (dialog == DialogResult.OK) {
-                    _soundFontPath = Path.GetFullPath(_openFileDialog.FileName);
-                    Synth.SoundFontPath = _soundFontPath;
-                    Env.SoundFontPath = _soundFontPath;
+                    _soundfont_path = Path.GetFullPath(_openfiledialog.FileName);
+                    Synth.SoundFontPath = _soundfont_path;
+                    Env.SoundFontPath = _soundfont_path;
                 }
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -119,12 +136,12 @@ namespace MidiPlayer.Win64 {
                 if (Synth.Playing) {
                     stopSong();
                 }
-                _openFileDialog.InitialDirectory = Env.MidiFileDir;
-                var dialog = _openFileDialog.ShowDialog();
+                _openfiledialog.InitialDirectory = Env.MidiFileDir;
+                var dialog = _openfiledialog.ShowDialog();
                 if (dialog == DialogResult.OK) {
-                    _midiFilePath = Path.GetFullPath(_openFileDialog.FileName);
-                    Synth.MidiFilePath = _midiFilePath;
-                    Env.MidiFilePath = _midiFilePath;
+                    _midi_file_path = Path.GetFullPath(_openfiledialog.FileName);
+                    Synth.MidiFilePath = _midi_file_path;
+                    Env.MidiFilePath = _midi_file_path;
                 }
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -134,7 +151,7 @@ namespace MidiPlayer.Win64 {
         void buttonStart_Click(object sender, EventArgs e) {
             Log.Info("buttonStart clicked.");
             try {
-                if (!_midiFilePath.HasValue()) {
+                if (!_midi_file_path.HasValue()) {
                     return;
                 }
                 playSong();
@@ -162,11 +179,11 @@ namespace MidiPlayer.Win64 {
         async void playSong() {
             try {
                 await Task.Run(() => {
-                    if (!_playList.Ready) {
-                        Synth.MidiFilePath = _midiFilePath;
+                    if (!_playlist.Ready) {
+                        Synth.MidiFilePath = _midi_file_path;
                         Synth.Start();
                     } else {
-                        Synth.MidiFilePath = _playList.Next;
+                        Synth.MidiFilePath = _playlist.Next;
                         Synth.Start();
                     }
                 });
@@ -181,10 +198,10 @@ namespace MidiPlayer.Win64 {
         async void stopSong() {
             try {
                 await Task.Run(() => Synth.Stop());
-                if (_listView.Items.Count != 0) {
+                if (_listview.Items.Count != 0) {
                     Invoke((MethodInvoker) (() => {
                         Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
-                            _listView.Items[x].SubItems[0].ForeColor = Color.Black;
+                            _listview.Items[x].SubItems[0].ForeColor = Color.Black;
                         });
                     }));
                 }
@@ -198,10 +215,10 @@ namespace MidiPlayer.Win64 {
         /// a callback function to be called when the synth updated.
         /// </summary>
         MethodInvoker updateList(Synth.Track track) {
-            const int _column1Idx = 0;
-            var trackIdx = track.Index - 1; // exclude conductor track;
+            const int COLUMN_1_INDEX = 0;
+            var track_index = track.Index - 1; // exclude conductor track;
             return () => {
-                var listViewItem = new ListViewItem(new string[] {
+                var listview_item = new ListViewItem(new string[] {
                     "  ●",
                     track.Name,
                     Synth.GetVoice(track.Index),
@@ -209,15 +226,16 @@ namespace MidiPlayer.Win64 {
                     track.Bank.ToString(),
                     track.Program.ToString()
                 });
-                _listView.BeginUpdate();
-                _listView.Items[trackIdx] = listViewItem;
-                _listView.Items[trackIdx].UseItemStyleForSubItems = false;
+                _listview.BeginUpdate();
+                _listview.Items[track_index] = listview_item;
+                _listview.Items[track_index].UseItemStyleForSubItems = false;
                 if (track.Sounds) {
-                    _listView.Items[trackIdx].SubItems[_column1Idx].ForeColor = Color.Lime;
-                } else {
-                    _listView.Items[trackIdx].SubItems[_column1Idx].ForeColor = Color.Black;
+                    _listview.Items[track_index].SubItems[COLUMN_1_INDEX].ForeColor = Color.Lime;
                 }
-                _listView.EndUpdate();
+                else {
+                    _listview.Items[track_index].SubItems[COLUMN_1_INDEX].ForeColor = Color.Black;
+                }
+                _listview.EndUpdate();
             };
         }
 
@@ -226,10 +244,10 @@ namespace MidiPlayer.Win64 {
         /// </summary>
         void initializeControl() {
             // initialize ListView
-            _listView.FullRowSelect = true;
-            _listView.GridLines = true;
-            _listView.Sorting = SortOrder.None; // do not sort automatically.
-            _listView.View = View.Details;
+            _listview.FullRowSelect = true;
+            _listview.GridLines = true;
+            _listview.Sorting = SortOrder.None; // do not sort automatically.
+            _listview.View = View.Details;
             ColumnHeader column1 = new();
             column1.Text = "On";
             column1.Width = 35;
@@ -249,7 +267,7 @@ namespace MidiPlayer.Win64 {
             column6.Text = "Prog";
             column6.Width = 45;
             ColumnHeader[] columnHeaderArray = { column1, column2, column3, column4, column5, column6 };
-            _listView.Columns.AddRange(columnHeaderArray);
+            _listview.Columns.AddRange(columnHeaderArray);
         }
     }
 }

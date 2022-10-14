@@ -1,4 +1,18 @@
-﻿
+﻿/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using Android.Content;
 using Android.Views;
 using Android.Widget;
@@ -19,6 +33,9 @@ namespace MidiPlayer.Droid {
     /// <summary>
     /// an Adapter class for ListView. 
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class ListTitleAdapter : ArrayAdapter<ListTitle> {
 #nullable enable
 
@@ -37,9 +54,9 @@ namespace MidiPlayer.Droid {
             if (convertView == null) {
                 convertView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_title, parent, false);
                 viewHolder = new();
-                viewHolder.TextViewName = convertView.FindViewById<TextView>(Resource.Id.text_view_title_name);
-                viewHolder.TextViewInstrument = convertView.FindViewById<TextView>(Resource.Id.text_view_title_instrument);
-                viewHolder.TextViewChannel = convertView.FindViewById<TextView>(Resource.Id.text_view_title_channel);
+                viewHolder.TextViewName = convertView.FindViewById<TextView>(Resource.Id.textview_title_name);
+                viewHolder.TextViewInstrument = convertView.FindViewById<TextView>(Resource.Id.textview_title_instrument);
+                viewHolder.TextViewChannel = convertView.FindViewById<TextView>(Resource.Id.textview_title_channel);
                 convertView.SetTag(Resource.String.view_holder_tag, viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.GetTag(Resource.String.view_holder_tag);
@@ -96,9 +113,9 @@ namespace MidiPlayer.Droid {
                 convertView = LayoutInflater.From(parent.Context).Inflate(Resource.Layout.list_item, parent, false);
                 viewHolder = new();
                 viewHolder.CheckBox = convertView.FindViewById<CheckBox>(Resource.Id.checkbox_item_select);
-                viewHolder.TextViewName = convertView.FindViewById<TextView>(Resource.Id.text_view_item_name);
-                viewHolder.TextViewInstrument = convertView.FindViewById<TextView>(Resource.Id.text_view_item_instrument);
-                viewHolder.TextViewChannel = convertView.FindViewById<TextView>(Resource.Id.text_view_item_channel);
+                viewHolder.TextViewName = convertView.FindViewById<TextView>(Resource.Id.textview_item_name);
+                viewHolder.TextViewInstrument = convertView.FindViewById<TextView>(Resource.Id.textview_item_instrument);
+                viewHolder.TextViewChannel = convertView.FindViewById<TextView>(Resource.Id.textview_item_channel);
                 convertView.SetTag(Resource.String.view_holder_tag, viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.GetTag(Resource.String.view_holder_tag);

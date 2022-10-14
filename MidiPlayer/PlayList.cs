@@ -1,48 +1,65 @@
-﻿
+﻿/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Collections.Generic;
 
 namespace MidiPlayer {
     /// <summary>
     /// playlist for synth
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public class PlayList {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        List<string> _targetList = new();
+        List<string> _target_list = new();
 
-        int _idx;
+        int _index;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
         public PlayList() {
-            _idx = 0;
+            _index = 0;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, noun phrase, adjective] 
 
         public bool Ready {
-            get => _targetList.Count == 0 ? false : true;
+            get => _target_list.Count == 0 ? false : true;
         }
 
         public string[] List {
-            get => _targetList.ToArray();
+            get => _target_list.ToArray();
         }
 
         public string Current {
-            get => _targetList[_idx];
+            get => _target_list[_index];
         }
 
         public string Next {
             get {
-                if (_idx == _targetList.Count) {
-                    _idx = 0;
+                if (_index == _target_list.Count) {
+                    _index = 0;
                 }
-                return _targetList[_idx++];
+                return _target_list[_index++];
             }
         }
 
@@ -50,11 +67,11 @@ namespace MidiPlayer {
         // public Methods [verb, verb phrases]
 
         public void Add(string target) {
-            _targetList.Add(target);
+            _target_list.Add(target);
         }
 
         public void Clear() {
-            _targetList.Clear();
+            _target_list.Clear();
         }
     }
 }

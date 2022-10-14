@@ -5665,7 +5665,7 @@ namespace MidiPlayer.Droid
 			public const int button_delete_playlist = 2131230814;
 			
 			// aapt resource value: 0x7F08005F
-			public const int button_load_midifile = 2131230815;
+			public const int button_load_midi_file = 2131230815;
 			
 			// aapt resource value: 0x7F080060
 			public const int button_load_soundfont = 2131230816;
@@ -5700,17 +5700,17 @@ namespace MidiPlayer.Droid
 			// aapt resource value: 0x7F08006A
 			public const int chains = 2131230826;
 			
+			// aapt resource value: 0x7F08006B
+			public const int checkbox = 2131230827;
+			
 			// aapt resource value: 0x7F08006C
-			public const int checkbox = 2131230828;
+			public const int checkbox_item_select = 2131230828;
 			
 			// aapt resource value: 0x7F08006D
-			public const int checkbox_item_select = 2131230829;
+			public const int checkbox_mute = 2131230829;
 			
 			// aapt resource value: 0x7F08006E
 			public const int @checked = 2131230830;
-			
-			// aapt resource value: 0x7F08006B
-			public const int check_box_mute = 2131230827;
 			
 			// aapt resource value: 0x7F08006F
 			public const int chip = 2131230831;
@@ -6051,14 +6051,14 @@ namespace MidiPlayer.Droid
 			// aapt resource value: 0x7F0800DD
 			public const int listMode = 2131230941;
 			
-			// aapt resource value: 0x7F0800DE
-			public const int list_item = 2131230942;
-			
 			// aapt resource value: 0x7F0800DF
-			public const int list_view_item = 2131230943;
+			public const int listview_item = 2131230943;
 			
 			// aapt resource value: 0x7F0800E0
-			public const int list_view_title = 2131230944;
+			public const int listview_title = 2131230944;
+			
+			// aapt resource value: 0x7F0800DE
+			public const int list_item = 2131230942;
 			
 			// aapt resource value: 0x7F0800E1
 			public const int masked = 2131230945;
@@ -6253,13 +6253,13 @@ namespace MidiPlayer.Droid
 			public const int NO_DEBUG = 2131230726;
 			
 			// aapt resource value: 0x7F08011F
-			public const int number_picker_pan = 2131231007;
+			public const int numberpicker_pan = 2131231007;
 			
 			// aapt resource value: 0x7F080120
-			public const int number_picker_prog = 2131231008;
+			public const int numberpicker_prog = 2131231008;
 			
 			// aapt resource value: 0x7F080121
-			public const int number_picker_vol = 2131231009;
+			public const int numberpicker_vol = 2131231009;
 			
 			// aapt resource value: 0x7F080122
 			public const int off = 2131231010;
@@ -6612,23 +6612,23 @@ namespace MidiPlayer.Droid
 			// aapt resource value: 0x7F080191
 			public const int textEnd = 2131231121;
 			
-			// aapt resource value: 0x7F0801A1
-			public const int textinput_counter = 2131231137;
+			// aapt resource value: 0x7F080199
+			public const int textinput_counter = 2131231129;
 			
-			// aapt resource value: 0x7F0801A2
-			public const int textinput_error = 2131231138;
+			// aapt resource value: 0x7F08019A
+			public const int textinput_error = 2131231130;
 			
-			// aapt resource value: 0x7F0801A3
-			public const int textinput_helper_text = 2131231139;
+			// aapt resource value: 0x7F08019B
+			public const int textinput_helper_text = 2131231131;
 			
-			// aapt resource value: 0x7F0801A4
-			public const int textinput_placeholder = 2131231140;
+			// aapt resource value: 0x7F08019C
+			public const int textinput_placeholder = 2131231132;
 			
-			// aapt resource value: 0x7F0801A5
-			public const int textinput_prefix_text = 2131231141;
+			// aapt resource value: 0x7F08019D
+			public const int textinput_prefix_text = 2131231133;
 			
-			// aapt resource value: 0x7F0801A6
-			public const int textinput_suffix_text = 2131231142;
+			// aapt resource value: 0x7F08019E
+			public const int textinput_suffix_text = 2131231134;
 			
 			// aapt resource value: 0x7F080192
 			public const int textSpacerNoButtons = 2131231122;
@@ -6642,6 +6642,30 @@ namespace MidiPlayer.Droid
 			// aapt resource value: 0x7F080195
 			public const int textTop = 2131231125;
 			
+			// aapt resource value: 0x7F08019F
+			public const int textview_channel = 2131231135;
+			
+			// aapt resource value: 0x7F0801A0
+			public const int textview_item_channel = 2131231136;
+			
+			// aapt resource value: 0x7F0801A1
+			public const int textview_item_instrument = 2131231137;
+			
+			// aapt resource value: 0x7F0801A2
+			public const int textview_item_name = 2131231138;
+			
+			// aapt resource value: 0x7F0801A3
+			public const int textview_no = 2131231139;
+			
+			// aapt resource value: 0x7F0801A4
+			public const int textview_title_channel = 2131231140;
+			
+			// aapt resource value: 0x7F0801A5
+			public const int textview_title_instrument = 2131231141;
+			
+			// aapt resource value: 0x7F0801A6
+			public const int textview_title_name = 2131231142;
+			
 			// aapt resource value: 0x7F080196
 			public const int text_input_end_icon = 2131231126;
 			
@@ -6650,30 +6674,6 @@ namespace MidiPlayer.Droid
 			
 			// aapt resource value: 0x7F080198
 			public const int text_input_start_icon = 2131231128;
-			
-			// aapt resource value: 0x7F080199
-			public const int text_view_channel = 2131231129;
-			
-			// aapt resource value: 0x7F08019A
-			public const int text_view_item_channel = 2131231130;
-			
-			// aapt resource value: 0x7F08019B
-			public const int text_view_item_instrument = 2131231131;
-			
-			// aapt resource value: 0x7F08019C
-			public const int text_view_item_name = 2131231132;
-			
-			// aapt resource value: 0x7F08019D
-			public const int text_view_no = 2131231133;
-			
-			// aapt resource value: 0x7F08019E
-			public const int text_view_title_channel = 2131231134;
-			
-			// aapt resource value: 0x7F08019F
-			public const int text_view_title_instrument = 2131231135;
-			
-			// aapt resource value: 0x7F0801A0
-			public const int text_view_title_name = 2131231136;
 			
 			// aapt resource value: 0x7F0801A7
 			public const int time = 2131231143;
