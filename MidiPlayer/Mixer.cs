@@ -1,13 +1,28 @@
-﻿
-using System;
+﻿/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.ComponentModel;
 using System.Linq;
 
 namespace MidiPlayer {
-
     /// <summary>
     /// Mixer object.
     /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     public static class Mixer {
 #nullable enable
 
@@ -43,12 +58,12 @@ namespace MidiPlayer {
         /// <summary>
         /// func object to be called when a fader is selected.
         /// </summary>
-        static PropertyChangedEventHandler _onSelected;
+        static PropertyChangedEventHandler? _on_selected;
 
         /// <summary>
         /// func object to be called when a fader is updated.
         /// </summary>
-        static PropertyChangedEventHandler _onUpdated;
+        static PropertyChangedEventHandler? _on_updated;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Constructor
@@ -59,7 +74,7 @@ namespace MidiPlayer {
         static Mixer() {
             _mixer = new();
             _current = 0;
-            Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
+            Enumerable.Range(start: MIDI_TRACK_BASE, count: MIDI_TRACK_COUNT).ToList().ForEach(x => {
                 Fader fader = new(x);
                 fader.Updated += onUpdate;
                 _mixer.Add(x, fader);
@@ -72,23 +87,23 @@ namespace MidiPlayer {
         /// <summary>
         /// selected event handler.
         /// </summary>
-        /// <remarks>
+        /// <note>
         /// called when Mixer's channel is clicked.<br/>
-        /// </remarks>
+        /// </note>
         public static event PropertyChangedEventHandler? Selected {
-            add => _onSelected += value;
-            remove => _onSelected -= value;
+            add => _on_selected += value;
+            remove => _on_selected -= value;
         }
 
         /// <summary>
         /// updated event handler.
         /// </summary>
-        /// <remarks>
+        /// <note>
         /// called when Fader's properties change.<br/>
-        /// </remarks>
+        /// </note>
         public static event PropertyChangedEventHandler? Updated {
-            add => _onUpdated += value;
-            remove => _onUpdated -= value;
+            add => _on_updated += value;
+            remove => _on_updated -= value;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,16 +112,16 @@ namespace MidiPlayer {
         /// <summary>
         /// get selected fader number.
         /// </summary>
-        /// <remarks>
+        /// <note>
         /// base index value is 0.
-        /// </remarks>
+        /// </note>
         public static int Current {
             get => _current;
             set {
                 _previous = _current;
                 _current = value;
                 Log.Info($"current: {_current}");
-                _onSelected(null, new(nameof(Current)));
+                _on_selected(null, new(nameof(Current)));
             }
         }
 
@@ -148,7 +163,7 @@ namespace MidiPlayer {
         /// called when a fader value is updated.
         /// </summary>
         static void onUpdate(object sender, PropertyChangedEventArgs e) {
-            _onUpdated(sender, e);
+            _on_updated(sender, e);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,9 +181,9 @@ namespace MidiPlayer {
             /// <summary>
             /// a track index value of a fader.
             /// </summary>
-            /// <remarks>
+            /// <note>
             /// base index value is 0, maxim value is MIDI_TRACK_COUNT.
-            /// </remarks>
+            /// </note>
             int _index = -1;
 
             /// <summary>
@@ -184,41 +199,41 @@ namespace MidiPlayer {
             /// <summary>
             /// a midi channel number of a fader.
             /// </summary>
-            /// <remarks>
+            /// <note>
             /// base index value is 0, maxim value is MIDI_TRACK_COUNT.
-            /// </remarks>
+            /// </note>
             int _channel = -1;
 
             /// <summary>
             /// a midi bank number of a fader.
             /// </summary>
-            /// <remarks>
+            /// <note>
             /// minimum value is 0, maxim value is 127.
-            /// </remarks>
+            /// </note>
             int _bank = -1;
 
             /// <summary>
             /// a midi program number of a fader.
             /// </summary>
-            /// <remarks>
+            /// <note>
             /// minimum value is 0, maxim value is 127.
-            /// </remarks>
+            /// </note>
             int _program = 0;
 
             /// <summary>
             /// a midi volume value of a fader.
             /// </summary>
-            /// <remarks>
+            /// <note>
             /// minimum value is 0, maxim value is 127.
-            /// </remarks>
+            /// </note>
             int _volume = 104;
 
             /// <summary>
             /// a midi pan value of a fader.
             /// </summary>
-            /// <remarks>
+            /// <note>
             /// full left value is 0, center value is 64, full right value is 127.
-            /// </remarks>
+            /// </note>
             int _pan = 64; // center
 
             ///////////////////////////////////////////////////////////////////////////////////////////
@@ -250,7 +265,7 @@ namespace MidiPlayer {
                 set {
                     if (value != _index) {
                         _index = value;
-                        Updated?.Invoke(this, new(nameof(Index)));
+                        Updated?.Invoke(sender: this, e: new(nameof(Index)));
                     }
                 }
             }
@@ -271,7 +286,7 @@ namespace MidiPlayer {
                 set {
                     if (value != _sounds) {
                         _sounds = value;
-                        Updated?.Invoke(this, new(nameof(Sounds)));
+                        Updated?.Invoke(sender: this, e: new(nameof(Sounds)));
                     }
                 }
             }
@@ -284,7 +299,7 @@ namespace MidiPlayer {
                 set {
                     if (value != _name) {
                         _name = value;
-                        Updated?.Invoke(this, new(nameof(Name)));
+                        Updated?.Invoke(sender: this, e: new(nameof(Name)));
                     }
                 }
             }
@@ -297,7 +312,7 @@ namespace MidiPlayer {
                 set {
                     if (value != _channel) {
                         _channel = value;
-                        Updated?.Invoke(this, new(nameof(Channel)));
+                        Updated?.Invoke(sender: this, e: new(nameof(Channel)));
                     }
                 }
             }
@@ -323,7 +338,7 @@ namespace MidiPlayer {
                 set {
                     if (value != _bank) {
                         _bank = value;
-                        Updated?.Invoke(this, new(nameof(Bank)));
+                        Updated?.Invoke(sender: this, e: new(nameof(Bank)));
                     }
                 }
             }
@@ -344,7 +359,7 @@ namespace MidiPlayer {
                 set {
                     if (value != _program) {
                         _program = value;
-                        Updated?.Invoke(this, new(nameof(Program)));
+                        Updated?.Invoke(sender: this, e: new(nameof(Program)));
                     }
                 }
             }
@@ -365,7 +380,7 @@ namespace MidiPlayer {
                 set {
                     if (value != _volume) {
                         _volume = value;
-                        Updated?.Invoke(this, new(nameof(Volume)));
+                        Updated?.Invoke(sender: this, e: new(nameof(Volume)));
                     }
                 }
             }
@@ -378,7 +393,7 @@ namespace MidiPlayer {
                 set {
                     if (value != _pan) {
                         _pan = value;
-                        Updated?.Invoke(this, new(nameof(Pan)));
+                        Updated?.Invoke(sender: this, e: new(nameof(Pan)));
                     }
                 }
             }

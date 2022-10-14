@@ -24,81 +24,81 @@ namespace MidiPlayer.Win64 {
         ///  the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this._buttonLoadSoundFont = new System.Windows.Forms.Button();
-            this._buttonLoadMidiFile = new System.Windows.Forms.Button();
-            this._buttonStart = new System.Windows.Forms.Button();
-            this._buttonStop = new System.Windows.Forms.Button();
-            this._openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this._listView = new MidiPlayer.Win64.BufferedListView();
+            this._button_load_soundfont = new System.Windows.Forms.Button();
+            this._button_load_midi_file = new System.Windows.Forms.Button();
+            this._button_start = new System.Windows.Forms.Button();
+            this._button_stop = new System.Windows.Forms.Button();
+            this._openfiledialog = new System.Windows.Forms.OpenFileDialog();
+            this._listview = new MidiPlayer.Win64.BufferedListView();
             this.SuspendLayout();
             // 
-            // _buttonLoadSoundFont
+            // _button_load_soundfont
             // 
-            this._buttonLoadSoundFont.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this._buttonLoadSoundFont.Location = new System.Drawing.Point(12, 12);
-            this._buttonLoadSoundFont.Name = "_buttonLoadSoundFont";
-            this._buttonLoadSoundFont.Size = new System.Drawing.Size(84, 40);
-            this._buttonLoadSoundFont.TabIndex = 0;
-            this._buttonLoadSoundFont.Text = "SOUND";
-            this._buttonLoadSoundFont.UseVisualStyleBackColor = true;
-            this._buttonLoadSoundFont.Click += new System.EventHandler(this.buttonLoadSoundFont_Click);
+            this._button_load_soundfont.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this._button_load_soundfont.Location = new System.Drawing.Point(12, 12);
+            this._button_load_soundfont.Name = "_button_load_soundfont";
+            this._button_load_soundfont.Size = new System.Drawing.Size(84, 40);
+            this._button_load_soundfont.TabIndex = 0;
+            this._button_load_soundfont.Text = "SOUND";
+            this._button_load_soundfont.UseVisualStyleBackColor = true;
+            this._button_load_soundfont.Click += new System.EventHandler(this.buttonLoadSoundFont_Click);
             // 
-            // _buttonLoadMidiFile
+            // _button_load_midi_file
             // 
-            this._buttonLoadMidiFile.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this._buttonLoadMidiFile.Location = new System.Drawing.Point(107, 12);
-            this._buttonLoadMidiFile.Name = "_buttonLoadMidiFile";
-            this._buttonLoadMidiFile.Size = new System.Drawing.Size(84, 40);
-            this._buttonLoadMidiFile.TabIndex = 1;
-            this._buttonLoadMidiFile.Text = "SONG";
-            this._buttonLoadMidiFile.UseVisualStyleBackColor = true;
-            this._buttonLoadMidiFile.Click += new System.EventHandler(this.buttonLoadMidiFile_Click);
+            this._button_load_midi_file.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this._button_load_midi_file.Location = new System.Drawing.Point(107, 12);
+            this._button_load_midi_file.Name = "_button_load_midi_file";
+            this._button_load_midi_file.Size = new System.Drawing.Size(84, 40);
+            this._button_load_midi_file.TabIndex = 1;
+            this._button_load_midi_file.Text = "SONG";
+            this._button_load_midi_file.UseVisualStyleBackColor = true;
+            this._button_load_midi_file.Click += new System.EventHandler(this.buttonLoadMidiFile_Click);
             // 
-            // _buttonStart
+            // _button_start
             // 
-            this._buttonStart.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this._buttonStart.Location = new System.Drawing.Point(202, 12);
-            this._buttonStart.Name = "_buttonStart";
-            this._buttonStart.Size = new System.Drawing.Size(84, 40);
-            this._buttonStart.TabIndex = 2;
-            this._buttonStart.Text = "START";
-            this._buttonStart.UseVisualStyleBackColor = true;
-            this._buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
+            this._button_start.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this._button_start.Location = new System.Drawing.Point(202, 12);
+            this._button_start.Name = "_button_start";
+            this._button_start.Size = new System.Drawing.Size(84, 40);
+            this._button_start.TabIndex = 2;
+            this._button_start.Text = "START";
+            this._button_start.UseVisualStyleBackColor = true;
+            this._button_start.Click += new System.EventHandler(this.buttonStart_Click);
             // 
-            // _buttonStop
+            // _button_stop
             // 
-            this._buttonStop.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this._buttonStop.Location = new System.Drawing.Point(297, 12);
-            this._buttonStop.Name = "_buttonStop";
-            this._buttonStop.Size = new System.Drawing.Size(84, 40);
-            this._buttonStop.TabIndex = 3;
-            this._buttonStop.Text = "STOP";
-            this._buttonStop.UseVisualStyleBackColor = true;
-            this._buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
+            this._button_stop.Font = new System.Drawing.Font("Yu Gothic UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this._button_stop.Location = new System.Drawing.Point(297, 12);
+            this._button_stop.Name = "_button_stop";
+            this._button_stop.Size = new System.Drawing.Size(84, 40);
+            this._button_stop.TabIndex = 3;
+            this._button_stop.Text = "STOP";
+            this._button_stop.UseVisualStyleBackColor = true;
+            this._button_stop.Click += new System.EventHandler(this.buttonStop_Click);
             // 
-            // _openFileDialog
+            // _openfiledialog
             // 
-            this._openFileDialog.FileName = "openFileDialog";
+            this._openfiledialog.FileName = "openFileDialog";
             // 
-            // _listView
+            // _listview
             // 
-            this._listView.HideSelection = false;
-            this._listView.Location = new System.Drawing.Point(12, 74);
-            this._listView.Name = "_listView";
-            this._listView.Size = new System.Drawing.Size(415, 423);
-            this._listView.TabIndex = 4;
-            this._listView.UseCompatibleStateImageBehavior = false;
+            this._listview.HideSelection = false;
+            this._listview.Location = new System.Drawing.Point(12, 74);
+            this._listview.Name = "_listview";
+            this._listview.Size = new System.Drawing.Size(415, 423);
+            this._listview.TabIndex = 4;
+            this._listview.UseCompatibleStateImageBehavior = false;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(439, 575);
-            this.Controls.Add(this._listView);
-            this.Controls.Add(this._buttonStop);
-            this.Controls.Add(this._buttonStart);
-            this.Controls.Add(this._buttonLoadMidiFile);
-            this.Controls.Add(this._buttonLoadSoundFont);
+            this.Controls.Add(this._listview);
+            this.Controls.Add(this._button_stop);
+            this.Controls.Add(this._button_start);
+            this.Controls.Add(this._button_load_midi_file);
+            this.Controls.Add(this._button_load_soundfont);
             this.Name = "MainForm";
             this.Text = "MIDIPlayer";
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -108,12 +108,12 @@ namespace MidiPlayer.Win64 {
 
         #endregion
 
-        private System.Windows.Forms.Button _buttonLoadSoundFont;
-        private System.Windows.Forms.Button _buttonLoadMidiFile;
-        private System.Windows.Forms.Button _buttonStart;
-        private System.Windows.Forms.Button _buttonStop;
-        private System.Windows.Forms.OpenFileDialog _openFileDialog;
-        private BufferedListView _listView;
+        private System.Windows.Forms.Button _button_load_soundfont;
+        private System.Windows.Forms.Button _button_load_midi_file;
+        private System.Windows.Forms.Button _button_start;
+        private System.Windows.Forms.Button _button_stop;
+        private System.Windows.Forms.OpenFileDialog _openfiledialog;
+        private BufferedListView _listview;
     }
 }
 
