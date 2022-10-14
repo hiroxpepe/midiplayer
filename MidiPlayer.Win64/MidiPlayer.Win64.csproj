@@ -38,9 +38,6 @@
     <Content Include="libs\libinstpatch-2.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="libs\libinstpatch-2.pdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="libs\libintl-8.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

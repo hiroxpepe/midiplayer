@@ -1,4 +1,18 @@
-﻿
+﻿/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using Android;
 using Android.App;
 using Android.Content;
@@ -18,7 +32,12 @@ using System.Threading.Tasks;
 using Xamarin.Essentials;
 
 namespace MidiPlayer.Droid {
-
+    /// <summary>
+    ///  partial class for MainActivity.
+    /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     [Activity(
         Label = "@string/app_name",
         Theme = "@style/Base.Theme.MaterialComponents.Light.DarkActionBar.Bridge",
@@ -37,23 +56,23 @@ namespace MidiPlayer.Droid {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
-        string _soundFontPath = "undefined";
+        string _sound_font_path = "undefined";
 
-        string _midiFilePath = "undefined";
+        string _midi_file_path = "undefined";
 
-        PlayList _playList;
+        PlayList _playlist;
 
-        List<ListItem> _itemList;
+        List<ListItem> _listitem_list;
 
-        Task _refreshTimer;
+        Task _refresh_timer;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
         public MainActivity() {
-            _playList = new();
-            _itemList = new();
-            _refreshTimer = createRefreshTask();
+            _playlist = new();
+            _listitem_list = new();
+            _refresh_timer = createRefreshTask();
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,7 +99,7 @@ namespace MidiPlayer.Droid {
             initializeComponent();
             Conf.Load();
             loadPreviousSetting();
-            _refreshTimer.Start();
+            _refresh_timer.Start();
 
             /// <summary>
             /// add a callback function to be called when the synth is playback.
@@ -94,7 +113,7 @@ namespace MidiPlayer.Droid {
             /// </summary>
             Synth.Started += () => {
                 Log.Info("Started called.");
-                MainThread.BeginInvokeOnMainThread(() => {
+                MainThread.BeginInvokeOnMainThread(action: () => {
                     Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
                 });
                 initializeListItem();
@@ -105,12 +124,12 @@ namespace MidiPlayer.Droid {
             /// </summary>
             Synth.Ended += () => {
                 Log.Info("Ended called.");
-                if (!_playList.Ready) {
+                if (!_playlist.Ready) {
                     Synth.Stop();
                     Synth.Start();
                 } else {
                     Synth.Stop();
-                    Synth.MidiFilePath = _playList.Next;
+                    Synth.MidiFilePath = _playlist.Next;
                     Synth.Start();
                 }
             };
@@ -123,10 +142,10 @@ namespace MidiPlayer.Droid {
             /// </remarks>
             Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
                 var track = (Synth.Track) sender;
-                ListItem listItem = _itemList[track.IndexWithExcludingConductor];
-                listItem.Name = track.Name;
-                listItem.Instrument = Synth.GetVoice(track.Index);
-                listItem.Channel = track.ChannelAsOneBased.ToString();
+                ListItem list_item = _listitem_list[track.IndexWithExcludingConductor];
+                list_item.Name = track.Name;
+                list_item.Instrument = Synth.GetVoice(track.Index);
+                list_item.Channel = track.ChannelAsOneBased.ToString();
             };
 
             /// <summary>
@@ -162,12 +181,12 @@ namespace MidiPlayer.Droid {
             Mixer.Selected += (object sender, PropertyChangedEventArgs e) => {
                 if (e.PropertyName is nameof(Mixer.Current)) {
                     Mixer.Fader fader = Mixer.GetCurrent();
-                    _textViewNo.Text = fader.IndexAsOneBased.ToString();
-                    _textViewChannel.Text = fader.ChannelAsOneBased.ToString();
-                    _numberPickerProg.Value = fader.ProgramAsOneBased;
-                    _numberPickerPan.Value = fader.Pan;
-                    _numberPickerVol.Value = fader.Volume;
-                    _checkBoxMute.Checked = !fader.Sounds;
+                    _textview_no.Text = fader.IndexAsOneBased.ToString();
+                    _textview_channel.Text = fader.ChannelAsOneBased.ToString();
+                    _numberpicker_prog.Value = fader.ProgramAsOneBased;
+                    _numberpicker_pan.Value = fader.Pan;
+                    _numberpicker_vol.Value = fader.Volume;
+                    _checkbox_mute.Checked = !fader.Sounds;
                 }
             };
 
@@ -244,36 +263,36 @@ namespace MidiPlayer.Droid {
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data) {
             switch (requestCode) {
                 case (int) Request.SoundFont:
-                    _soundFontPath = getActualPathBy(data);
-                    if (!(_soundFontPath.Contains(".SF2") || _soundFontPath.Contains(".sf2"))) {
+                    _sound_font_path = getActualPathBy(data);
+                    if (!(_sound_font_path.Contains(".SF2") || _sound_font_path.Contains(".sf2"))) {
                         Log.Warn("not a sound font.");
                         break;
                     }
-                    Log.Info($"selected: {_soundFontPath}");
-                    Synth.SoundFontPath = _soundFontPath;
-                    Env.SoundFontPath = _soundFontPath;
-                    Title = $"MidiPlayer: {_midiFilePath.ToFileName()} {_soundFontPath.ToFileName()}";
+                    Log.Info($"selected: {_sound_font_path}");
+                    Synth.SoundFontPath = _sound_font_path;
+                    Env.SoundFontPath = _sound_font_path;
+                    Title = $"MidiPlayer: {_midi_file_path.ToFileName()} {_sound_font_path.ToFileName()}";
                     break;
                 case (int) Request.MidiFile:
-                    _midiFilePath = getActualPathBy(data);
-                    if (!(_midiFilePath.Contains(".MID") || _midiFilePath.Contains(".mid"))) {
+                    _midi_file_path = getActualPathBy(data);
+                    if (!(_midi_file_path.Contains(".MID") || _midi_file_path.Contains(".mid"))) {
                         Log.Warn("not a midi file.");
                         break;
                     }
-                    Log.Info($"selected: {_midiFilePath}");
-                    Synth.MidiFilePath = _midiFilePath;
-                    Env.MidiFilePath = _midiFilePath;
-                    Title = $"MidiPlayer: {_midiFilePath.ToFileName()} {_soundFontPath.ToFileName()}";
+                    Log.Info($"selected: {_midi_file_path}");
+                    Synth.MidiFilePath = _midi_file_path;
+                    Env.MidiFilePath = _midi_file_path;
+                    Title = $"MidiPlayer: {_midi_file_path.ToFileName()} {_sound_font_path.ToFileName()}";
                     break;
                 case (int) Request.AddPlayList:
-                    var midiFilePath = getActualPathBy(data);
-                    if (!(midiFilePath.Contains(".MID") || midiFilePath.Contains(".mid"))) {
+                    var midi_file_path = getActualPathBy(data);
+                    if (!(midi_file_path.Contains(".MID") || midi_file_path.Contains(".mid"))) {
                         Log.Warn("not a midi file.");
                         break;
                     }
-                    Log.Info($"selected: {midiFilePath}");
-                    _playList.Add(midiFilePath); // add to playlist
-                    Env.MidiFilePath = midiFilePath;
+                    Log.Info($"selected: {midi_file_path}");
+                    _playlist.Add(midi_file_path); // add to playlist
+                    Env.MidiFilePath = midi_file_path;
                     break;
                 default:
                     break;
@@ -298,15 +317,15 @@ namespace MidiPlayer.Droid {
         /// <summary>
         /// call Intent.
         /// </summary>
-        void callIntent(string targetDir, int requestCode) {
+        void callIntent(string target_dir, int request_code) {
             var intent = new Intent(Intent.ActionOpenDocument);
-            var uri = Android.Net.Uri.Parse($"content://com.android.externalstorage.documents/document/primary%3A{targetDir}");
+            var uri = Android.Net.Uri.Parse($"content://com.android.externalstorage.documents/document/primary%3A{target_dir}");
             intent.SetData(uri);
             intent.SetType("*/*");
             intent.PutExtra("android.provider.extra.INITIAL_URI", uri);
             intent.PutExtra("android.content.extra.SHOW_ADVANCED", true);
             intent.AddCategory(Intent.CategoryOpenable);
-            StartActivityForResult(intent, requestCode);
+            StartActivityForResult(intent, request_code);
         }
 
         /// <summary>
@@ -314,13 +333,13 @@ namespace MidiPlayer.Droid {
         /// </summary>
         static string getActualPathBy(Intent data) {
             var uri = data.Data;
-            string docId = DocumentsContract.GetDocumentId(uri);
-            char[] charArray = { ':' };
-            string[] stringArray = docId.Split(charArray);
-            string type = stringArray[0]; // primary
-            string path = "";
+            string doc_id = DocumentsContract.GetDocumentId(uri);
+            char[] char_array = { ':' };
+            string[] string_array = doc_id.Split(char_array);
+            string type = string_array[0]; // primary
+            string path = string.Empty;
             if ("primary".Equals(type, StringComparison.OrdinalIgnoreCase)) {
-                path = Android.OS.Environment.ExternalStorageDirectory + "/" + stringArray[1];
+                path = Android.OS.Environment.ExternalStorageDirectory + "/" + string_array[1];
             }
             return path;
         }
@@ -333,8 +352,8 @@ namespace MidiPlayer.Droid {
                 Synth.SoundFontPath = Env.SoundFontPath;
                 Synth.MidiFilePath = Env.MidiFilePath;
                 Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
-                _soundFontPath = Env.SoundFontPath;
-                _midiFilePath = Env.MidiFilePath;
+                _sound_font_path = Env.SoundFontPath;
+                _midi_file_path = Env.MidiFilePath;
             }
         }
 
@@ -343,16 +362,16 @@ namespace MidiPlayer.Droid {
         /// </summary>
         async void playSong() {
             try {
-                await Task.Run(() => {
-                    if (!_playList.Ready) {
-                        Synth.MidiFilePath = _midiFilePath;
+                await Task.Run(action: () => {
+                    if (!_playlist.Ready) {
+                        Synth.MidiFilePath = _midi_file_path;
                         Synth.Start();
                     } else {
-                        Synth.MidiFilePath = _playList.Next;
+                        Synth.MidiFilePath = _playlist.Next;
                         Synth.Start();
                     }
                 });
-                logMemoryInro();
+                logMemoryInfo();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
@@ -363,10 +382,10 @@ namespace MidiPlayer.Droid {
         /// </summary>
         async void stopSong() {
             try {
-                await Task.Run(() => Synth.Stop());
-                Conf.Value.PlayList = _playList.List; // TODO: save
+                await Task.Run(action: () => Synth.Stop());
+                Conf.Value.PlayList = _playlist.List; // TODO: save
                 Conf.Save(); // TODO: save
-                logMemoryInro();
+                logMemoryInfo();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
@@ -376,11 +395,11 @@ namespace MidiPlayer.Droid {
         /// refresh the view in a few seconds.
         /// </summary>
         Task createRefreshTask() {
-            return new(async () => {
-                var listItemAdapter = (ListItemAdapter) _itemListView.Adapter;
+            return new(action: async () => {
+                var listitem_adapter = (ListItemAdapter) _listview_item.Adapter;
                 while (true) {
-                    RunOnUiThread(() => {
-                        listItemAdapter.NotifyDataSetChanged();
+                    RunOnUiThread(action: () => {
+                        listitem_adapter.NotifyDataSetChanged();
                     });
                     await Task.Delay(VIEW_REFRESH_TIME);
                 }
@@ -391,27 +410,29 @@ namespace MidiPlayer.Droid {
         /// initialize listItem.
         /// </summary>
         void initializeListItem() {
-            Enumerable.Range(MIDI_TRACK_BASE, MIDI_TRACK_COUNT).ToList().ForEach(x => {
-                var listItem = _itemList[x];
-                listItem.Name = "------"; listItem.Instrument = "------"; listItem.Channel = "---";
+            Enumerable.Range(start: MIDI_TRACK_BASE, count: MIDI_TRACK_COUNT).ToList().ForEach(x => {
+                var listitem = _listitem_list[x];
+                listitem.Name = "------"; listitem.Instrument = "------"; listitem.Channel = "---";
             });
         }
 
         /// <summary>
         /// show memory information to log.
-        /// FIXME: delete
         /// </summary>
-        static void logMemoryInro() {
+        /// <note>
+        /// development
+        /// </note>
+        static void logMemoryInfo() {
             // JVM runtime.
-            var jvmMaxMemory = Java.Lang.Runtime.GetRuntime().MaxMemory();
-            var jvmFreeMemory = Java.Lang.Runtime.GetRuntime().FreeMemory();
-            var jvmTotalMemory = Java.Lang.Runtime.GetRuntime().TotalMemory();
-            Log.Debug($"JVM maxMemory: {jvmMaxMemory.ToMegabytes()}MB");
-            Log.Debug($"JVM freeMemory: {jvmFreeMemory.ToMegabytes()}MB");
-            Log.Debug($"JVM totalMemory: {jvmTotalMemory.ToMegabytes()}MB");
+            var jvm_max_memory = Java.Lang.Runtime.GetRuntime().MaxMemory();
+            var jvm_free_memory = Java.Lang.Runtime.GetRuntime().FreeMemory();
+            var jvm_total_memory = Java.Lang.Runtime.GetRuntime().TotalMemory();
+            Log.Debug($"JVM max memory: {jvm_max_memory.ToMegabytes()}MB");
+            Log.Debug($"JVM free memory: {jvm_free_memory.ToMegabytes()}MB");
+            Log.Debug($"JVM total memory: {jvm_total_memory.ToMegabytes()}MB");
             // Mono runtime.
-            var monoTotalMemory = GC.GetTotalMemory(false);
-            Log.Debug($"Mono totalMemory: {monoTotalMemory.ToMegabytes()}MB");
+            var mono_total_memory = GC.GetTotalMemory(false);
+            Log.Debug($"Mono total memory: {mono_total_memory.ToMegabytes()}MB");
         }
     }
 }
