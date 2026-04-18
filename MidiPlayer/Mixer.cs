@@ -13,6 +13,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
 using System.ComponentModel;
 using System.Linq;
 
@@ -131,7 +132,7 @@ namespace MidiPlayer {
                 _previous = _current;
                 _current = value;
                 Log.Info($"current: {_current}");
-                _on_selected(null, new(nameof(Current)));
+                _on_selected?.Invoke(null, new(nameof(Current)));
             }
         }
 
@@ -175,11 +176,16 @@ namespace MidiPlayer {
 
         /// <summary>
         /// called when a fader value is updated.
+        /// Uses null-safe invoke and a try-catch so exceptions never escape from the Fader.Updated chain.
         /// </summary>
         /// <param name="sender">the Fader that raised the update.</param>
         /// <param name="e">the property-change event arguments.</param>
         static void onUpdate(object sender, PropertyChangedEventArgs e) {
-            _on_updated(sender, e);
+            try {
+                _on_updated?.Invoke(sender, e);
+            } catch (Exception ex) {
+                Log.Error($"[Mixer.onUpdate] {ex}");
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

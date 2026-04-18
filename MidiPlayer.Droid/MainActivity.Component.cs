@@ -13,11 +13,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using Android.Support.V7.App;
+using AndroidX.AppCompat.App;
 using Android.Widget;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace MidiPlayer.Droid {
@@ -130,34 +131,82 @@ namespace MidiPlayer.Droid {
         void initializeComponent() {
 
             /// <summary>
-            /// buttonLoadSoundFont
+            /// buttonLoadSoundFont: shows an AlertDialog listing all *.sf2 files in the
+            /// app-specific SoundFont directory so the user can pick one without SAF.
             /// </summary>
             _button_load_soundfont = FindViewById<Button>(Resource.Id.button_load_soundfont);
             _button_load_soundfont.Click += (object sender, EventArgs e) => {
-                Log.Info("_button_load_soundfont clicked.");
+                //Log.Info("_button_load_soundfont clicked.");
                 try {
-                    if (Synth.Playing) {
-                        stopSong();
+                    //Log.Debug($"[SF2] AppRootPath={Env.AppRootPath}");
+                    //Log.Debug($"[SF2] SoundFontDir={Env.SoundFontDir}");
+                    if (Synth.Playing) { stopSong(); }
+                    if (!Directory.Exists(Env.SoundFontDir)) {
+                        Directory.CreateDirectory(Env.SoundFontDir);
+                        //Log.Info($"[SF2] created: {Env.SoundFontDir}");
                     }
-                    callIntent(Env.SoundFontDirForIntent, (int) Request.SoundFont);
+                    var files = Directory.GetFiles(Env.SoundFontDir, "*.sf2");
+                    //Log.Debug($"[SF2] files.Length={files.Length}");
+                    if (files.Length == 0) {
+                        Toast.MakeText(this, $"Please put .sf2 files in Music/{Env.SOUNDFONT_FOLDER}", ToastLength.Long)!.Show();
+                        return;
+                    }
+                    var fileNames = files.Select(f => Path.GetFileName(f)).ToArray();
+                    //Log.Debug($"[SF2] showing dialog with {fileNames.Length} items");
+                    new AlertDialog.Builder(this)
+                        .SetTitle("Select SoundFont")!
+                        .SetItems(fileNames, (dialogSender, args) => {
+                            _sound_font_path = files[args.Which];
+                            Synth.SoundFontPath = _sound_font_path;
+                            Env.SoundFontPath = _sound_font_path;
+                            Title = $"MidiPlayer: {_midi_file_path.ToFileName()} {_sound_font_path.ToFileName()}";
+                            Toast.MakeText(this, $"Loaded: {fileNames[args.Which]}", ToastLength.Short)!.Show();
+                        })!
+                        .SetNegativeButton("Cancel", (dialogSender, args) => { })!
+                        .Show();
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    //Log.Error($"[SF2] {ex}");
+                    Toast.MakeText(this, $"Error: {ex.Message}", ToastLength.Long)!.Show();
                 }
             };
 
             /// <summary>
-            /// buttonLoadMidiFile
+            /// buttonLoadMidiFile: shows an AlertDialog listing all *.mid files in the
+            /// app-specific MIDI directory so the user can pick one without SAF.
             /// </summary>
             _button_load_midi_file = FindViewById<Button>(Resource.Id.button_load_midi_file);
             _button_load_midi_file.Click += (object sender, EventArgs e) => {
-                Log.Info("_button_load_midi_file clicked.");
+                //Log.Info("_button_load_midi_file clicked.");
                 try {
-                    if (Synth.Playing) {
-                        stopSong();
+                    //Log.Debug($"[MID] AppRootPath={Env.AppRootPath}");
+                    //Log.Debug($"[MID] MidiFileDir={Env.MidiFileDir}");
+                    if (Synth.Playing) { stopSong(); }
+                    if (!Directory.Exists(Env.MidiFileDir)) {
+                        Directory.CreateDirectory(Env.MidiFileDir);
+                        //Log.Info($"[MID] created: {Env.MidiFileDir}");
                     }
-                    callIntent(Env.MidiFileDirForIntent, (int) Request.MidiFile);
+                    var files = Directory.GetFiles(Env.MidiFileDir, "*.mid");
+                    //Log.Debug($"[MID] files.Length={files.Length}");
+                    if (files.Length == 0) {
+                        Toast.MakeText(this, $"Please put .mid files in Music/{Env.MIDI_FOLDER}", ToastLength.Long)!.Show();
+                        return;
+                    }
+                    var fileNames = files.Select(f => Path.GetFileName(f)).ToArray();
+                    //Log.Debug($"[MID] showing dialog with {fileNames.Length} items");
+                    new AlertDialog.Builder(this)
+                        .SetTitle("Select MIDI File")!
+                        .SetItems(fileNames, (dialogSender, args) => {
+                            _midi_file_path = files[args.Which];
+                            Synth.MidiFilePath = _midi_file_path;
+                            Env.MidiFilePath = _midi_file_path;
+                            Title = $"MidiPlayer: {_midi_file_path.ToFileName()} {_sound_font_path.ToFileName()}";
+                            Toast.MakeText(this, $"Loaded: {fileNames[args.Which]}", ToastLength.Short)!.Show();
+                        })!
+                        .SetNegativeButton("Cancel", (dialogSender, args) => { })!
+                        .Show();
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    //Log.Error($"[MID] {ex}");
+                    Toast.MakeText(this, $"Error: {ex.Message}", ToastLength.Long)!.Show();
                 }
             };
 
@@ -166,28 +215,26 @@ namespace MidiPlayer.Droid {
             /// </summary>
             _button_start = FindViewById<Button>(Resource.Id.button_start);
             _button_start.Click += (object sender, EventArgs e) => {
-                Log.Info("_button_start clicked.");
+                //Log.Info("_button_start clicked.");
                 try {
                     if (!_midi_file_path.HasValue()) { // FIXME: case sounFdont
-                        Log.Warn("midiFilePath has no value.");
+                        //Log.Warn("midiFilePath has no value.");
                         return;
                     }
+                    initializeListItem();
                     playSong();
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    //Log.Error($"[Start] {ex}");
                 }
             };
-
-            /// <summary>
-            /// buttonStop
             /// </summary>
             _button_stop = FindViewById<Button>(Resource.Id.button_stop);
             _button_stop.Click += (object sender, EventArgs e) => {
-                Log.Info("_button_stop clicked.");
+                //Log.Info("_button_stop clicked.");
                 try {
                     stopSong();
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    //Log.Error($"[Stop] {ex}");
                 }
             };
 
@@ -196,11 +243,11 @@ namespace MidiPlayer.Droid {
             /// </summary>
             _button_add_playlist = FindViewById<Button>(Resource.Id.button_add_playlist);
             _button_add_playlist.Click += (object sender, EventArgs e) => {
-                Log.Info("_button_add_playlist clicked.");
+                //Log.Info("_button_add_playlist clicked.");
                 try {
                     callIntent(Env.MidiFileDir, (int) Request.AddPlayList);
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    //Log.Error($"[AddPlaylist] {ex}");
                 }
             };
 
@@ -209,11 +256,11 @@ namespace MidiPlayer.Droid {
             /// </summary>
             _button_delete_playlist = FindViewById<Button>(Resource.Id.button_delete_playlist);
             _button_delete_playlist.Click += (object sender, EventArgs e) => {
-                Log.Info("_button_delete_playlist clicked.");
+                //Log.Info("_button_delete_playlist clicked.");
                 try {
                     _playlist.Clear();
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    //Log.Error($"[DeletePlaylist] {ex}");
                 }
             };
 
@@ -222,11 +269,11 @@ namespace MidiPlayer.Droid {
             /// </summary>
             _button_send_synth = FindViewById<Button>(Resource.Id.button_send_synth);
             _button_send_synth.Click += (object sender, EventArgs e) => {
-                Log.Info("_button_send_synth clicked.");
+                //Log.Info("_button_send_synth clicked.");
                 try {
                     Mixer.Fader fader = Mixer.GetCurrent();
-                    Log.Debug($"track index {fader.Index}: send a data to MIDI {fader.Channel} channel.");
-                    Log.Debug($"prog: {fader.Program} pan: {fader.Pan} vol: {fader.Volume}.");
+                    //Log.Debug($"track index {fader.Index}: send a data to MIDI {fader.Channel} channel.");
+                    //Log.Debug($"prog: {fader.Program} pan: {fader.Pan} vol: {fader.Volume}.");
                     Data data = new() {
                         Channel = fader.Channel,
                         Program = fader.Program,
@@ -236,7 +283,7 @@ namespace MidiPlayer.Droid {
                     };
                     EventQueue.Enqueue(fader.Index, data);
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    //Log.Error($"[SendSynth] {ex}");
                 }
             };
 
@@ -254,7 +301,7 @@ namespace MidiPlayer.Droid {
             _numberpicker_prog.MaxValue = 128;
             _numberpicker_prog.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
                 var fader = Mixer.GetCurrent();
-                Log.Debug($"_numberpicker_prog.Value: {_numberpicker_prog.Value}");
+                //Log.Debug($"_numberpicker_prog.Value: {_numberpicker_prog.Value}");
                 fader.ProgramAsOneBased = _numberpicker_prog.Value;
             };
 
@@ -267,7 +314,7 @@ namespace MidiPlayer.Droid {
             _numberpicker_pan.Value = 65;
             _numberpicker_pan.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
                 var fader = Mixer.GetCurrent();
-                Log.Debug($"_numberpicker_pan.Value: {_numberpicker_pan.Value}");
+                //Log.Debug($"_numberpicker_pan.Value: {_numberpicker_pan.Value}");
                 fader.Pan = _numberpicker_pan.Value;
             };
 
@@ -280,7 +327,7 @@ namespace MidiPlayer.Droid {
             _numberpicker_vol.Value = 104;
             _numberpicker_vol.ValueChanged += (object sender, NumberPicker.ValueChangeEventArgs e) => {
                 var fader = Mixer.GetCurrent();
-                Log.Debug($"_numberpicker_vol.Value: {_numberpicker_vol.Value}");
+                //Log.Debug($"_numberpicker_vol.Value: {_numberpicker_vol.Value}");
                 fader.Volume = _numberpicker_vol.Value;
             };
 
@@ -311,8 +358,12 @@ namespace MidiPlayer.Droid {
             var listitem_adapter = new ListItemAdapter(this, 0, _listitem_list);
             _listview_item.Adapter = listitem_adapter;
             _listview_item.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
-                Log.Debug($"setected: {e.Position}");
-                Mixer.Current = e.Position;
+                try {
+                    //Log.Debug($"setected: {e.Position}");
+                    Mixer.Current = e.Position;
+                } catch (Exception ex) {
+                    //Log.Error($"[ItemClick] {ex}");
+                }
             };
         }
     }

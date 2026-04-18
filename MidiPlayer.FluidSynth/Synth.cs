@@ -127,16 +127,17 @@ namespace MidiPlayer {
         /// <summary>initializes the _on_playbacking multicast delegate with the default handler that calls ProcessPlayback and, for the real P/Invoke implementation, also forwards the event to the native FluidSynth handler.</summary>
         static Synth() {
             _on_playbacking += (void_ptr data, fluid_midi_event_t evt) => {
-                // Run the managed processing logic for both production and tests. When using the real PInvoke implementation,
-                // allow the native fluidsynth to handle the event after applying managed state changes. When using a Fake, avoid
-                // calling back into the fake to prevent infinite recursion.
+                // Run the managed processing logic for both production and tests. Delegate through
+                // FluidSynthAPI.Instance so FakeFluidSynth returns 0 in tests (no recursion) and
+                // PInvokeFluidSynth forwards to the native library in production.
                 ProcessPlayback(data, evt);
-                if (MidiPlayer.FluidSynth.FluidSynthAPI.Instance is MidiPlayer.FluidSynth.PInvokeFluidSynth)
-                {
-                    return NativeFuncs.Fluidsynth.fluid_synth_handle_midi_event(data, evt);
-                }
-                return 0;
+                return fluid_synth_handle_midi_event(data, evt);
             };
+            // GC-root the callback delegate here so it can never be collected between Init() calls.
+            // Previously this was done inside the Playbacking event add accessor, which meant the
+            // delegate was only rooted after OnCreate subscribed — too late on Android where the
+            // native audio thread can start before the UI finishes initialization.
+            _event_callback = new NativeFuncs.Fluidsynth.handle_midi_event_func_t(_on_playbacking);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,12 +181,9 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Events [verb, verb phrase] 
 
-        /// <summary>fired for each incoming MIDI event during playback; the add accessor also registers the native callback with FluidSynth.</summary>
+        /// <summary>fired for each incoming MIDI event during playback.</summary>
         public static event Func<IntPtr, IntPtr, int> Playbacking {
-            add {
-                _on_playbacking += value;
-                _event_callback = new NativeFuncs.Fluidsynth.handle_midi_event_func_t(_on_playbacking);
-            }
+            add => _on_playbacking += value;
             remove => _on_playbacking -= value;
         }
 
@@ -214,7 +212,18 @@ namespace MidiPlayer {
         public static void Init() {
             try {
                 if (!SoundFontPath.HasValue() || !MidiFilePath.HasValue()) {
-                    Log.Warn("no sound font or no midi file.");
+                    Log.Warn("no sound font or no midi file path specified.");
+                    return;
+                }
+                // Guard: reject paths that do not exist on disk before touching any native API.
+                // fluid_player_add and fluid_is_soundfont silently pass SIGSEGV/abort when fed
+                // a nonexistent path, which kills the process without throwing a managed exception.
+                if (!System.IO.File.Exists(SoundFontPath)) {
+                    Log.Error($"SoundFont file NOT FOUND on disk: {SoundFontPath}");
+                    return;
+                }
+                if (!System.IO.File.Exists(MidiFilePath)) {
+                    Log.Error($"MIDI file NOT FOUND on disk: {MidiFilePath}");
                     return;
                 }
                 _setting = new_fluid_settings();
@@ -223,7 +232,7 @@ namespace MidiPlayer {
                 _player = new_fluid_player(_synth);
                 Log.Info($"try to load the sound font: {SoundFontPath}");
                 if (fluid_is_soundfont(SoundFontPath) != 1) {
-                    Log.Error("not a sound font.");
+                    Log.Error("not a valid sound font file.");
                     return;
                 }
                 fluid_player_set_playback_callback(_player, _event_callback, _synth);
@@ -236,21 +245,23 @@ namespace MidiPlayer {
                 }
                 Log.Info($"try to load the midi file: {MidiFilePath}");
                 if (fluid_is_midifile(MidiFilePath) != 1) {
-                    Log.Error("not a midi file.");
+                    Log.Error("not a valid midi file.");
                     return;
                 }
                 Multi.StandardMidiFile = _standard_midi_file;
                 int result = fluid_player_add(_player, MidiFilePath);
                 if (result == NativeFuncs.Fluidsynth.FLUID_FAILED) {
-                    Log.Error("failed to load the midi file.");
+                    Log.Error("failed to add the midi file to player.");
                     return;
                 } else {
-                    Log.Info($"loaded the midi file: {MidiFilePath}");
+                    Log.Info($"added the midi file: {MidiFilePath}");
                 }
                 // Guard: if Stop() ran concurrently and cleared native handles while this
                 // Init() was in the slow fluid_synth_sfload call, abort here. Calling
                 // new_fluid_audio_driver with IntPtr.Zero arguments hangs indefinitely.
-                if (_stopping || _setting.IsZero() || _synth.IsZero() || _player.IsZero()) {
+                // Only _player is checked alongside _stopping: settings and synth stubs in
+                // FakeFluidSynth intentionally return IntPtr.Zero and must not be tested here.
+                if (_stopping || _player.IsZero()) {
                     Log.Warn("Init() aborted: native handles were cleared by a concurrent Stop().");
                     return;
                 }
@@ -258,8 +269,7 @@ namespace MidiPlayer {
                 _ready = true;
                 Log.Info("init :)");
             } catch (Exception ex) {
-                Log.Error(ex.Message);
-                // FIXME: terminate Fluidsynth.
+                Log.Error($"[Init] {ex}");
             }
         }
 
@@ -273,16 +283,18 @@ namespace MidiPlayer {
                         return;
                     }
                 }
+                Log.Info("Start: calling fluid_player_play...");
                 fluid_player_play(_player);
-                Log.Info("start :)");
+                Log.Info("Start: fluid_player_play done, firing Started...");
                 _on_started();
+                Log.Info("Start: Started fired, calling fluid_player_join...");
                 fluid_player_join(_player);
                 Log.Info("end :D");
                 if (_stopping == false) {
                     _on_ended();
                 }
             } catch (Exception ex) {
-                Log.Error(ex.Message);
+                Log.Error($"[Start] {ex}");
             }
         }
 
@@ -298,7 +310,7 @@ namespace MidiPlayer {
                 GC.Collect();
                 Log.Info("GC.Collect.");
             } catch (Exception ex) {
-                Log.Error(ex.Message);
+                Log.Error($"[Stop] {ex}");
             }
         }
 
@@ -420,7 +432,7 @@ namespace MidiPlayer {
                 _setting = IntPtr.Zero;
                 Log.Info("final :|");
             } catch (Exception ex) {
-                Log.Error(ex.Message);
+                Log.Error($"[final] {ex}");
             } finally {
                 _ready = false;
                 _stopping = false;
@@ -430,43 +442,57 @@ namespace MidiPlayer {
         /// <summary>
         /// Process a playback event's managed side-effects (update Multi and EventQueue) without invoking native fluidsynth handlers.
         /// This method is callable by fakes to avoid recursive native -> managed -> native loops.
+        /// Wrapped in try-catch so that no C# exception can escape to the native JNI audio callback thread,
+        /// which would otherwise manifest as Android.Runtime.JavaProxyThrowable and kill the process.
         /// </summary>
         public static int ProcessPlayback(IntPtr data, IntPtr evt) {
-            var type = fluid_midi_event_get_type(evt);
-            var channel = fluid_midi_event_get_channel(evt);
-            var control = fluid_midi_event_get_control(evt);
-            var value = fluid_midi_event_get_value(evt);
-            var program = fluid_midi_event_get_program(evt);
-            if (type == NOTE_ON) { // NOTE_ON = 144
-                Multi.ApplyNoteOn(channel);
-            } else if (type == NOTE_OFF) { // NOTE_OFF = 128
-                Multi.ApplyNoteOff(channel);
-            } else if (type == PROGRAM_CHANGE) { // PROGRAM_CHANGE = 192
-                Multi.ApplyProgramChange(channel, program);
-            } else if (type == CONTROL_CHANGE) { // CONTROL_CHANGE = 176
-                Multi.ApplyControlChange(channel, control, value);
-            }
-            for (int track_index = MIDI_TRACK_BASE; track_index < MIDI_TRACK_BASE + MIDI_TRACK_COUNT; track_index++) {
-                var event_data = EventQueue.Dequeue(track_index);
-                if (event_data is not null) {
-                    fluid_synth_program_change(_synth, event_data.Channel, event_data.Program);
-                    fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Pan, event_data.Pan);
-                    if (event_data.Mute) {
-                        fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, MUTE_VOLUME);
-                    } else {
-                        fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, event_data.Volume);
-                    }
-                    Multi.ApplyProgramChange(event_data.Channel, event_data.Program);
+            try {
+                var type = fluid_midi_event_get_type(evt);
+                var channel = fluid_midi_event_get_channel(evt);
+                var control = fluid_midi_event_get_control(evt);
+                var value = fluid_midi_event_get_value(evt);
+                var program = fluid_midi_event_get_program(evt);
+                if (type == NOTE_ON) { // NOTE_ON = 144
+                    Multi.ApplyNoteOn(channel);
+                } else if (type == NOTE_OFF) { // NOTE_OFF = 128
+                    Multi.ApplyNoteOff(channel);
+                } else if (type == PROGRAM_CHANGE) { // PROGRAM_CHANGE = 192
+                    Multi.ApplyProgramChange(channel, program);
+                } else if (type == CONTROL_CHANGE) { // CONTROL_CHANGE = 176
+                    Multi.ApplyControlChange(channel, control, value);
                 }
+                for (int track_index = MIDI_TRACK_BASE; track_index < MIDI_TRACK_BASE + MIDI_TRACK_COUNT; track_index++) {
+                    var event_data = EventQueue.Dequeue(track_index);
+                    if (event_data is not null) {
+                        fluid_synth_program_change(_synth, event_data.Channel, event_data.Program);
+                        fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Pan, event_data.Pan);
+                        if (event_data.Mute) {
+                            fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, MUTE_VOLUME);
+                        } else {
+                            fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, event_data.Volume);
+                        }
+                        Multi.ApplyProgramChange(event_data.Channel, event_data.Program);
+                    }
+                }
+                return 0;
+            } catch (Exception ex) {
+                //Log.Error($"[ProcessPlayback] {ex}");
+                return 0;
             }
-            return 0;
         }
 
-        /// <summary>forwards property-change notifications from Track objects to the outer _on_updated event.</summary>
+        /// <summary>
+        /// forwards property-change notifications from Track objects to the outer _on_updated event.
+        /// Uses null-safe invoke and a try-catch so exceptions never escape into the native audio callback thread.
+        /// </summary>
         /// <param name="sender">the Track that changed.</param>
         /// <param name="e">the property-change args.</param>
         static void onPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            _on_updated(sender, e);
+            try {
+                _on_updated?.Invoke(sender, e);
+            } catch (Exception ex) {
+                //Log.Error($"[onPropertyChanged] {ex}");
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

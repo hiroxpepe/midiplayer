@@ -80,13 +80,6 @@ namespace MidiPlayer.Win64 {
             }
 
             /// <summary>
-            /// add a callback function to be called when the synth is playback.
-            /// </summary>
-            Synth.Playbacking += (IntPtr data, IntPtr evt) => {
-                return Synth.HandleEvent(data, evt);
-            };
-
-            /// <summary>
             /// add a callback function to be called when the synth started.
             /// </summary>
             Synth.Started += () => {

@@ -1,6 +1,6 @@
 ﻿# Aggregated C# sources
 Repository: C:\Users\hiroxpepe\Projects\midiplayer
-Date: 2026-04-18 21:14:13Z
+Date: 2026-04-19 02:05:01Z
 
 ## MidiPlayer.Droid\ListViewAdapter.cs
 
@@ -197,7 +197,6 @@ namespace MidiPlayer.Droid {
             viewHolder.TextViewName.Text = listItem.Name;
             viewHolder.TextViewInstrument.Text = listItem.Instrument;
             viewHolder.TextViewChannel.Text = listItem.Channel;
-            NotifyDataSetChanged();
             return convertView;
         }
 
@@ -267,11 +266,12 @@ namespace MidiPlayer.Droid {
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using Android.Support.V7.App;
+using AndroidX.AppCompat.App;
 using Android.Widget;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace MidiPlayer.Droid {
@@ -384,34 +384,82 @@ namespace MidiPlayer.Droid {
         void initializeComponent() {
 
             /// <summary>
-            /// buttonLoadSoundFont
+            /// buttonLoadSoundFont: shows an AlertDialog listing all *.sf2 files in the
+            /// app-specific SoundFont directory so the user can pick one without SAF.
             /// </summary>
             _button_load_soundfont = FindViewById<Button>(Resource.Id.button_load_soundfont);
             _button_load_soundfont.Click += (object sender, EventArgs e) => {
                 Log.Info("_button_load_soundfont clicked.");
                 try {
-                    if (Synth.Playing) {
-                        stopSong();
+                    Log.Debug($"[SF2] AppRootPath={Env.AppRootPath}");
+                    Log.Debug($"[SF2] SoundFontDir={Env.SoundFontDir}");
+                    if (Synth.Playing) { stopSong(); }
+                    if (!Directory.Exists(Env.SoundFontDir)) {
+                        Directory.CreateDirectory(Env.SoundFontDir);
+                        Log.Info($"[SF2] created: {Env.SoundFontDir}");
                     }
-                    callIntent(Env.SoundFontDirForIntent, (int) Request.SoundFont);
+                    var files = Directory.GetFiles(Env.SoundFontDir, "*.sf2");
+                    Log.Debug($"[SF2] files.Length={files.Length}");
+                    if (files.Length == 0) {
+                        Toast.MakeText(this, $"Please put .sf2 files in Music/{Env.SOUNDFONT_FOLDER}", ToastLength.Long)!.Show();
+                        return;
+                    }
+                    var fileNames = files.Select(f => Path.GetFileName(f)).ToArray();
+                    Log.Debug($"[SF2] showing dialog with {fileNames.Length} items");
+                    new AlertDialog.Builder(this)
+                        .SetTitle("Select SoundFont")!
+                        .SetItems(fileNames, (dialogSender, args) => {
+                            _sound_font_path = files[args.Which];
+                            Synth.SoundFontPath = _sound_font_path;
+                            Env.SoundFontPath = _sound_font_path;
+                            Title = $"MidiPlayer: {_midi_file_path.ToFileName()} {_sound_font_path.ToFileName()}";
+                            Toast.MakeText(this, $"Loaded: {fileNames[args.Which]}", ToastLength.Short)!.Show();
+                        })!
+                        .SetNegativeButton("Cancel", (dialogSender, args) => { })!
+                        .Show();
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    Log.Error($"[SF2] {ex}");
+                    Toast.MakeText(this, $"Error: {ex.Message}", ToastLength.Long)!.Show();
                 }
             };
 
             /// <summary>
-            /// buttonLoadMidiFile
+            /// buttonLoadMidiFile: shows an AlertDialog listing all *.mid files in the
+            /// app-specific MIDI directory so the user can pick one without SAF.
             /// </summary>
             _button_load_midi_file = FindViewById<Button>(Resource.Id.button_load_midi_file);
             _button_load_midi_file.Click += (object sender, EventArgs e) => {
                 Log.Info("_button_load_midi_file clicked.");
                 try {
-                    if (Synth.Playing) {
-                        stopSong();
+                    Log.Debug($"[MID] AppRootPath={Env.AppRootPath}");
+                    Log.Debug($"[MID] MidiFileDir={Env.MidiFileDir}");
+                    if (Synth.Playing) { stopSong(); }
+                    if (!Directory.Exists(Env.MidiFileDir)) {
+                        Directory.CreateDirectory(Env.MidiFileDir);
+                        Log.Info($"[MID] created: {Env.MidiFileDir}");
                     }
-                    callIntent(Env.MidiFileDirForIntent, (int) Request.MidiFile);
+                    var files = Directory.GetFiles(Env.MidiFileDir, "*.mid");
+                    Log.Debug($"[MID] files.Length={files.Length}");
+                    if (files.Length == 0) {
+                        Toast.MakeText(this, $"Please put .mid files in Music/{Env.MIDI_FOLDER}", ToastLength.Long)!.Show();
+                        return;
+                    }
+                    var fileNames = files.Select(f => Path.GetFileName(f)).ToArray();
+                    Log.Debug($"[MID] showing dialog with {fileNames.Length} items");
+                    new AlertDialog.Builder(this)
+                        .SetTitle("Select MIDI File")!
+                        .SetItems(fileNames, (dialogSender, args) => {
+                            _midi_file_path = files[args.Which];
+                            Synth.MidiFilePath = _midi_file_path;
+                            Env.MidiFilePath = _midi_file_path;
+                            Title = $"MidiPlayer: {_midi_file_path.ToFileName()} {_sound_font_path.ToFileName()}";
+                            Toast.MakeText(this, $"Loaded: {fileNames[args.Which]}", ToastLength.Short)!.Show();
+                        })!
+                        .SetNegativeButton("Cancel", (dialogSender, args) => { })!
+                        .Show();
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    Log.Error($"[MID] {ex}");
+                    Toast.MakeText(this, $"Error: {ex.Message}", ToastLength.Long)!.Show();
                 }
             };
 
@@ -426,14 +474,12 @@ namespace MidiPlayer.Droid {
                         Log.Warn("midiFilePath has no value.");
                         return;
                     }
+                    initializeListItem();
                     playSong();
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    Log.Error($"[Start] {ex}");
                 }
             };
-
-            /// <summary>
-            /// buttonStop
             /// </summary>
             _button_stop = FindViewById<Button>(Resource.Id.button_stop);
             _button_stop.Click += (object sender, EventArgs e) => {
@@ -441,7 +487,7 @@ namespace MidiPlayer.Droid {
                 try {
                     stopSong();
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    Log.Error($"[Stop] {ex}");
                 }
             };
 
@@ -454,7 +500,7 @@ namespace MidiPlayer.Droid {
                 try {
                     callIntent(Env.MidiFileDir, (int) Request.AddPlayList);
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    Log.Error($"[AddPlaylist] {ex}");
                 }
             };
 
@@ -467,7 +513,7 @@ namespace MidiPlayer.Droid {
                 try {
                     _playlist.Clear();
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    Log.Error($"[DeletePlaylist] {ex}");
                 }
             };
 
@@ -490,7 +536,7 @@ namespace MidiPlayer.Droid {
                     };
                     EventQueue.Enqueue(fader.Index, data);
                 } catch (Exception ex) {
-                    Log.Error(ex.Message);
+                    Log.Error($"[SendSynth] {ex}");
                 }
             };
 
@@ -565,8 +611,12 @@ namespace MidiPlayer.Droid {
             var listitem_adapter = new ListItemAdapter(this, 0, _listitem_list);
             _listview_item.Adapter = listitem_adapter;
             _listview_item.ItemClick += (object sender, AdapterView.ItemClickEventArgs e) => {
-                Log.Debug($"setected: {e.Position}");
-                Mixer.Current = e.Position;
+                try {
+                    Log.Debug($"setected: {e.Position}");
+                    Mixer.Current = e.Position;
+                } catch (Exception ex) {
+                    Log.Error($"[ItemClick] {ex}");
+                }
             };
         }
     }
@@ -599,16 +649,16 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
 using Android.Runtime;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
-using Android.Support.V7.App;
+using AndroidX.AppCompat.App;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
 
 namespace MidiPlayer.Droid {
     /// <summary>
@@ -672,69 +722,100 @@ namespace MidiPlayer.Droid {
             _playlist = new();
             _listitem_list = new();
             _refresh_timer_cts = new();
-            _refresh_timer = createRefreshTask(_refresh_timer_cts.Token);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // EventHandler
 
         /// <summary>
-        /// Activity OnRequestPermissionsResult.
+        /// called by Android when the user responds to a runtime permission dialog.
+        /// forwards the result to the base class so the framework can process it.
         /// </summary>
+        /// <param name="requestCode">the integer request code passed to <c>RequestPermissions</c>.</param>
+        /// <param name="permissions">the array of requested permissions.</param>
+        /// <param name="grantResults">the array of grant results for each permission.</param>
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults) {
-            Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
         /// <summary>
-        /// Activity OnCreate.
+        /// called by the OS when the Activity is first created.
+        /// initializes UI, configuration, and all synth event callbacks.
         /// </summary>
+        /// <param name="savedInstanceState">the previously saved instance state, or <c>null</c> on first launch.</param>
         protected override void OnCreate(Bundle? savedInstanceState) {
             base.OnCreate(savedInstanceState);
+
+            // Global unhandled-exception hooks: log the FULL inner exception so the real
+            // cause of JavaProxyThrowable is visible in logcat before the process dies.
+            AppDomain.CurrentDomain.UnhandledException += (s, ev) => {
+                var ex = ev.ExceptionObject as Exception;
+                Log.Error($"[UNHANDLED AppDomain] {ex}");
+            };
+            TaskScheduler.UnobservedTaskException += (s, ev) => {
+                Log.Error($"[UNHANDLED Task] {ev.Exception}");
+                ev.SetObserved();
+            };
+            AndroidEnvironment.UnhandledExceptionRaiser += (s, ev) => {
+                Log.Error($"[UNHANDLED Android] {ev.Exception}");
+                ev.Handled = true;
+            };
+
             requestPermissions();
-            Platform.Init(this, savedInstanceState);
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
 
             initializeComponent();
-            // inject the OS-resolved external files directory before loading conf to
-            // satisfy Android 10+ Scoped Storage policy (no hardcoded /storage/emulated/0/ paths).
-            Conf.SetAndroidFilesDir(GetExternalFilesDir(null).AbsolutePath);
+            // set the app-specific external files directory so that Env resolves all paths
+            // under the Meowziq hierarchy (AppRootPath/Music/SoundFont, AppRootPath/Music/MIDI),
+            // satisfying Android 10+ Scoped Storage policy (no hardcoded /storage/emulated/0/ paths).
+            Env.AppRootPath = GetExternalFilesDir(null)?.AbsolutePath ?? string.Empty;
             Conf.Load();
             loadPreviousSetting();
+            // Create and start the refresh timer only after initializeComponent() has set
+            // _listview_item.Adapter; creating it earlier (e.g. in the constructor) would
+            // start the loop before the adapter exists, risking NullReferenceException.
+            _refresh_timer = createRefreshTask(_refresh_timer_cts.Token);
             _refresh_timer.Start();
-
-            /// <summary>
-            /// add a callback function to be called when the synth is playback.
-            /// </summary>
-            Synth.Playbacking += (IntPtr data, IntPtr evt) => {
-                return Synth.HandleEvent(data, evt);
-            };
 
             /// <summary>
             /// add a callback function to be called when the synth started.
             /// </summary>
             Synth.Started += () => {
                 Log.Info("Started called.");
-                MainThread.BeginInvokeOnMainThread(action: () => {
-                    Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
+                RunOnUiThread(() => {
+                    try {
+                        Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
+                    } catch (Exception ex) {
+                        Log.Error($"[Started/UI] {ex}");
+                    }
                 });
-                initializeListItem();
             };
 
             /// <summary>
             /// add a callback function to be called when the synth ended.
+            /// posted to the UI thread via RunOnUiThread so it is serialised with the STOP button handler,
+            /// preventing the Init/Stop race condition that caused a hang on the LongRunning thread.
             /// </summary>
             Synth.Ended += () => {
                 Log.Info("Ended called.");
-                if (!_playlist.Ready) {
-                    Synth.Stop();
-                    Synth.Start();
-                } else {
-                    Synth.Stop();
-                    Synth.MidiFilePath = _playlist.Next;
-                    Synth.Start();
-                }
+                RunOnUiThread(() => {
+                    try {
+                        if (!Synth.Playing) {
+                            Log.Info("Ended: Synth not playing, skip restart.");
+                            return;
+                        }
+                        stopSong();
+                        if (!_playlist.Ready) {
+                            playSong();
+                        } else {
+                            Synth.MidiFilePath = _playlist.Next;
+                            playSong();
+                        }
+                    } catch (Exception ex) {
+                        Log.Error($"[Ended/UI] {ex}");
+                    }
+                });
             };
 
             /// <summary>
@@ -742,13 +823,24 @@ namespace MidiPlayer.Droid {
             /// </summary>
             /// <remarks>
             /// update listitem values by track values.
+            /// Writes directly to in-memory _listitem_list without calling RunOnUiThread —
+            /// the Updated callback fires from the native FluidSynth audio thread which is not
+            /// JNI-attached, so any JNI call (including RunOnUiThread) causes an unrecoverable crash.
+            /// The periodic refresh timer calls NotifyDataSetChanged() on the UI thread to display
+            /// the updated values safely.
             /// </remarks>
             Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
-                var track = (Synth.Track) sender;
-                ListItem list_item = _listitem_list[track.IndexWithExcludingConductor];
-                list_item.Name = track.Name;
-                list_item.Instrument = Synth.GetVoice(track.Index);
-                list_item.Channel = track.ChannelAsOneBased.ToString();
+                try {
+                    var track = (Synth.Track) sender;
+                    if (track.Index == 0) return; // conductor track has no list slot
+                    ListItem list_item = _listitem_list[track.IndexWithExcludingConductor];
+                    list_item.Name = track.Name;
+                    list_item.Instrument = Synth.GetVoice(track.Index);
+                    list_item.Channel = track.ChannelAsOneBased.ToString();
+                } catch (Exception) {
+                    // Swallow: this handler runs on the native audio thread.
+                    // Any Log/JNI call here would crash the process on Android.
+                }
             };
 
             /// <summary>
@@ -756,25 +848,28 @@ namespace MidiPlayer.Droid {
             /// </summary>
             /// <remarks>
             /// update fader values by track values.
+            /// Same no-JNI constraint as the listitem handler above.
             /// </remarks>
             Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
-                var track = (Synth.Track) sender;
-                Mixer.Fader fader = Mixer.GetBy(track.IndexWithExcludingConductor);
-                if (e.PropertyName is nameof(Synth.Track.Channel)) {
-                    Log.Debug($"Synth.Updated: track {track.Index} Channel is {track.Channel}");
-                    fader.Channel = track.Channel;
-                }
-                if (e.PropertyName is nameof(Synth.Track.Program)) {
-                    Log.Debug($"Synth.Updated: track {track.Index} Program is {track.Program}");
-                    fader.Program = track.Program;
-                }
-                if (e.PropertyName is nameof(Synth.Track.Pan)) {
-                    Log.Debug($"Synth.Updated: track {track.Index} Pan is {track.Pan}");
-                    fader.Pan = track.Pan;
-                }
-                if (e.PropertyName is nameof(Synth.Track.Volume)) {
-                    Log.Debug($"Synth.Updated: track {track.Index} Volume is {track.Volume}");
-                    fader.Volume = track.Volume;
+                try {
+                    var track = (Synth.Track) sender;
+                    if (track.Index == 0) return; // conductor track has no fader slot
+                    Mixer.Fader fader = Mixer.GetBy(track.IndexWithExcludingConductor);
+                    if (e.PropertyName is nameof(Synth.Track.Channel)) {
+                        fader.Channel = track.Channel;
+                    }
+                    if (e.PropertyName is nameof(Synth.Track.Program)) {
+                        fader.Program = track.Program;
+                    }
+                    if (e.PropertyName is nameof(Synth.Track.Pan)) {
+                        fader.Pan = track.Pan;
+                    }
+                    if (e.PropertyName is nameof(Synth.Track.Volume)) {
+                        fader.Volume = track.Volume;
+                    }
+                } catch (Exception) {
+                    // Swallow: this handler runs on the native audio thread.
+                    // Any Log/JNI call here would crash the process on Android.
                 }
             };
 
@@ -784,39 +879,32 @@ namespace MidiPlayer.Droid {
             Mixer.Selected += (object sender, PropertyChangedEventArgs e) => {
                 if (e.PropertyName is nameof(Mixer.Current)) {
                     Mixer.Fader fader = Mixer.GetCurrent();
-                    _textview_no.Text = fader.IndexAsOneBased.ToString();
-                    _textview_channel.Text = fader.ChannelAsOneBased.ToString();
-                    _numberpicker_prog.Value = fader.ProgramAsOneBased;
-                    _numberpicker_pan.Value = fader.Pan;
-                    _numberpicker_vol.Value = fader.Volume;
-                    _checkbox_mute.Checked = !fader.Sounds;
+                    RunOnUiThread(() => {
+                        try {
+                            _textview_no.Text = fader.IndexAsOneBased.ToString();
+                            _textview_channel.Text = fader.ChannelAsOneBased.ToString();
+                            _numberpicker_prog.Value = fader.ProgramAsOneBased;
+                            _numberpicker_pan.Value = fader.Pan;
+                            _numberpicker_vol.Value = fader.Volume;
+                            _checkbox_mute.Checked = !fader.Sounds;
+                        } catch (Exception ex) {
+                            Log.Error($"[Mixer.Selected/UI] {ex}");
+                        }
+                    });
                 }
             };
 
             /// <summary>
             /// add a callback function to be called when the mixer updated.
             /// </summary>
-            Mixer.Updated += (object sender, PropertyChangedEventArgs e) => {
-                var fader = (Mixer.Fader) sender;
-                if (fader.Index == Mixer.Current) {
-                    Log.Debug($"Mixer.Updated: mixer.current {Mixer.Current}: fader.Index {fader.Index}");
-                    if (e.PropertyName is nameof(Mixer.Fader.Name)) {
-                        Log.Debug($"fadar {fader.Index} Name is {fader.Name}");
-                    }
-                    if (e.PropertyName is nameof(Mixer.Fader.Bank)) {
-                        Log.Debug($"fadar {fader.Index} Bank is {fader.Bank}");
-                    }
-                    if (e.PropertyName is nameof(Mixer.Fader.Program)) {
-                        Log.Debug($"fadar {fader.Index} Program is {fader.Program}");
-                    }
-                    if (e.PropertyName is nameof(Mixer.Fader.Volume)) {
-                        Log.Debug($"fadar {fader.Index} Volume is {fader.Volume}");
-                    }
-                    if (e.PropertyName is nameof(Mixer.Fader.Pan)) {
-                        Log.Debug($"fadar {fader.Index} Pan is {fader.Pan}");
-                    }
-                }
-            };
+            /// <remarks>
+            /// This handler is invoked from the native FluidSynth audio thread (a bare POSIX thread
+            /// not registered with JNI). Any call that crosses the JNI boundary — including Log.Debug,
+            /// Log.Error, or any Android API — will crash the process immediately on Android.
+            /// Keep this handler empty; fader state is already written by the Synth.Updated handler
+            /// and displayed by the periodic NotifyDataSetChanged() timer.
+            /// </remarks>
+            Mixer.Updated += (object sender, PropertyChangedEventArgs e) => { };
         }
 
         /// <summary>
@@ -857,7 +945,7 @@ namespace MidiPlayer.Droid {
                 _refresh_timer_cts.Cancel();
                 stopSong();
             } catch (Exception ex) {
-                Log.Error(ex.Message);
+                Log.Error($"[OnDestroy] {ex}");
             } finally {
                 base.OnDestroy();
             }
@@ -867,6 +955,9 @@ namespace MidiPlayer.Droid {
         /// Activity OnActivityResult.
         /// </summary>
         protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent? data) {
+            if (resultCode != Result.Ok || data is null) {
+                return;
+            }
             switch (requestCode) {
                 case (int) Request.SoundFont:
                     _sound_font_path = getActualPathBy(data);
@@ -985,11 +1076,11 @@ namespace MidiPlayer.Droid {
                         }
                         logMemoryInfo();
                     } catch (Exception ex) {
-                        Log.Error(ex.Message);
+                        Log.Error($"[playSong task] {ex}");
                     }
                 }, TaskCreationOptions.LongRunning);
             } catch (Exception ex) {
-                Log.Error(ex.Message);
+                Log.Error($"[playSong] {ex}");
             }
         }
 
@@ -1008,7 +1099,7 @@ namespace MidiPlayer.Droid {
                 Conf.Save(); // TODO: save
                 logMemoryInfo();
             } catch (Exception ex) {
-                Log.Error(ex.Message);
+                Log.Error($"[stopSong] {ex}");
             }
         }
 
@@ -1016,21 +1107,29 @@ namespace MidiPlayer.Droid {
         /// refresh the view in a few seconds.
         /// </summary>
         /// <remarks>
-        /// the loop exits cleanly when the token is cancelled (Activity destroyed).
-        /// OperationCanceledException from Task.Delay is swallowed intentionally.
+        /// Uses a synchronous blocking loop (CancellationToken.WaitHandle.WaitOne) instead of
+        /// async/await to avoid the "new Task(async lambda)" pitfall where the async continuation
+        /// runs as an async-void delegate. Exceptions thrown after the first await point in that
+        /// pattern are unobserved and cross the Java boundary as JavaProxyThrowable.
+        /// WaitHandle.WaitOne returns false when the token is cancelled, ending the loop cleanly.
         /// </remarks>
         Task createRefreshTask(CancellationToken token) {
-            return new(action: async () => {
+            return new Task(() => {
                 try {
-                    var listitem_adapter = (ListItemAdapter) _listview_item.Adapter;
                     while (!token.IsCancellationRequested) {
-                        RunOnUiThread(action: () => {
-                            listitem_adapter.NotifyDataSetChanged();
+                        RunOnUiThread(() => {
+                            try {
+                                if (_listview_item?.Adapter != null) {
+                                    ((ListItemAdapter) _listview_item.Adapter).NotifyDataSetChanged();
+                                }
+                            } catch (Exception ex) {
+                                Log.Error($"[refreshTask UI] {ex}");
+                            }
                         });
-                        await Task.Delay(VIEW_REFRESH_TIME, token);
+                        token.WaitHandle.WaitOne(VIEW_REFRESH_TIME);
                     }
-                } catch (OperationCanceledException) {
-                    // intentional: loop ends cleanly when the Activity is destroyed.
+                } catch (Exception ex) {
+                    Log.Error($"[refreshTask] {ex}");
                 }
             }, token);
         }
@@ -18813,16 +18912,17 @@ namespace MidiPlayer {
         /// <summary>initializes the _on_playbacking multicast delegate with the default handler that calls ProcessPlayback and, for the real P/Invoke implementation, also forwards the event to the native FluidSynth handler.</summary>
         static Synth() {
             _on_playbacking += (void_ptr data, fluid_midi_event_t evt) => {
-                // Run the managed processing logic for both production and tests. When using the real PInvoke implementation,
-                // allow the native fluidsynth to handle the event after applying managed state changes. When using a Fake, avoid
-                // calling back into the fake to prevent infinite recursion.
+                // Run the managed processing logic for both production and tests. Delegate through
+                // FluidSynthAPI.Instance so FakeFluidSynth returns 0 in tests (no recursion) and
+                // PInvokeFluidSynth forwards to the native library in production.
                 ProcessPlayback(data, evt);
-                if (MidiPlayer.FluidSynth.FluidSynthAPI.Instance is MidiPlayer.FluidSynth.PInvokeFluidSynth)
-                {
-                    return NativeFuncs.Fluidsynth.fluid_synth_handle_midi_event(data, evt);
-                }
-                return 0;
+                return fluid_synth_handle_midi_event(data, evt);
             };
+            // GC-root the callback delegate here so it can never be collected between Init() calls.
+            // Previously this was done inside the Playbacking event add accessor, which meant the
+            // delegate was only rooted after OnCreate subscribed — too late on Android where the
+            // native audio thread can start before the UI finishes initialization.
+            _event_callback = new NativeFuncs.Fluidsynth.handle_midi_event_func_t(_on_playbacking);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -18866,12 +18966,9 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Events [verb, verb phrase] 
 
-        /// <summary>fired for each incoming MIDI event during playback; the add accessor also registers the native callback with FluidSynth.</summary>
+        /// <summary>fired for each incoming MIDI event during playback.</summary>
         public static event Func<IntPtr, IntPtr, int> Playbacking {
-            add {
-                _on_playbacking += value;
-                _event_callback = new NativeFuncs.Fluidsynth.handle_midi_event_func_t(_on_playbacking);
-            }
+            add => _on_playbacking += value;
             remove => _on_playbacking -= value;
         }
 
@@ -18900,7 +18997,18 @@ namespace MidiPlayer {
         public static void Init() {
             try {
                 if (!SoundFontPath.HasValue() || !MidiFilePath.HasValue()) {
-                    Log.Warn("no sound font or no midi file.");
+                    Log.Warn("no sound font or no midi file path specified.");
+                    return;
+                }
+                // Guard: reject paths that do not exist on disk before touching any native API.
+                // fluid_player_add and fluid_is_soundfont silently pass SIGSEGV/abort when fed
+                // a nonexistent path, which kills the process without throwing a managed exception.
+                if (!System.IO.File.Exists(SoundFontPath)) {
+                    Log.Error($"SoundFont file NOT FOUND on disk: {SoundFontPath}");
+                    return;
+                }
+                if (!System.IO.File.Exists(MidiFilePath)) {
+                    Log.Error($"MIDI file NOT FOUND on disk: {MidiFilePath}");
                     return;
                 }
                 _setting = new_fluid_settings();
@@ -18909,7 +19017,7 @@ namespace MidiPlayer {
                 _player = new_fluid_player(_synth);
                 Log.Info($"try to load the sound font: {SoundFontPath}");
                 if (fluid_is_soundfont(SoundFontPath) != 1) {
-                    Log.Error("not a sound font.");
+                    Log.Error("not a valid sound font file.");
                     return;
                 }
                 fluid_player_set_playback_callback(_player, _event_callback, _synth);
@@ -18922,23 +19030,31 @@ namespace MidiPlayer {
                 }
                 Log.Info($"try to load the midi file: {MidiFilePath}");
                 if (fluid_is_midifile(MidiFilePath) != 1) {
-                    Log.Error("not a midi file.");
+                    Log.Error("not a valid midi file.");
                     return;
                 }
                 Multi.StandardMidiFile = _standard_midi_file;
                 int result = fluid_player_add(_player, MidiFilePath);
                 if (result == NativeFuncs.Fluidsynth.FLUID_FAILED) {
-                    Log.Error("failed to load the midi file.");
+                    Log.Error("failed to add the midi file to player.");
                     return;
                 } else {
-                    Log.Info($"loaded the midi file: {MidiFilePath}");
+                    Log.Info($"added the midi file: {MidiFilePath}");
+                }
+                // Guard: if Stop() ran concurrently and cleared native handles while this
+                // Init() was in the slow fluid_synth_sfload call, abort here. Calling
+                // new_fluid_audio_driver with IntPtr.Zero arguments hangs indefinitely.
+                // Only _player is checked alongside _stopping: settings and synth stubs in
+                // FakeFluidSynth intentionally return IntPtr.Zero and must not be tested here.
+                if (_stopping || _player.IsZero()) {
+                    Log.Warn("Init() aborted: native handles were cleared by a concurrent Stop().");
+                    return;
                 }
                 _adriver = new_fluid_audio_driver(_setting, _synth);
                 _ready = true;
                 Log.Info("init :)");
             } catch (Exception ex) {
-                Log.Error(ex.Message);
-                // FIXME: terminate Fluidsynth.
+                Log.Error($"[Init] {ex}");
             }
         }
 
@@ -18952,16 +19068,18 @@ namespace MidiPlayer {
                         return;
                     }
                 }
+                Log.Info("Start: calling fluid_player_play...");
                 fluid_player_play(_player);
-                Log.Info("start :)");
+                Log.Info("Start: fluid_player_play done, firing Started...");
                 _on_started();
+                Log.Info("Start: Started fired, calling fluid_player_join...");
                 fluid_player_join(_player);
                 Log.Info("end :D");
                 if (_stopping == false) {
                     _on_ended();
                 }
             } catch (Exception ex) {
-                Log.Error(ex.Message);
+                Log.Error($"[Start] {ex}");
             }
         }
 
@@ -18977,7 +19095,7 @@ namespace MidiPlayer {
                 GC.Collect();
                 Log.Info("GC.Collect.");
             } catch (Exception ex) {
-                Log.Error(ex.Message);
+                Log.Error($"[Stop] {ex}");
             }
         }
 
@@ -19099,7 +19217,7 @@ namespace MidiPlayer {
                 _setting = IntPtr.Zero;
                 Log.Info("final :|");
             } catch (Exception ex) {
-                Log.Error(ex.Message);
+                Log.Error($"[final] {ex}");
             } finally {
                 _ready = false;
                 _stopping = false;
@@ -19109,43 +19227,57 @@ namespace MidiPlayer {
         /// <summary>
         /// Process a playback event's managed side-effects (update Multi and EventQueue) without invoking native fluidsynth handlers.
         /// This method is callable by fakes to avoid recursive native -> managed -> native loops.
+        /// Wrapped in try-catch so that no C# exception can escape to the native JNI audio callback thread,
+        /// which would otherwise manifest as Android.Runtime.JavaProxyThrowable and kill the process.
         /// </summary>
         public static int ProcessPlayback(IntPtr data, IntPtr evt) {
-            var type = fluid_midi_event_get_type(evt);
-            var channel = fluid_midi_event_get_channel(evt);
-            var control = fluid_midi_event_get_control(evt);
-            var value = fluid_midi_event_get_value(evt);
-            var program = fluid_midi_event_get_program(evt);
-            if (type == NOTE_ON) { // NOTE_ON = 144
-                Multi.ApplyNoteOn(channel);
-            } else if (type == NOTE_OFF) { // NOTE_OFF = 128
-                Multi.ApplyNoteOff(channel);
-            } else if (type == PROGRAM_CHANGE) { // PROGRAM_CHANGE = 192
-                Multi.ApplyProgramChange(channel, program);
-            } else if (type == CONTROL_CHANGE) { // CONTROL_CHANGE = 176
-                Multi.ApplyControlChange(channel, control, value);
-            }
-            for (int track_index = MIDI_TRACK_BASE; track_index < MIDI_TRACK_BASE + MIDI_TRACK_COUNT; track_index++) {
-                var event_data = EventQueue.Dequeue(track_index);
-                if (event_data is not null) {
-                    fluid_synth_program_change(_synth, event_data.Channel, event_data.Program);
-                    fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Pan, event_data.Pan);
-                    if (event_data.Mute) {
-                        fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, MUTE_VOLUME);
-                    } else {
-                        fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, event_data.Volume);
-                    }
-                    Multi.ApplyProgramChange(event_data.Channel, event_data.Program);
+            try {
+                var type = fluid_midi_event_get_type(evt);
+                var channel = fluid_midi_event_get_channel(evt);
+                var control = fluid_midi_event_get_control(evt);
+                var value = fluid_midi_event_get_value(evt);
+                var program = fluid_midi_event_get_program(evt);
+                if (type == NOTE_ON) { // NOTE_ON = 144
+                    Multi.ApplyNoteOn(channel);
+                } else if (type == NOTE_OFF) { // NOTE_OFF = 128
+                    Multi.ApplyNoteOff(channel);
+                } else if (type == PROGRAM_CHANGE) { // PROGRAM_CHANGE = 192
+                    Multi.ApplyProgramChange(channel, program);
+                } else if (type == CONTROL_CHANGE) { // CONTROL_CHANGE = 176
+                    Multi.ApplyControlChange(channel, control, value);
                 }
+                for (int track_index = MIDI_TRACK_BASE; track_index < MIDI_TRACK_BASE + MIDI_TRACK_COUNT; track_index++) {
+                    var event_data = EventQueue.Dequeue(track_index);
+                    if (event_data is not null) {
+                        fluid_synth_program_change(_synth, event_data.Channel, event_data.Program);
+                        fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Pan, event_data.Pan);
+                        if (event_data.Mute) {
+                            fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, MUTE_VOLUME);
+                        } else {
+                            fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, event_data.Volume);
+                        }
+                        Multi.ApplyProgramChange(event_data.Channel, event_data.Program);
+                    }
+                }
+                return 0;
+            } catch (Exception ex) {
+                Log.Error($"[ProcessPlayback] {ex}");
+                return 0;
             }
-            return 0;
         }
 
-        /// <summary>forwards property-change notifications from Track objects to the outer _on_updated event.</summary>
+        /// <summary>
+        /// forwards property-change notifications from Track objects to the outer _on_updated event.
+        /// Uses null-safe invoke and a try-catch so exceptions never escape into the native audio callback thread.
+        /// </summary>
         /// <param name="sender">the Track that changed.</param>
         /// <param name="e">the property-change args.</param>
         static void onPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            _on_updated(sender, e);
+            try {
+                _on_updated?.Invoke(sender, e);
+            } catch (Exception ex) {
+                Log.Error($"[onPropertyChanged] {ex}");
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -19854,13 +19986,6 @@ namespace MidiPlayer.Win64 {
             }
 
             /// <summary>
-            /// add a callback function to be called when the synth is playback.
-            /// </summary>
-            Synth.Playbacking += (IntPtr data, IntPtr evt) => {
-                return Synth.HandleEvent(data, evt);
-            };
-
-            /// <summary>
             /// add a callback function to be called when the synth started.
             /// </summary>
             Synth.Started += () => {
@@ -19877,24 +20002,43 @@ namespace MidiPlayer.Win64 {
             /// <summary>
             /// add a callback function to be called when the synth ended.
             /// </summary>
+            /// <remarks>
+            /// Ended fires on the LongRunning thread (Thread 11). Calling Stop()+Start() directly
+            /// here caused a race: Thread 11 would be inside Init() loading the SF2 file while
+            /// Thread 1 (buttonStop_Click) called final(), which deleted the native handles Thread
+            /// 11 was using — causing new_fluid_audio_driver(IntPtr.Zero) to hang indefinitely.
+            ///
+            /// Fix: post the restart to the UI thread via BeginInvoke. This serializes the restart
+            /// with buttonStop_Click on the same message queue, eliminating the race entirely.
+            /// Thread 11 exits cleanly; the UI thread decides whether to restart.
+            /// </remarks>
             Synth.Ended += () => {
                 Log.Info("Ended called.");
-                if (!_playlist.Ready) {
-                    Synth.Stop();
-                    Synth.Start();
-                } else {
-                    Synth.Stop();
-                    Synth.MidiFilePath = _playlist.Next;
-                    Synth.Start();
-                }
+                BeginInvoke((MethodInvoker) (() => {
+                    if (!Synth.Playing) {
+                        // Stop() was already called (user pressed Stop); do not restart.
+                        return;
+                    }
+                    stopSong();
+                    if (!_playlist.Ready) {
+                        playSong();
+                    } else {
+                        Synth.MidiFilePath = _playlist.Next;
+                        playSong();
+                    }
+                }));
             };
 
             /// <summary>
             /// add a callback function to be called when the synth updated.
+            /// BeginInvoke (async) is used instead of Invoke (sync) because Updated fires on the
+            /// native audio callback thread. Using Invoke here would block the callback thread
+            /// while waiting for the UI thread, and Synth.Stop() calls delete_fluid_audio_driver
+            /// (on the UI thread) which waits for all callbacks to finish — causing deadlock.
             /// </summary>
             Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
                 var track = (Synth.Track) sender;
-                Invoke(updateList(track));
+                BeginInvoke(updateList(track));
             };
         }
 
@@ -20033,6 +20177,10 @@ namespace MidiPlayer.Win64 {
             const int COLUMN_1_INDEX = 0;
             var track_index = track.Index - 1; // exclude conductor track;
             return () => {
+                // guard: listview is populated by the Started event; during Init() it may be empty.
+                if (track_index < 0 || track_index >= _listview.Items.Count) {
+                    return;
+                }
                 var listview_item = new ListViewItem(new string[] {
                     "  ●",
                     track.Name,
@@ -20548,24 +20696,6 @@ namespace MidiPlayer {
 
 ```
 
-## MidiPlayer\DIAppSample.cs
-
-```csharp
-// DIAppSample.cs removed per user request (2026-04-18).
-// Original sample/host wiring deleted to keep repository focused on Xamarin.Android adapters and tests.
-// If you need this snippet later, restore from session history or ask the assistant to recreate it.
-
-```
-
-## MidiPlayer\DIRegistrationSample.cs
-
-```csharp
-// DIRegistrationSample.cs removed per user request (2026-04-18).
-// Keep IEventQueue/IMixer adapters and Test implementations in place; global registration sample removed.
-// Restore from session history if needed.
-
-```
-
 ## MidiPlayer\Enums.cs
 
 ```csharp
@@ -20679,81 +20809,121 @@ using System.IO;
 
 namespace MidiPlayer {
     /// <summary>
-    /// environment value for the application.
+    /// manages environment paths for the application.
+    /// provides a hybrid path strategy: on Android (when <see cref="AppRootPath"/> is set), paths are
+    /// resolved from the app-specific external files directory following the Meowziq folder hierarchy
+    /// (<c>AppRootPath/Music/SoundFont</c> and <c>AppRootPath/Music/MIDI</c>);
+    /// on Win64 (when <see cref="AppRootPath"/> is not set), paths delegate to the active configuration,
+    /// preserving all existing Win64 behaviour without modification.
     /// </summary>
     /// <author>
     /// h.adachi (STUDIO MeowToon)
     /// </author>
-    public class Env {
+    public static class Env {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Properties [noun, noun phrase, adjective] 
+        // Constants [nouns]
 
         /// <summary>
-        /// the SoundFont directory path from the active configuration.
+        /// the top-level music folder name used in the Android directory hierarchy.
         /// </summary>
+        public const string MUSIC_FOLDER = "Music";
+
+        /// <summary>
+        /// the subfolder name under <see cref="MUSIC_FOLDER"/> that holds SoundFont files.
+        /// </summary>
+        public const string SOUNDFONT_FOLDER = "SoundFont";
+
+        /// <summary>
+        /// the subfolder name under <see cref="MUSIC_FOLDER"/> that holds MIDI files.
+        /// </summary>
+        public const string MIDI_FOLDER = "MIDI";
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // static Properties [noun, noun phrase, adjective]
+
+        /// <summary>
+        /// the app-specific root directory injected at runtime by the Android platform.
+        /// set this to <c>Activity.GetExternalFilesDir(null)?.AbsolutePath ?? string.Empty</c> in <c>OnCreate</c>
+        /// before calling <see cref="Conf.Load"/>.
+        /// when empty, all path properties fall back to the Win64 configuration values,
+        /// so this property must never be set on Win64.
+        /// </summary>
+        /// <value>
+        /// the absolute path to the app-specific external files directory on Android,
+        /// or <see cref="string.Empty"/> on Win64 or when external storage is unavailable.
+        /// </value>
+        public static string AppRootPath { get; set; } = string.Empty;
+
+        /// <summary>
+        /// the SoundFont directory path.
+        /// on Android (when <see cref="AppRootPath"/> is set) returns
+        /// <c>AppRootPath/Music/SoundFont</c> built with <see cref="Path.Combine"/>;
+        /// on Win64 returns the directory stored in the active configuration.
+        /// the setter always writes to the active configuration regardless of platform.
+        /// </summary>
+        /// <value>the absolute path to the directory that contains SoundFont files.</value>
         public static string SoundFontDir {
-            get => Conf.Value.Synth.SoundFontDir;
+            get {
+                if (!string.IsNullOrEmpty(AppRootPath)) {
+                    return Path.Combine(AppRootPath, MUSIC_FOLDER, SOUNDFONT_FOLDER);
+                }
+                return Conf.Value?.Synth?.SoundFontDir ?? "undefined";
+            }
             set => Conf.Value.Synth.SoundFontDir = value;
         }
 
         /// <summary>
-        /// the MIDI file directory path from the active configuration.
+        /// the MIDI file directory path.
+        /// on Android (when <see cref="AppRootPath"/> is set) returns
+        /// <c>AppRootPath/Music/MIDI</c> built with <see cref="Path.Combine"/>;
+        /// on Win64 returns the directory stored in the active configuration.
+        /// the setter always writes to the active configuration regardless of platform.
         /// </summary>
+        /// <value>the absolute path to the directory that contains MIDI files.</value>
         public static string MidiFileDir {
-            get => Conf.Value.Synth.MidiFileDir;
+            get {
+                if (!string.IsNullOrEmpty(AppRootPath)) {
+                    return Path.Combine(AppRootPath, MUSIC_FOLDER, MIDI_FOLDER);
+                }
+                return Conf.Value?.Synth?.MidiFileDir ?? "undefined";
+            }
             set => Conf.Value.Synth.MidiFileDir = value;
         }
 
         /// <summary>
-        /// the SoundFont directory path in URL-encoded form suitable for use in Android Intents.
-        /// returns "Music" when no SoundFont is configured.
+        /// the SoundFont file name stored in the active configuration.
+        /// returns <c>"undefined"</c> when the configuration value is <c>null</c>
+        /// (e.g. on first launch before <c>app_conf.json</c> is created).
         /// </summary>
-        public static string SoundFontDirForIntent {
-            get {
-                if (!ExistsSoundFont) {
-                    return "Music";
-                }
-                return SoundFontDir.Replace("/storage/emulated/0/", string.Empty).Replace("/", "%2F");
-            }
-        }
-
-        /// <summary>
-        /// the MIDI file directory path in URL-encoded form suitable for use in Android Intents.
-        /// returns "Music" when no MIDI file is configured.
-        /// </summary>
-        public static string MidiFileDirForIntent {
-            get {
-                if (!ExistsMidiFile) {
-                    return "Music";
-                }
-                return MidiFileDir.Replace("/storage/emulated/0/", string.Empty).Replace("/", "%2F");
-            }
-        }
-
-        /// <summary>
-        /// the SoundFont file name from the active configuration.
-        /// </summary>
+        /// <value>the file name (without directory) of the currently selected SoundFont.</value>
         public static string SoundFontName {
-            get => Conf.Value.Synth.SoundFontName;
+            get => Conf.Value?.Synth?.SoundFontName ?? "undefined";
             set => Conf.Value.Synth.SoundFontName = value;
         }
 
         /// <summary>
-        /// the MIDI file name from the active configuration.
+        /// the MIDI file name stored in the active configuration.
+        /// returns <c>"undefined"</c> when the configuration value is <c>null</c>
+        /// (e.g. on first launch before <c>app_conf.json</c> is created).
         /// </summary>
+        /// <value>the file name (without directory) of the currently selected MIDI file.</value>
         public static string MidiFileName {
-            get => Conf.Value.Synth.MidiFileName;
+            get => Conf.Value?.Synth?.MidiFileName ?? "undefined";
             set => Conf.Value.Synth.MidiFileName = value;
         }
 
         /// <summary>
-        /// the full path to the SoundFont file (directory + name).
-        /// setting this property updates SoundFontDir and SoundFontName separately.
+        /// the full path to the currently selected SoundFont file.
+        /// combines <see cref="SoundFontDir"/> and <see cref="SoundFontName"/> with
+        /// <see cref="Path.Combine"/> so the path separator is correct on every platform.
+        /// setting this property splits the value and updates <see cref="SoundFontDir"/>
+        /// and <see cref="SoundFontName"/> individually.
         /// </summary>
+        /// <value>the absolute path to the SoundFont file.</value>
         public static string SoundFontPath {
-            get => $"{SoundFontDir}/{SoundFontName}";
+            get => Path.Combine(SoundFontDir, SoundFontName);
             set {
                 SoundFontDir = value.ToDirectoryName();
                 SoundFontName = value.ToFileName();
@@ -20761,11 +20931,15 @@ namespace MidiPlayer {
         }
 
         /// <summary>
-        /// the full path to the MIDI file (directory + name).
-        /// setting this property updates MidiFileDir and MidiFileName separately.
+        /// the full path to the currently selected MIDI file.
+        /// combines <see cref="MidiFileDir"/> and <see cref="MidiFileName"/> with
+        /// <see cref="Path.Combine"/> so the path separator is correct on every platform.
+        /// setting this property splits the value and updates <see cref="MidiFileDir"/>
+        /// and <see cref="MidiFileName"/> individually.
         /// </summary>
+        /// <value>the absolute path to the MIDI file.</value>
         public static string MidiFilePath {
-            get => $"{MidiFileDir}/{MidiFileName}";
+            get => Path.Combine(MidiFileDir, MidiFileName);
             set {
                 MidiFileDir = value.ToDirectoryName();
                 MidiFileName = value.ToFileName();
@@ -20773,18 +20947,16 @@ namespace MidiPlayer {
         }
 
         /// <summary>
-        /// returns true if the SoundFont file exists at SoundFontPath.
+        /// returns <c>true</c> if the file at <see cref="SoundFontPath"/> exists on disk.
         /// </summary>
-        public static bool ExistsSoundFont {
-            get => File.Exists(SoundFontPath);
-        }
+        /// <value><c>true</c> when the SoundFont file is present; otherwise <c>false</c>.</value>
+        public static bool ExistsSoundFont => File.Exists(SoundFontPath);
 
         /// <summary>
-        /// returns true if the MIDI file exists at MidiFilePath.
+        /// returns <c>true</c> if the file at <see cref="MidiFilePath"/> exists on disk.
         /// </summary>
-        public static bool ExistsMidiFile {
-            get => File.Exists(MidiFilePath);
-        }
+        /// <value><c>true</c> when the MIDI file is present; otherwise <c>false</c>.</value>
+        public static bool ExistsMidiFile => File.Exists(MidiFilePath);
     }
 }
 
@@ -21055,201 +21227,6 @@ namespace MidiPlayer {
 
 ```
 
-## MidiPlayer\FakeFluidSynth.cs
-
-```csharp
-/*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-// This file is a compatibility stub retained during refactor.
-// The canonical implementation has moved to MidiPlayer.FluidSynth.FakeFluidSynth.
-#nullable enable
-using System;
-
-namespace MidiPlayer {
-    /// <summary>
-    /// compatibility stub retained during refactor.
-    /// always throws NotImplementedException; use MidiPlayer.FluidSynth.FakeFluidSynth in tests.
-    /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
-    public sealed class FakeFluidSynth : IFluidSynth {
-        /// <inheritdoc/>
-        public IntPtr new_fluid_settings() => throw new NotImplementedException("Use MidiPlayer.FluidSynth.FakeFluidSynth in tests");
-        /// <inheritdoc/>
-        public void delete_fluid_settings(IntPtr settings) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public IntPtr new_fluid_synth(IntPtr settings) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public void delete_fluid_synth(IntPtr synth) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public IntPtr new_fluid_audio_driver(IntPtr settings, IntPtr synth) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public void delete_fluid_audio_driver(IntPtr driver) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_synth_sfload(IntPtr synth, string filename, bool reset_presets) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_is_soundfont(string filename) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_synth_noteon(IntPtr synth, int chan, int key, int vel) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_synth_noteoff(IntPtr synth, int chan, int key) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public void fluid_synth_set_gain(IntPtr synth, float gain) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public IntPtr new_fluid_player(IntPtr synth) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int delete_fluid_player(IntPtr player) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_player_add(IntPtr player, string midifile) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_is_midifile(string filename) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_player_play(IntPtr player) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_player_join(IntPtr player) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_player_stop(IntPtr player) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_player_set_playback_callback(IntPtr player, IntPtr handler, IntPtr handler_data) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_synth_handle_midi_event(IntPtr data, IntPtr evt) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_synth_program_change(IntPtr synth, int chan, int program) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_synth_cc(IntPtr synth, int chan, int ctrl, int val) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_type(IntPtr evt) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_channel(IntPtr evt) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_key(IntPtr evt) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_velocity(IntPtr evt) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_control(IntPtr evt) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_value(IntPtr evt) => throw new NotImplementedException();
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_program(IntPtr evt) => throw new NotImplementedException();
-    }
-}
-
-```
-
-## MidiPlayer\FluidSynthAPI.cs
-
-```csharp
-/*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-// This file is a compatibility stub retained during refactor.
-// The canonical implementation has moved to MidiPlayer.FluidSynth.FluidSynthAPI.
-#nullable enable
-using System;
-
-namespace MidiPlayer {
-    /// <summary>
-    /// compatibility stub retained during refactor.
-    /// always throws NotImplementedException; use MidiPlayer.FluidSynth.FluidSynthAPI for production.
-    /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
-    public static class FluidSynthAPI {
-        /// <summary>
-        /// placeholder instance property; not used by production code.
-        /// </summary>
-        public static object Instance { get; set; } = null!;
-
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static IntPtr new_fluid_settings() => throw new NotImplementedException("Use MidiPlayer.FluidSynth.FluidSynthAPI instead");
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static void delete_fluid_settings(IntPtr settings) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static IntPtr new_fluid_synth(IntPtr settings) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static void delete_fluid_synth(IntPtr synth) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static IntPtr new_fluid_audio_driver(IntPtr settings, IntPtr synth) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static void delete_fluid_audio_driver(IntPtr driver) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_synth_sfload(IntPtr synth, string filename, bool reset_presets) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_is_soundfont(string filename) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_synth_noteon(IntPtr synth, int chan, int key, int vel) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_synth_noteoff(IntPtr synth, int chan, int key) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static void fluid_synth_set_gain(IntPtr synth, float gain) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static IntPtr new_fluid_player(IntPtr synth) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int delete_fluid_player(IntPtr player) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_player_add(IntPtr player, string midifile) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_is_midifile(string filename) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_player_play(IntPtr player) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_player_join(IntPtr player) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_player_stop(IntPtr player) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_player_set_playback_callback(IntPtr player, IntPtr handler, IntPtr handler_data) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_synth_handle_midi_event(IntPtr data, IntPtr evt) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_synth_program_change(IntPtr synth, int chan, int program) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_synth_cc(IntPtr synth, int chan, int ctrl, int val) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_midi_event_get_type(IntPtr evt) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_midi_event_get_channel(IntPtr evt) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_midi_event_get_key(IntPtr evt) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_midi_event_get_velocity(IntPtr evt) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_midi_event_get_control(IntPtr evt) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_midi_event_get_value(IntPtr evt) => throw new NotImplementedException();
-        /// <summary>stub 窶・always throws. use MidiPlayer.FluidSynth.FluidSynthAPI.</summary>
-        public static int fluid_midi_event_get_program(IntPtr evt) => throw new NotImplementedException();
-    }
-}
-
-```
-
 ## MidiPlayer\IEventQueue.cs
 
 ```csharp
@@ -21306,202 +21283,6 @@ namespace MidiPlayer {
     }
 }
 
-```
-
-## MidiPlayer\IFluidSynth.cs
-
-```csharp
-/*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-#nullable enable
-using System;
-
-namespace MidiPlayer {
-    /// <summary>
-    /// compatibility stub retained during refactor.
-    /// the canonical implementation has moved to MidiPlayer.FluidSynth.IFluidSynth.
-    /// this interface mirrors the FluidSynth native API for dependency injection.
-    /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
-    public interface IFluidSynth {
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // public Methods [verb, verb phrases]
-
-        /// <summary>creates a new FluidSynth settings object.</summary>
-        /// <returns>pointer to the new fluid_settings_t.</returns>
-        IntPtr new_fluid_settings();
-
-        /// <summary>destroys a FluidSynth settings object.</summary>
-        /// <param name="settings">pointer to the fluid_settings_t to delete.</param>
-        void delete_fluid_settings(IntPtr settings);
-
-        /// <summary>creates a new FluidSynth synthesizer.</summary>
-        /// <param name="settings">pointer to the settings object.</param>
-        /// <returns>pointer to the new fluid_synth_t.</returns>
-        IntPtr new_fluid_synth(IntPtr settings);
-
-        /// <summary>destroys a FluidSynth synthesizer.</summary>
-        /// <param name="synth">pointer to the fluid_synth_t to delete.</param>
-        void delete_fluid_synth(IntPtr synth);
-
-        /// <summary>creates a new FluidSynth audio driver.</summary>
-        /// <param name="settings">pointer to the settings object.</param>
-        /// <param name="synth">pointer to the synthesizer.</param>
-        /// <returns>pointer to the new fluid_audio_driver_t.</returns>
-        IntPtr new_fluid_audio_driver(IntPtr settings, IntPtr synth);
-
-        /// <summary>destroys a FluidSynth audio driver.</summary>
-        /// <param name="driver">pointer to the fluid_audio_driver_t to delete.</param>
-        void delete_fluid_audio_driver(IntPtr driver);
-
-        /// <summary>loads a SoundFont file into the synthesizer.</summary>
-        /// <param name="synth">pointer to the synthesizer.</param>
-        /// <param name="filename">path to the SoundFont file.</param>
-        /// <param name="reset_presets">whether to reset all presets after loading.</param>
-        /// <returns>SoundFont ID on success, FLUID_FAILED on error.</returns>
-        int fluid_synth_sfload(IntPtr synth, string filename, bool reset_presets);
-
-        /// <summary>checks whether a file is a valid SoundFont.</summary>
-        /// <param name="filename">path to the file.</param>
-        /// <returns>1 if valid, 0 otherwise.</returns>
-        int fluid_is_soundfont(string filename);
-
-        /// <summary>sends a MIDI note-on message.</summary>
-        /// <param name="synth">pointer to the synthesizer.</param>
-        /// <param name="chan">MIDI channel (0-based).</param>
-        /// <param name="key">MIDI key number.</param>
-        /// <param name="vel">velocity (0-127).</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int fluid_synth_noteon(IntPtr synth, int chan, int key, int vel);
-
-        /// <summary>sends a MIDI note-off message.</summary>
-        /// <param name="synth">pointer to the synthesizer.</param>
-        /// <param name="chan">MIDI channel (0-based).</param>
-        /// <param name="key">MIDI key number.</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int fluid_synth_noteoff(IntPtr synth, int chan, int key);
-
-        /// <summary>sets the master gain of the synthesizer.</summary>
-        /// <param name="synth">pointer to the synthesizer.</param>
-        /// <param name="gain">gain value (0.0 to 10.0).</param>
-        void fluid_synth_set_gain(IntPtr synth, float gain);
-
-        /// <summary>creates a new MIDI player.</summary>
-        /// <param name="synth">pointer to the synthesizer.</param>
-        /// <returns>pointer to the new fluid_player_t.</returns>
-        IntPtr new_fluid_player(IntPtr synth);
-
-        /// <summary>destroys a MIDI player.</summary>
-        /// <param name="player">pointer to the fluid_player_t to delete.</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int delete_fluid_player(IntPtr player);
-
-        /// <summary>adds a MIDI file to the player's playlist.</summary>
-        /// <param name="player">pointer to the player.</param>
-        /// <param name="midifile">path to the MIDI file.</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int fluid_player_add(IntPtr player, string midifile);
-
-        /// <summary>checks whether a file is a valid MIDI file.</summary>
-        /// <param name="filename">path to the file.</param>
-        /// <returns>1 if valid, 0 otherwise.</returns>
-        int fluid_is_midifile(string filename);
-
-        /// <summary>starts MIDI playback.</summary>
-        /// <param name="player">pointer to the player.</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int fluid_player_play(IntPtr player);
-
-        /// <summary>blocks until MIDI playback finishes.</summary>
-        /// <param name="player">pointer to the player.</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int fluid_player_join(IntPtr player);
-
-        /// <summary>stops MIDI playback.</summary>
-        /// <param name="player">pointer to the player.</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int fluid_player_stop(IntPtr player);
-
-        /// <summary>registers a MIDI event callback with the player.</summary>
-        /// <param name="player">pointer to the player.</param>
-        /// <param name="handler">the callback handler pointer.</param>
-        /// <param name="handler_data">user data passed to the handler.</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int fluid_player_set_playback_callback(IntPtr player, IntPtr handler, IntPtr handler_data);
-
-        /// <summary>default MIDI event handler that routes events to the synthesizer.</summary>
-        /// <param name="data">pointer to the synthesizer.</param>
-        /// <param name="evt">pointer to the MIDI event.</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int fluid_synth_handle_midi_event(IntPtr data, IntPtr evt);
-
-        /// <summary>sends a MIDI program change message.</summary>
-        /// <param name="synth">pointer to the synthesizer.</param>
-        /// <param name="chan">MIDI channel (0-based).</param>
-        /// <param name="program">program number (0-127).</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int fluid_synth_program_change(IntPtr synth, int chan, int program);
-
-        /// <summary>sends a MIDI control change (CC) message.</summary>
-        /// <param name="synth">pointer to the synthesizer.</param>
-        /// <param name="chan">MIDI channel (0-based).</param>
-        /// <param name="ctrl">controller number.</param>
-        /// <param name="val">controller value (0-127).</param>
-        /// <returns>FLUID_OK or FLUID_FAILED.</returns>
-        int fluid_synth_cc(IntPtr synth, int chan, int ctrl, int val);
-
-        /// <summary>returns the type field of a MIDI event.</summary>
-        /// <param name="evt">pointer to the MIDI event.</param>
-        /// <returns>MIDI event type number.</returns>
-        int fluid_midi_event_get_type(IntPtr evt);
-
-        /// <summary>returns the channel field of a MIDI event.</summary>
-        /// <param name="evt">pointer to the MIDI event.</param>
-        /// <returns>MIDI channel number (0-based).</returns>
-        int fluid_midi_event_get_channel(IntPtr evt);
-
-        /// <summary>returns the key field of a MIDI note event.</summary>
-        /// <param name="evt">pointer to the MIDI event.</param>
-        /// <returns>MIDI key number.</returns>
-        int fluid_midi_event_get_key(IntPtr evt);
-
-        /// <summary>returns the velocity field of a MIDI note event.</summary>
-        /// <param name="evt">pointer to the MIDI event.</param>
-        /// <returns>velocity value (0-127).</returns>
-        int fluid_midi_event_get_velocity(IntPtr evt);
-
-        /// <summary>returns the controller number field of a MIDI CC event.</summary>
-        /// <param name="evt">pointer to the MIDI event.</param>
-        /// <returns>controller number.</returns>
-        int fluid_midi_event_get_control(IntPtr evt);
-
-        /// <summary>returns the value field of a MIDI CC event.</summary>
-        /// <param name="evt">pointer to the MIDI event.</param>
-        /// <returns>controller value (0-127).</returns>
-        int fluid_midi_event_get_value(IntPtr evt);
-
-        /// <summary>returns the program number field of a MIDI program change event.</summary>
-        /// <param name="evt">pointer to the MIDI event.</param>
-        /// <returns>program number (0-127).</returns>
-        int fluid_midi_event_get_program(IntPtr evt);
-    }
-}
 ```
 
 ## MidiPlayer\IMixer.cs
@@ -21709,6 +21490,7 @@ namespace MidiPlayer {
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
 using System.ComponentModel;
 using System.Linq;
 
@@ -21827,7 +21609,7 @@ namespace MidiPlayer {
                 _previous = _current;
                 _current = value;
                 Log.Info($"current: {_current}");
-                _on_selected(null, new(nameof(Current)));
+                _on_selected?.Invoke(null, new(nameof(Current)));
             }
         }
 
@@ -21871,11 +21653,16 @@ namespace MidiPlayer {
 
         /// <summary>
         /// called when a fader value is updated.
+        /// Uses null-safe invoke and a try-catch so exceptions never escape from the Fader.Updated chain.
         /// </summary>
         /// <param name="sender">the Fader that raised the update.</param>
         /// <param name="e">the property-change event arguments.</param>
         static void onUpdate(object sender, PropertyChangedEventArgs e) {
-            _on_updated(sender, e);
+            try {
+                _on_updated?.Invoke(sender, e);
+            } catch (Exception ex) {
+                Log.Error($"[Mixer.onUpdate] {ex}");
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -22111,101 +21898,6 @@ namespace MidiPlayer {
                 }
             }
         }
-    }
-}
-
-```
-
-## MidiPlayer\PInvokeFluidSynth.cs
-
-```csharp
-/*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-// This file is a compatibility stub retained during refactor.
-// The canonical implementation has moved to MidiPlayer.FluidSynth.PInvokeFluidSynth.
-#nullable enable
-using System;
-
-namespace MidiPlayer {
-    /// <summary>
-    /// compatibility stub retained during refactor.
-    /// always throws NotImplementedException; use MidiPlayer.FluidSynth.PInvokeFluidSynth for production.
-    /// </summary>
-    /// <author>
-    /// h.adachi (STUDIO MeowToon)
-    /// </author>
-    internal sealed class PInvokeFluidSynth : IFluidSynth {
-        /// <inheritdoc/>
-        public IntPtr new_fluid_settings() => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public void delete_fluid_settings(IntPtr settings) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public IntPtr new_fluid_synth(IntPtr settings) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public void delete_fluid_synth(IntPtr synth) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public IntPtr new_fluid_audio_driver(IntPtr settings, IntPtr synth) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public void delete_fluid_audio_driver(IntPtr driver) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_synth_sfload(IntPtr synth, string filename, bool reset_presets) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_is_soundfont(string filename) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_synth_noteon(IntPtr synth, int chan, int key, int vel) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_synth_noteoff(IntPtr synth, int chan, int key) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public void fluid_synth_set_gain(IntPtr synth, float gain) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public IntPtr new_fluid_player(IntPtr synth) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int delete_fluid_player(IntPtr player) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_player_add(IntPtr player, string midifile) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_is_midifile(string filename) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_player_play(IntPtr player) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_player_join(IntPtr player) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_player_stop(IntPtr player) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_player_set_playback_callback(IntPtr player, IntPtr handler, IntPtr handler_data) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_synth_handle_midi_event(IntPtr data, IntPtr evt) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_synth_program_change(IntPtr synth, int chan, int program) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_synth_cc(IntPtr synth, int chan, int ctrl, int val) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_type(IntPtr evt) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_channel(IntPtr evt) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_key(IntPtr evt) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_velocity(IntPtr evt) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_control(IntPtr evt) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_value(IntPtr evt) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
-        /// <inheritdoc/>
-        public int fluid_midi_event_get_program(IntPtr evt) => throw new NotImplementedException("Use MidiPlayer.FluidSynth.PInvokeFluidSynth instead");
     }
 }
 
