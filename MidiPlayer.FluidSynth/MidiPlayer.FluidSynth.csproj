@@ -12,4 +12,16 @@
     <ProjectReference Include="..\MidiPlayer\MidiPlayer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\MidiPlayer.Midi\Sanford.Multimedia.Midi.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Sanford.Multimedia.Midi">
+      <HintPath>..\MidiPlayer.Midi\Sanford.Multimedia.Midi.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

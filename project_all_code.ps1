@@ -1,3 +1,5 @@
+# powershell -NoProfile -ExecutionPolicy Bypass -File .\project_all_code.ps1 project_all_code.md -ExcludeProjects 'MidiPlayer.Droid','MidiPlayer.Win64'
+
 Param(
     [string]$OutFile = "project_all_code.md",
     [string[]]$ExcludeProjects = @()

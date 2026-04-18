@@ -5,6 +5,14 @@
     <LangVersion>9</LangVersion>
   </PropertyGroup>
 
+  <!-- expose internal members to the test project so tests can call GetTrackNameAndMidiChannel
+       without reflection. this avoids the PrivateObject black-magic anti-pattern. -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>MidiPlayerTest</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="Sanford.Multimedia.Midi.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

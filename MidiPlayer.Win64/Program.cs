@@ -26,6 +26,9 @@ namespace MidiPlayer.Win64 {
     static class Program {
 #nullable enable
 
+        /// <summary>
+        /// the application entry point. configures high-DPI awareness, enables visual styles, and launches the main form.
+        /// </summary>
         [STAThread]
         static void Main() {
             Application.SetHighDpiMode(HighDpiMode.SystemAware);

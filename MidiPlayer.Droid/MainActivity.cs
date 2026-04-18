@@ -56,14 +56,34 @@ namespace MidiPlayer.Droid {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
+        /// <summary>
+        /// current sound font file path, loaded from the file picker.
+        /// </summary>
         string _sound_font_path = "undefined";
 
+        /// <summary>
+        /// current MIDI file path, loaded from the file picker.
+        /// </summary>
         string _midi_file_path = "undefined";
 
+        /// <summary>
+        /// playlist holding MIDI file paths to play sequentially.
+        /// </summary>
         PlayList _playlist;
 
+        /// <summary>
+        /// list data backing the ListView adapter.
+        /// </summary>
         List<ListItem> _listitem_list;
 
+        /// <summary>
+        /// source used to cancel the view refresh loop when the Activity is destroyed.
+        /// </summary>
+        CancellationTokenSource _refresh_timer_cts;
+
+        /// <summary>
+        /// task running the view-refresh loop; started in OnCreate, cancelled via _refresh_timer_cts.
+        /// </summary>
         Task _refresh_timer;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +92,8 @@ namespace MidiPlayer.Droid {
         public MainActivity() {
             _playlist = new();
             _listitem_list = new();
-            _refresh_timer = createRefreshTask();
+            _refresh_timer_cts = new();
+            _refresh_timer = createRefreshTask(_refresh_timer_cts.Token);
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,6 +118,9 @@ namespace MidiPlayer.Droid {
             SetContentView(Resource.Layout.activity_main);
 
             initializeComponent();
+            // inject the OS-resolved external files directory before loading conf to
+            // satisfy Android 10+ Scoped Storage policy (no hardcoded /storage/emulated/0/ paths).
+            Conf.SetAndroidFilesDir(GetExternalFilesDir(null).AbsolutePath);
             Conf.Load();
             loadPreviousSetting();
             _refresh_timer.Start();
@@ -249,6 +273,9 @@ namespace MidiPlayer.Droid {
         /// </summary>
         protected override void OnDestroy() {
             try {
+                // cancel the view refresh loop before stopping playback to prevent the
+                // task from touching the destroyed Activity's UI after OnDestroy returns.
+                _refresh_timer_cts.Cancel();
                 stopSong();
             } catch (Exception ex) {
                 Log.Error(ex.Message);
@@ -358,20 +385,30 @@ namespace MidiPlayer.Droid {
         }
 
         /// <summary>
-        /// play a song.
+        /// play the song.
         /// </summary>
-        async void playSong() {
+        /// <remarks>
+        /// TaskCreationOptions.LongRunning is used instead of Task.Run because Synth.Start()
+        /// calls fluid_player_join() internally, which blocks until the song finishes.
+        /// LongRunning signals the scheduler to allocate a dedicated thread outside the ThreadPool,
+        /// preventing Thread Pool Starvation when multiple songs play consecutively.
+        /// </remarks>
+        void playSong() {
             try {
-                await Task.Run(action: () => {
-                    if (!_playlist.Ready) {
-                        Synth.MidiFilePath = _midi_file_path;
-                        Synth.Start();
-                    } else {
-                        Synth.MidiFilePath = _playlist.Next;
-                        Synth.Start();
+                Task.Factory.StartNew(() => {
+                    try {
+                        if (!_playlist.Ready) {
+                            Synth.MidiFilePath = _midi_file_path;
+                            Synth.Start();
+                        } else {
+                            Synth.MidiFilePath = _playlist.Next;
+                            Synth.Start();
+                        }
+                        logMemoryInfo();
+                    } catch (Exception ex) {
+                        Log.Error(ex.Message);
                     }
-                });
-                logMemoryInfo();
+                }, TaskCreationOptions.LongRunning);
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
@@ -380,9 +417,14 @@ namespace MidiPlayer.Droid {
         /// <summary>
         /// stop the song.
         /// </summary>
-        async void stopSong() {
+        /// <remarks>
+        /// kept synchronous intentionally: Synth.Stop() calls fluid_player_stop + final(),
+        /// both of which return quickly. making this async void would silently swallow any
+        /// exception that escapes the try-catch, crashing the process without a call-site trace.
+        /// </remarks>
+        void stopSong() {
             try {
-                await Task.Run(action: () => Synth.Stop());
+                Synth.Stop();
                 Conf.Value.PlayList = _playlist.List; // TODO: save
                 Conf.Save(); // TODO: save
                 logMemoryInfo();
@@ -394,16 +436,24 @@ namespace MidiPlayer.Droid {
         /// <summary>
         /// refresh the view in a few seconds.
         /// </summary>
-        Task createRefreshTask() {
+        /// <remarks>
+        /// the loop exits cleanly when the token is cancelled (Activity destroyed).
+        /// OperationCanceledException from Task.Delay is swallowed intentionally.
+        /// </remarks>
+        Task createRefreshTask(CancellationToken token) {
             return new(action: async () => {
-                var listitem_adapter = (ListItemAdapter) _listview_item.Adapter;
-                while (true) {
-                    RunOnUiThread(action: () => {
-                        listitem_adapter.NotifyDataSetChanged();
-                    });
-                    await Task.Delay(VIEW_REFRESH_TIME);
+                try {
+                    var listitem_adapter = (ListItemAdapter) _listview_item.Adapter;
+                    while (!token.IsCancellationRequested) {
+                        RunOnUiThread(action: () => {
+                            listitem_adapter.NotifyDataSetChanged();
+                        });
+                        await Task.Delay(VIEW_REFRESH_TIME, token);
+                    }
+                } catch (OperationCanceledException) {
+                    // intentional: loop ends cleanly when the Activity is destroyed.
                 }
-            });
+            }, token);
         }
 
         /// <summary>

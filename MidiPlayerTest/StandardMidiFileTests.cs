@@ -1,44 +1,63 @@
-﻿using MidiPlayer.Midi;
+﻿/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+using MidiPlayer.Midi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 using System.Collections.Generic;
 
 namespace MidiPlayerTest.Midi {
+    /// <summary>
+    /// unit tests for StandardMidiFile.
+    /// </summary>
+    /// <author>
+    /// h.adachi (STUDIO MeowToon)
+    /// </author>
     [TestClass()]
     public class StandardMidiFileTests {
 #nullable enable
+        /// <summary>
+        /// verifies track name and MIDI channel for all 9 raw sequence tracks in Cmon_v1.mid.
+        /// </summary>
         [TestMethod()]
-        public void getTrackNameAndMidiChannelTest1() {
+        public void GetTrackNameAndMidiChannelTest1() {
             var target = new StandardMidiFile("../data/Cmon_v1.mid");
-            var privateObj = new PrivateObject(target);
-            var result0 = privateObj.Invoke("getTrackNameAndMidiChannel", 0);
-            AreEqual(("Cmon", -1), result0);
-            var result1 = privateObj.Invoke("getTrackNameAndMidiChannel", 1);
-            AreEqual(("Vocal Main", 13), result1);
-            var result2 = privateObj.Invoke("getTrackNameAndMidiChannel", 2);
-            AreEqual(("Vocal Cho", 0), result2);
-            var result3 = privateObj.Invoke("getTrackNameAndMidiChannel", 3);
-            AreEqual(("Synth Sqe", 15), result3);
-            var result4 = privateObj.Invoke("getTrackNameAndMidiChannel", 4);
-            AreEqual(("Synth Pad", 14), result4);
-            var result5 = privateObj.Invoke("getTrackNameAndMidiChannel", 5);
-            AreEqual(("Guiter Riff", 12), result5);
-            var result6 = privateObj.Invoke("getTrackNameAndMidiChannel", 6);
-            AreEqual(("Bass", 11), result6);
-            var result7 = privateObj.Invoke("getTrackNameAndMidiChannel", 7);
-            AreEqual(("Drum OverTop", 9), result7);
-            var result8 = privateObj.Invoke("getTrackNameAndMidiChannel", 8);
-            AreEqual(("Durm SN & BD", 9), result8);
+            AreEqual(("Cmon", -1),       target.GetTrackNameAndMidiChannel(0));
+            AreEqual(("Vocal Main", 13), target.GetTrackNameAndMidiChannel(1));
+            AreEqual(("Vocal Cho", 0),   target.GetTrackNameAndMidiChannel(2));
+            AreEqual(("Synth Sqe", 15),  target.GetTrackNameAndMidiChannel(3));
+            AreEqual(("Synth Pad", 14),  target.GetTrackNameAndMidiChannel(4));
+            AreEqual(("Guiter Riff", 12),target.GetTrackNameAndMidiChannel(5));
+            AreEqual(("Bass", 11),       target.GetTrackNameAndMidiChannel(6));
+            AreEqual(("Drum OverTop", 9),target.GetTrackNameAndMidiChannel(7));
+            AreEqual(("Durm SN & BD", 9),target.GetTrackNameAndMidiChannel(8));
         }
 
+        /// <summary>
+        /// verifies that accessing index 9 (out of range) throws ArgumentOutOfRangeException.
+        /// </summary>
         [TestMethod()]
         [ExpectedException(typeof(System.ArgumentOutOfRangeException))]
-        public void getTrackNameAndMidiChannelTest2() {
+        public void GetTrackNameAndMidiChannelTest2() {
             var target = new StandardMidiFile("../data/Cmon_v1.mid");
-            var privateObj = new PrivateObject(target);
-            privateObj.Invoke("getTrackNameAndMidiChannel", 9);
+            target.GetTrackNameAndMidiChannel(9);
         }
 
+        /// <summary>
+        /// verifies that TrackCount is 8 for Cmon_v1.mid.
+        /// </summary>
         [TestMethod()]
         public void TrackCountTest1() {
             var target = new StandardMidiFile("../data/Cmon_v1.mid");
@@ -46,6 +65,9 @@ namespace MidiPlayerTest.Midi {
             AreEqual(8, result);
         }
 
+        /// <summary>
+        /// verifies that TrackCount is 14 for ABC_v1.mid.
+        /// </summary>
         [TestMethod()]
         public void TrackCountTest2() {
             var target = new StandardMidiFile("../data/ABC_v1.mid");
@@ -53,6 +75,9 @@ namespace MidiPlayerTest.Midi {
             AreEqual(14, result);
         }
 
+        /// <summary>
+        /// verifies that TrackCount is 8 for DoYouSay_v4.mid.
+        /// </summary>
         [TestMethod()]
         public void TrackCountTest3() {
             var target = new StandardMidiFile("../data/DoYouSay_v4.mid");
@@ -60,6 +85,9 @@ namespace MidiPlayerTest.Midi {
             AreEqual(8, result);
         }
 
+        /// <summary>
+        /// verifies the full MIDI channel list for Cmon_v1.mid.
+        /// </summary>
         [TestMethod()]
         public void MidiChannelListTest1() {
             var target = new StandardMidiFile("../data/Cmon_v1.mid");
@@ -67,100 +95,74 @@ namespace MidiPlayerTest.Midi {
             CollectionAssert.AreEqual(new List<int>() { 13, 0, 15, 14, 12, 11, 9, 9 }, result);
         }
 
+        /// <summary>
+        /// verifies all non-conductor track names in Cmon_v1.mid by index.
+        /// </summary>
         [TestMethod()]
         public void GetTrackNameTest1() {
             var target = new StandardMidiFile("../data/Cmon_v1.mid");
-            var result1 = target.GetTrackName(1);
-            AreEqual("Vocal Main", result1);
-            var result2 = target.GetTrackName(2);
-            AreEqual("Vocal Cho", result2);
-            var result3 = target.GetTrackName(3);
-            AreEqual("Synth Sqe", result3);
-            var result4 = target.GetTrackName(4);
-            AreEqual("Synth Pad", result4);
-            var result5 = target.GetTrackName(5);
-            AreEqual("Guiter Riff", result5);
-            var result6 = target.GetTrackName(6);
-            AreEqual("Bass", result6);
-            var result7 = target.GetTrackName(7);
-            AreEqual("Drum OverTop", result7);
-            var result8 = target.GetTrackName(8);
-            AreEqual("Durm SN & BD", result8);
+            AreEqual("Vocal Main",   target.GetTrackName(1));
+            AreEqual("Vocal Cho",    target.GetTrackName(2));
+            AreEqual("Synth Sqe",    target.GetTrackName(3));
+            AreEqual("Synth Pad",    target.GetTrackName(4));
+            AreEqual("Guiter Riff",  target.GetTrackName(5));
+            AreEqual("Bass",         target.GetTrackName(6));
+            AreEqual("Drum OverTop", target.GetTrackName(7));
+            AreEqual("Durm SN & BD", target.GetTrackName(8));
         }
 
+        /// <summary>
+        /// verifies all track names in Tornado_v2.mid.
+        /// </summary>
         [TestMethod()]
         public void GetTrackNameTest2() {
             var target = new StandardMidiFile("../data/Tornado_v2.mid");
-            var result0 = target.GetTrackName(0);
-            AreEqual("Tornado", result0);
-            var result1 = target.GetTrackName(1);
-            AreEqual("Bass", result1);
-            var result2 = target.GetTrackName(2);
-            AreEqual("Seque", result2);
-            var result3 = target.GetTrackName(3);
-            AreEqual("Pad", result3);
-            var result4 = target.GetTrackName(4);
-            AreEqual("Melody", result4);
-            var result5 = target.GetTrackName(5);
-            AreEqual("Drum", result5);
+            AreEqual("Tornado", target.GetTrackName(0));
+            AreEqual("Bass",    target.GetTrackName(1));
+            AreEqual("Seque",   target.GetTrackName(2));
+            AreEqual("Pad",     target.GetTrackName(3));
+            AreEqual("Melody",  target.GetTrackName(4));
+            AreEqual("Drum",    target.GetTrackName(5));
         }
 
+        /// <summary>
+        /// verifies all 15 track names in ABC_v1.mid.
+        /// </summary>
         [TestMethod()]
         public void GetTrackNameTest3() {
             var target = new StandardMidiFile("../data/ABC_v1.mid");
-            var result0 = target.GetTrackName(0);
-            AreEqual("ABC", result0);
-            var result1 = target.GetTrackName(1);
-            AreEqual("Brass1", result1);
-            var result2 = target.GetTrackName(2);
-            AreEqual("Brass2", result2);
-            var result3 = target.GetTrackName(3);
-            AreEqual("Melody Main", result3);
-            var result4 = target.GetTrackName(4);
-            AreEqual("Synth Reff", result4);
-            var result5 = target.GetTrackName(5);
-            AreEqual("Synth Pad2", result5);
-            var result6 = target.GetTrackName(6);
-            AreEqual("Synth Pad1", result6);
-            var result7 = target.GetTrackName(7);
-            AreEqual("DX Reff", result7);
-            var result8 = target.GetTrackName(8);
-            AreEqual("Drum Main", result8);
-            var result9 = target.GetTrackName(9);
-            AreEqual("Percussion1", result9);
-            var result10 = target.GetTrackName(10);
-            AreEqual("Percussion2", result10);
-            var result11 = target.GetTrackName(11);
-            AreEqual("Bass", result11);
-            var result12 = target.GetTrackName(12);
-            AreEqual("Bass over dub", result12);
-            var result13 = target.GetTrackName(13);
-            AreEqual("DX Sequence", result13);
-            var result14 = target.GetTrackName(14);
-            AreEqual("Orchestral Hit", result14);
+            AreEqual("ABC",            target.GetTrackName(0));
+            AreEqual("Brass1",         target.GetTrackName(1));
+            AreEqual("Brass2",         target.GetTrackName(2));
+            AreEqual("Melody Main",    target.GetTrackName(3));
+            AreEqual("Synth Reff",     target.GetTrackName(4));
+            AreEqual("Synth Pad2",     target.GetTrackName(5));
+            AreEqual("Synth Pad1",     target.GetTrackName(6));
+            AreEqual("DX Reff",        target.GetTrackName(7));
+            AreEqual("Drum Main",      target.GetTrackName(8));
+            AreEqual("Percussion1",    target.GetTrackName(9));
+            AreEqual("Percussion2",    target.GetTrackName(10));
+            AreEqual("Bass",           target.GetTrackName(11));
+            AreEqual("Bass over dub",  target.GetTrackName(12));
+            AreEqual("DX Sequence",    target.GetTrackName(13));
+            AreEqual("Orchestral Hit", target.GetTrackName(14));
         }
 
+        /// <summary>
+        /// verifies all track names in DoYouSay_v4.mid.
+        /// </summary>
         [TestMethod()]
         public void GetTrackNameTest4() {
             var target = new StandardMidiFile("../data/DoYouSay_v4.mid");
-            var result0 = target.GetTrackName(0);
-            AreEqual("DoYouSay", result0);
-            var result1 = target.GetTrackName(1);
-            AreEqual("Vocal Main", result1);
-            var result2 = target.GetTrackName(2);
-            AreEqual("Vocal Cho", result2);
-            var result3 = target.GetTrackName(3);
-            AreEqual("Synth Pad", result3);
-            var result4 = target.GetTrackName(4);
-            AreEqual("Guiter Clean", result4);
-            var result5 = target.GetTrackName(5);
-            AreEqual("Guiter Riff", result5);
-            var result6 = target.GetTrackName(6);
-            AreEqual("Bass", result6);
-            var result7 = target.GetTrackName(7);
-            AreEqual("Drum OverTop", result7);
-            var result8 = target.GetTrackName(8);
-            AreEqual("Drum SN & BD", result8);
+            AreEqual("DoYouSay",     target.GetTrackName(0));
+            AreEqual("Vocal Main",   target.GetTrackName(1));
+            AreEqual("Vocal Cho",    target.GetTrackName(2));
+            AreEqual("Synth Pad",    target.GetTrackName(3));
+            AreEqual("Guiter Clean", target.GetTrackName(4));
+            AreEqual("Guiter Riff",  target.GetTrackName(5));
+            AreEqual("Bass",         target.GetTrackName(6));
+            AreEqual("Drum OverTop", target.GetTrackName(7));
+            AreEqual("Drum SN & BD", target.GetTrackName(8));
         }
     }
 }

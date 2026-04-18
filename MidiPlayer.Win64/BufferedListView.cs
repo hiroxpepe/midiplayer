@@ -27,6 +27,9 @@ namespace MidiPlayer.Win64 {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // protected Methods [verb, verb phrases]
 
+        /// <summary>
+        /// always returns true to enable double buffering; the set accessor is intentionally empty.
+        /// </summary>
         protected override bool DoubleBuffered {
             get {
                 return true;

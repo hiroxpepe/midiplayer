@@ -34,15 +34,27 @@ namespace MidiPlayer.Win64 {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
+        /// <summary>
+        /// current sound font file path, loaded from the open-file dialog.
+        /// </summary>
         string _soundfont_path = "undefined";
 
+        /// <summary>
+        /// current MIDI file path, loaded from the open-file dialog.
+        /// </summary>
         string _midi_file_path = "undefined";
 
+        /// <summary>
+        /// playlist holding MIDI file paths to play sequentially.
+        /// </summary>
         PlayList _playlist;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
+        /// <summary>
+        /// initializes a new MainForm.
+        /// </summary>
         public MainForm() {
             InitializeComponent();
             DoubleBuffered = true;
@@ -91,27 +103,49 @@ namespace MidiPlayer.Win64 {
             /// <summary>
             /// add a callback function to be called when the synth ended.
             /// </summary>
+            /// <remarks>
+            /// Ended fires on the LongRunning thread (Thread 11). Calling Stop()+Start() directly
+            /// here caused a race: Thread 11 would be inside Init() loading the SF2 file while
+            /// Thread 1 (buttonStop_Click) called final(), which deleted the native handles Thread
+            /// 11 was using — causing new_fluid_audio_driver(IntPtr.Zero) to hang indefinitely.
+            ///
+            /// Fix: post the restart to the UI thread via BeginInvoke. This serializes the restart
+            /// with buttonStop_Click on the same message queue, eliminating the race entirely.
+            /// Thread 11 exits cleanly; the UI thread decides whether to restart.
+            /// </remarks>
             Synth.Ended += () => {
                 Log.Info("Ended called.");
-                if (!_playlist.Ready) {
-                    Synth.Stop();
-                    Synth.Start();
-                } else {
-                    Synth.Stop();
-                    Synth.MidiFilePath = _playlist.Next;
-                    Synth.Start();
-                }
+                BeginInvoke((MethodInvoker) (() => {
+                    if (!Synth.Playing) {
+                        // Stop() was already called (user pressed Stop); do not restart.
+                        return;
+                    }
+                    stopSong();
+                    if (!_playlist.Ready) {
+                        playSong();
+                    } else {
+                        Synth.MidiFilePath = _playlist.Next;
+                        playSong();
+                    }
+                }));
             };
 
             /// <summary>
             /// add a callback function to be called when the synth updated.
+            /// BeginInvoke (async) is used instead of Invoke (sync) because Updated fires on the
+            /// native audio callback thread. Using Invoke here would block the callback thread
+            /// while waiting for the UI thread, and Synth.Stop() calls delete_fluid_audio_driver
+            /// (on the UI thread) which waits for all callbacks to finish — causing deadlock.
             /// </summary>
             Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
                 var track = (Synth.Track) sender;
-                Invoke(updateList(track));
+                BeginInvoke(updateList(track));
             };
         }
 
+        /// <summary>
+        /// button load sound font click event handler.
+        /// </summary>
         void buttonLoadSoundFont_Click(object sender, EventArgs e) {
             Log.Info("buttonLoadSoundFont clicked.");
             try {
@@ -130,6 +164,9 @@ namespace MidiPlayer.Win64 {
             }
         }
 
+        /// <summary>
+        /// button load MIDI file click event handler.
+        /// </summary>
         void buttonLoadMidiFile_Click(object sender, EventArgs e) {
             Log.Info("buttonLoadMidiFile clicked.");
             try {
@@ -148,6 +185,9 @@ namespace MidiPlayer.Win64 {
             }
         }
 
+        /// <summary>
+        /// button start click event handler.
+        /// </summary>
         void buttonStart_Click(object sender, EventArgs e) {
             Log.Info("buttonStart clicked.");
             try {
@@ -160,6 +200,9 @@ namespace MidiPlayer.Win64 {
             }
         }
 
+        /// <summary>
+        /// button stop click event handler.
+        /// </summary>
         void buttonStop_Click(object sender, EventArgs e) {
             Log.Info("buttonStop clicked.");
             try {
@@ -176,17 +219,27 @@ namespace MidiPlayer.Win64 {
         /// <summary>
         /// play the song.
         /// </summary>
-        async void playSong() {
+        /// <remarks>
+        /// TaskCreationOptions.LongRunning is used instead of Task.Run because Synth.Start()
+        /// calls fluid_player_join() internally, which blocks until the song finishes.
+        /// LongRunning signals the scheduler to allocate a dedicated thread outside the ThreadPool,
+        /// preventing Thread Pool Starvation when multiple songs play consecutively.
+        /// </remarks>
+        void playSong() {
             try {
-                await Task.Run(() => {
-                    if (!_playlist.Ready) {
-                        Synth.MidiFilePath = _midi_file_path;
-                        Synth.Start();
-                    } else {
-                        Synth.MidiFilePath = _playlist.Next;
-                        Synth.Start();
+                Task.Factory.StartNew(() => {
+                    try {
+                        if (!_playlist.Ready) {
+                            Synth.MidiFilePath = _midi_file_path;
+                            Synth.Start();
+                        } else {
+                            Synth.MidiFilePath = _playlist.Next;
+                            Synth.Start();
+                        }
+                    } catch (Exception ex) {
+                        Log.Error(ex.Message);
                     }
-                });
+                }, TaskCreationOptions.LongRunning);
             } catch (Exception ex) {
                 Log.Error(ex.Message);
             }
@@ -195,9 +248,14 @@ namespace MidiPlayer.Win64 {
         /// <summary>
         /// stop the song.
         /// </summary>
-        async void stopSong() {
+        /// <remarks>
+        /// kept synchronous intentionally: Synth.Stop() calls fluid_player_stop + final(),
+        /// both of which return quickly. making this async void would silently swallow any
+        /// exception that escapes the try-catch, crashing the process without a call-site trace.
+        /// </remarks>
+        void stopSong() {
             try {
-                await Task.Run(() => Synth.Stop());
+                Synth.Stop();
                 if (_listview.Items.Count != 0) {
                     Invoke((MethodInvoker) (() => {
                         Enumerable.Range(0, Synth.TrackCount).ToList().ForEach(x => {
@@ -214,10 +272,16 @@ namespace MidiPlayer.Win64 {
         /// <summary>
         /// a callback function to be called when the synth updated.
         /// </summary>
+        /// <param name="track">the track whose state changed.</param>
+        /// <returns>a MethodInvoker that updates the corresponding ListView row on the UI thread.</returns>
         MethodInvoker updateList(Synth.Track track) {
             const int COLUMN_1_INDEX = 0;
             var track_index = track.Index - 1; // exclude conductor track;
             return () => {
+                // guard: listview is populated by the Started event; during Init() it may be empty.
+                if (track_index < 0 || track_index >= _listview.Items.Count) {
+                    return;
+                }
                 var listview_item = new ListViewItem(new string[] {
                     "  ●",
                     track.Name,

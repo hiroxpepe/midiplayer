@@ -29,9 +29,19 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Const [nouns]
 
+        /// <summary>
+        /// the base (zero) index for MIDI track slots.
+        /// </summary>
         const int MIDI_TRACK_BASE = 0;
+
+        /// <summary>
+        /// the total number of MIDI track slots (channels 0-15).
+        /// </summary>
         const int MIDI_TRACK_COUNT = 16;
 
+        /// <summary>
+        /// the offset added to convert a zero-based index to a one-based value.
+        /// </summary>
         const int TO_ONE_BASED = 1;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,6 +148,7 @@ namespace MidiPlayer {
         /// <summary>
         /// get the current fader.
         /// </summary>
+        /// <returns>the Fader at the current selection index.</returns>
         public static Fader GetCurrent() {
             return _mixer[Current];
         }
@@ -145,6 +156,7 @@ namespace MidiPlayer {
         /// <summary>
         /// get the previous fader.
         /// </summary>
+        /// <returns>the Fader at the previous selection index.</returns>
         public static Fader GetPrevious() {
             return _mixer[_previous];
         }
@@ -152,6 +164,8 @@ namespace MidiPlayer {
         /// <summary>
         /// get a fader by 0 based index value.
         /// </summary>
+        /// <param name="index">the zero-based fader index to retrieve.</param>
+        /// <returns>the Fader at the given index.</returns>
         public static Fader GetBy(int index) {
             return _mixer[index];
         }
@@ -162,6 +176,8 @@ namespace MidiPlayer {
         /// <summary>
         /// called when a fader value is updated.
         /// </summary>
+        /// <param name="sender">the Fader that raised the update.</param>
+        /// <param name="e">the property-change event arguments.</param>
         static void onUpdate(object sender, PropertyChangedEventArgs e) {
             _on_updated(sender, e);
         }
@@ -242,6 +258,7 @@ namespace MidiPlayer {
             /// <summary>
             /// internal constructor.
             /// </summary>
+            /// <param name="index">the zero-based fader index to assign.</param>
             internal Fader(int index) {
                 _index = index;
             }

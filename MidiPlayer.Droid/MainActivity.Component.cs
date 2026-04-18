@@ -33,26 +33,92 @@ namespace MidiPlayer.Droid {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Const [nouns]
 
+        /// <summary>
+        /// the first MIDI track index used as the base offset for array iteration.
+        /// </summary>
         const int MIDI_TRACK_BASE = 0;
+
+        /// <summary>
+        /// number of MIDI tracks displayed in the ListView.
+        /// </summary>
         const int MIDI_TRACK_COUNT = 16;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
+        /// <summary>
+        /// button that opens the sound font file picker.
+        /// </summary>
         Button _button_load_soundfont;
+
+        /// <summary>
+        /// button that opens the MIDI file picker.
+        /// </summary>
         Button _button_load_midi_file;
+
+        /// <summary>
+        /// button that starts playback.
+        /// </summary>
         Button _button_start;
+
+        /// <summary>
+        /// button that stops playback.
+        /// </summary>
         Button _button_stop;
+
+        /// <summary>
+        /// button that opens the MIDI file picker and adds the selected file to the playlist.
+        /// </summary>
         Button _button_add_playlist;
+
+        /// <summary>
+        /// button that clears all entries from the playlist.
+        /// </summary>
         Button _button_delete_playlist;
+
+        /// <summary>
+        /// button that sends the current mixer fader state to the synth via EventQueue.
+        /// </summary>
         Button _button_send_synth;
+
+        /// <summary>
+        /// text view that displays the currently selected fader index (one-based).
+        /// </summary>
         TextView _textview_no;
+
+        /// <summary>
+        /// text view that displays the MIDI channel of the currently selected fader (one-based).
+        /// </summary>
         TextView _textview_channel;
+
+        /// <summary>
+        /// number picker for selecting the MIDI program (instrument) of the current fader (1–128).
+        /// </summary>
         NumberPicker _numberpicker_prog;
+
+        /// <summary>
+        /// number picker for setting the pan position of the current fader (1–128, center = 65).
+        /// </summary>
         NumberPicker _numberpicker_pan;
+
+        /// <summary>
+        /// number picker for setting the volume of the current fader (1–128).
+        /// </summary>
         NumberPicker _numberpicker_vol;
+
+        /// <summary>
+        /// check box that mutes or unmutes the current fader.
+        /// </summary>
         CheckBox _checkbox_mute;
+
+        /// <summary>
+        /// list view that shows the column header row (Name / Voice / Ch).
+        /// </summary>
         ListView _listview_title;
+
+        /// <summary>
+        /// list view that shows one row per MIDI track with live track data.
+        /// </summary>
         ListView _listview_item;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////

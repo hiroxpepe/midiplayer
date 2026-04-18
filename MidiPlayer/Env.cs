@@ -28,16 +28,26 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Properties [noun, noun phrase, adjective] 
 
+        /// <summary>
+        /// the SoundFont directory path from the active configuration.
+        /// </summary>
         public static string SoundFontDir {
             get => Conf.Value.Synth.SoundFontDir;
             set => Conf.Value.Synth.SoundFontDir = value;
         }
 
+        /// <summary>
+        /// the MIDI file directory path from the active configuration.
+        /// </summary>
         public static string MidiFileDir {
             get => Conf.Value.Synth.MidiFileDir;
             set => Conf.Value.Synth.MidiFileDir = value;
         }
 
+        /// <summary>
+        /// the SoundFont directory path in URL-encoded form suitable for use in Android Intents.
+        /// returns "Music" when no SoundFont is configured.
+        /// </summary>
         public static string SoundFontDirForIntent {
             get {
                 if (!ExistsSoundFont) {
@@ -47,6 +57,10 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>
+        /// the MIDI file directory path in URL-encoded form suitable for use in Android Intents.
+        /// returns "Music" when no MIDI file is configured.
+        /// </summary>
         public static string MidiFileDirForIntent {
             get {
                 if (!ExistsMidiFile) {
@@ -56,16 +70,26 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>
+        /// the SoundFont file name from the active configuration.
+        /// </summary>
         public static string SoundFontName {
             get => Conf.Value.Synth.SoundFontName;
             set => Conf.Value.Synth.SoundFontName = value;
         }
 
+        /// <summary>
+        /// the MIDI file name from the active configuration.
+        /// </summary>
         public static string MidiFileName {
             get => Conf.Value.Synth.MidiFileName;
             set => Conf.Value.Synth.MidiFileName = value;
         }
 
+        /// <summary>
+        /// the full path to the SoundFont file (directory + name).
+        /// setting this property updates SoundFontDir and SoundFontName separately.
+        /// </summary>
         public static string SoundFontPath {
             get => $"{SoundFontDir}/{SoundFontName}";
             set {
@@ -74,6 +98,10 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>
+        /// the full path to the MIDI file (directory + name).
+        /// setting this property updates MidiFileDir and MidiFileName separately.
+        /// </summary>
         public static string MidiFilePath {
             get => $"{MidiFileDir}/{MidiFileName}";
             set {
@@ -82,10 +110,16 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>
+        /// returns true if the SoundFont file exists at SoundFontPath.
+        /// </summary>
         public static bool ExistsSoundFont {
             get => File.Exists(SoundFontPath);
         }
 
+        /// <summary>
+        /// returns true if the MIDI file exists at MidiFilePath.
+        /// </summary>
         public static bool ExistsMidiFile {
             get => File.Exists(MidiFilePath);
         }

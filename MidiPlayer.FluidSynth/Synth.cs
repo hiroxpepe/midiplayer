@@ -17,9 +17,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 
-using static NativeFuncs.Fluidsynth;
+using static MidiPlayer.FluidSynth.FluidSynthAPI;
+
 using void_ptr = System.IntPtr;
 using fluid_settings_t = System.IntPtr;
 using fluid_synth_t = System.IntPtr;
@@ -42,103 +42,107 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Const [nouns]
 
+        /// <summary>the default master gain applied to the FluidSynth synthesizer on initialization.</summary>
         const float SYNTH_GAIN = 0.5f;
 
+        /// <summary>the base (zero) index for MIDI track slots.</summary>
         const int MIDI_TRACK_BASE = 0;
+        /// <summary>the total number of MIDI track slots (0-15).</summary>
         const int MIDI_TRACK_COUNT = 16;
 
+        /// <summary>MIDI event type for note-on (value: 144).</summary>
         const int NOTE_ON = 144;
+        /// <summary>MIDI event type for note-off (value: 128).</summary>
         const int NOTE_OFF = 128;
+        /// <summary>MIDI event type for program change (value: 192).</summary>
         const int PROGRAM_CHANGE = 192;
+        /// <summary>MIDI event type for control change (value: 176).</summary>
         const int CONTROL_CHANGE = 176;
 
+        /// <summary>MIDI CC number for bank select MSB (value: 0).</summary>
         const int BANK_SELECT_MSB = 0;
+        /// <summary>MIDI CC number for bank select LSB (value: 32).</summary>
         const int BANK_SELECT_LSB = 32;
+        /// <summary>MIDI CC number for channel volume (value: 7).</summary>
         const int VOLUME_MSB = 7;
+        /// <summary>MIDI CC number for stereo pan (value: 10).</summary>
         const int PAN_MSB = 10;
 
+        /// <summary>the volume value used to silence a muted channel (value: 0).</summary>
         const int MUTE_VOLUME = 0;
+        /// <summary>the offset added to convert a zero-based index to a one-based value (value: 1).</summary>
         const int TO_ONE_BASED = 1;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
+        /// <summary>the native FluidSynth settings handle (fluid_settings_t).</summary>
         static fluid_settings_t _setting = IntPtr.Zero;
 
+        /// <summary>the native FluidSynth synthesizer handle (fluid_synth_t).</summary>
         static fluid_synth_t _synth = IntPtr.Zero;
 
+        /// <summary>the native FluidSynth MIDI player handle (fluid_player_t).</summary>
         static fluid_player_t _player = IntPtr.Zero;
 
+        /// <summary>the native FluidSynth audio driver handle (fluid_audio_driver_t).</summary>
         static fluid_audio_driver_t _adriver = IntPtr.Zero;
 
-        static handle_midi_event_func_t _event_callback;
+        /// <summary>the native MIDI event callback delegate registered with fluid_player_set_playback_callback.</summary>
+        static NativeFuncs.Fluidsynth.handle_midi_event_func_t _event_callback;
 
+        /// <summary>the managed multicast delegate invoked for each incoming MIDI playback event.</summary>
         static Func<IntPtr, IntPtr, int> _on_playbacking;
 
+        /// <summary>the managed action invoked when playback starts.</summary>
         static Action _on_started;
 
+        /// <summary>the managed action invoked when playback ends naturally.</summary>
         static Action _on_ended;
 
+        /// <summary>the managed property-changed event handler invoked when a Track property changes.</summary>
         static PropertyChangedEventHandler _on_updated;
 
+        /// <summary>the full path to the currently loaded SoundFont file.</summary>
         static string _sound_font_path = string.Empty;
 
+        /// <summary>the full path to the currently loaded MIDI file.</summary>
         static string _midi_file_path = string.Empty;
 
+        /// <summary>the parsed SoundFont metadata for the currently loaded SoundFont.</summary>
         static SoundFontInfo _sound_font_info;
 
+        /// <summary>the parsed Standard MIDI File metadata for the currently loaded MIDI file.</summary>
         static StandardMidiFile _standard_midi_file;
 
+        /// <summary>true after Init() succeeds; false after Stop() cleans up.</summary>
         static bool _ready = false;
 
+        /// <summary>true when a stop request is in progress, suppressing the natural Ended callback.</summary>
         static bool _stopping = false;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Constructor
 
+        /// <summary>initializes the _on_playbacking multicast delegate with the default handler that calls ProcessPlayback and, for the real P/Invoke implementation, also forwards the event to the native FluidSynth handler.</summary>
         static Synth() {
             _on_playbacking += (void_ptr data, fluid_midi_event_t evt) => {
-                var type = fluid_midi_event_get_type(evt);
-                var channel = fluid_midi_event_get_channel(evt);
-                var control = fluid_midi_event_get_control(evt);
-                var value = fluid_midi_event_get_value(evt);
-                var program = fluid_midi_event_get_program(evt);
-                if (type != NOTE_ON && type != NOTE_OFF) { // not note on or note off
-                    //Log.Debug($"type: {type} channel: {channel} control: {control} value: {value} program: {program}");
+                // Run the managed processing logic for both production and tests. When using the real PInvoke implementation,
+                // allow the native fluidsynth to handle the event after applying managed state changes. When using a Fake, avoid
+                // calling back into the fake to prevent infinite recursion.
+                ProcessPlayback(data, evt);
+                if (MidiPlayer.FluidSynth.FluidSynthAPI.Instance is MidiPlayer.FluidSynth.PInvokeFluidSynth)
+                {
+                    return NativeFuncs.Fluidsynth.fluid_synth_handle_midi_event(data, evt);
                 }
-                Task.Run(() => {
-                    if (type == NOTE_ON) { // NOTE_ON = 144
-                        Multi.ApplyNoteOn(channel);
-                    } else if (type == NOTE_OFF) { // NOTE_OFF = 128
-                        Multi.ApplyNoteOff(channel);
-                    } else if (type == PROGRAM_CHANGE) { // PROGRAM_CHANGE = 192
-                        Multi.ApplyProgramChange(channel, program);
-                    } else if (type == CONTROL_CHANGE) { // CONTROL_CHANGE = 176
-                        Multi.ApplyControlChange(channel, control, value);
-                    }
-                });
-                Enumerable.Range(start: MIDI_TRACK_BASE, count: MIDI_TRACK_COUNT).ToList().ForEach(track_index => {
-                    var event_data = EventQueue.Dequeue(track_index);
-                    if (event_data is not null) {
-                        fluid_synth_program_change(_synth, event_data.Channel, event_data.Program);
-                        fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Pan, event_data.Pan);
-                        if (event_data.Mute) {
-                            fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, MUTE_VOLUME);
-                        } else {
-                            fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, event_data.Volume);
-                        }
-                        Task.Run(() => {
-                            Multi.ApplyProgramChange(event_data.Channel, event_data.Program);
-                        });
-                    }
-                });
-                return fluid_synth_handle_midi_event(data, evt);
+                return 0;
             };
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Properties [noun, noun phrase, adjective] 
 
+        /// <summary>the full path to the SoundFont file. Setting this property also loads the SoundFont metadata.</summary>
         public static string SoundFontPath {
             get => _sound_font_path;
             set {
@@ -148,6 +152,7 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>the full path to the MIDI file. Setting this property also parses the MIDI file metadata.</summary>
         public static string MidiFilePath {
             get => _midi_file_path;
             set {
@@ -157,14 +162,17 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>the list of MIDI channel numbers used by the current MIDI file.</summary>
         public static List<int> MidiChannelList {
             get => _standard_midi_file.MidiChannelList;
         }
 
+        /// <summary>the number of non-conductor MIDI tracks in the current MIDI file.</summary>
         public static int TrackCount {
             get => _standard_midi_file.TrackCount;
         }
 
+        /// <summary>true when the synth has been initialized and playback is active.</summary>
         public static bool Playing {
             get => _ready;
         }
@@ -172,24 +180,28 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Events [verb, verb phrase] 
 
+        /// <summary>fired for each incoming MIDI event during playback; the add accessor also registers the native callback with FluidSynth.</summary>
         public static event Func<IntPtr, IntPtr, int> Playbacking {
             add {
                 _on_playbacking += value;
-                _event_callback = new handle_midi_event_func_t(_on_playbacking);
+                _event_callback = new NativeFuncs.Fluidsynth.handle_midi_event_func_t(_on_playbacking);
             }
             remove => _on_playbacking -= value;
         }
 
+        /// <summary>fired when MIDI playback starts.</summary>
         public static event Action Started {
             add => _on_started += value;
             remove => _on_started -= value;
         }
 
+        /// <summary>fired when MIDI playback ends naturally (not when Stop() is called).</summary>
         public static event Action Ended {
             add => _on_ended += value;
             remove => _on_ended -= value;
         }
 
+        /// <summary>fired when a Track property changes (forwarded from Track.Updated via Multi).</summary>
         public static event PropertyChangedEventHandler Updated {
             add => _on_updated += value;
             remove => _on_updated -= value;
@@ -198,6 +210,7 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public static Methods [verb, verb phrases]
 
+        /// <summary>initializes all FluidSynth handles, loads the SoundFont and MIDI file, and creates the audio driver. Sets _ready = true on success.</summary>
         public static void Init() {
             try {
                 if (!SoundFontPath.HasValue() || !MidiFilePath.HasValue()) {
@@ -215,7 +228,7 @@ namespace MidiPlayer {
                 }
                 fluid_player_set_playback_callback(_player, _event_callback, _synth);
                 int sfont_id = fluid_synth_sfload(_synth, SoundFontPath, true);
-                if (sfont_id == FLUID_FAILED) {
+                if (sfont_id == NativeFuncs.Fluidsynth.FLUID_FAILED) {
                     Log.Error("failed to load the sound font.");
                     return;
                 } else {
@@ -228,11 +241,18 @@ namespace MidiPlayer {
                 }
                 Multi.StandardMidiFile = _standard_midi_file;
                 int result = fluid_player_add(_player, MidiFilePath);
-                if (result == FLUID_FAILED) {
+                if (result == NativeFuncs.Fluidsynth.FLUID_FAILED) {
                     Log.Error("failed to load the midi file.");
                     return;
                 } else {
                     Log.Info($"loaded the midi file: {MidiFilePath}");
+                }
+                // Guard: if Stop() ran concurrently and cleared native handles while this
+                // Init() was in the slow fluid_synth_sfload call, abort here. Calling
+                // new_fluid_audio_driver with IntPtr.Zero arguments hangs indefinitely.
+                if (_stopping || _setting.IsZero() || _synth.IsZero() || _player.IsZero()) {
+                    Log.Warn("Init() aborted: native handles were cleared by a concurrent Stop().");
+                    return;
                 }
                 _adriver = new_fluid_audio_driver(_setting, _synth);
                 _ready = true;
@@ -243,6 +263,7 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>starts MIDI playback. Calls Init() if not yet ready, then fluid_player_play followed by a blocking fluid_player_join. Fires Started on play and Ended on natural completion.</summary>
         public static void Start() {
             try {
                 if (!_ready) {
@@ -265,6 +286,7 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>stops playback, calls final() to release all native handles, and requests GC collection.</summary>
         public static void Stop() {
             try {
                 if (!_player.IsZero()) {
@@ -280,20 +302,48 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>forwards a MIDI event directly to FluidSynth's default handler.</summary>
+        /// <param name="data">user data pointer.</param>
+        /// <param name="evt">the MIDI event.</param>
+        /// <returns>the handler's return code.</returns>
         public static int HandleEvent(IntPtr data, IntPtr evt) {
             return fluid_synth_handle_midi_event(data, evt);
         }
 
+        /// <summary>
+        /// Test helper: apply initial program change directly into managed state (Multi).
+        /// Allows fakes to populate Multi without invoking native callbacks.
+        /// </summary>
+        public static void ApplyInitialProgramChange(int channel, int program) {
+            Multi.ApplyProgramChange(channel, program);
+        }
+
+        /// <summary>
+        /// Test helper: apply initial control change directly into managed state (Multi).
+        /// </summary>
+        public static void ApplyInitialControlChange(int channel, int control, int value) {
+            Multi.ApplyControlChange(channel, control, value);
+        }
+
+        /// <summary>gets the MIDI channel from a raw MIDI event pointer.</summary>
+        /// <param name="evt">the MIDI event.</param>
+        /// <returns>the channel (0-15).</returns>
         public static int GetChannel(IntPtr evt) {
             int channel = fluid_midi_event_get_channel(evt);
             return channel;
         }
 
+        /// <summary>gets the MIDI channel assigned to the given track slot.</summary>
+        /// <param name="track_index">zero-based track index.</param>
+        /// <returns>the channel (0-15).</returns>
         public static int GetChannel(int track_index) {
             int channel = Multi.GetBy(track_index).Channel;
             return channel;
         }
 
+        /// <summary>gets the MIDI bank number for the given track slot. Unset bank (-1) is returned as 0.</summary>
+        /// <param name="track_index">zero-based track index.</param>
+        /// <returns>the bank number.</returns>
         public static int GetBank(int track_index) {
             int bank = Multi.GetBy(track_index).Bank;
             if (bank == -1) { // unset BANK_SELECT_LSB = 32
@@ -302,23 +352,53 @@ namespace MidiPlayer {
             return bank;
         }
 
+        /// <summary>gets the MIDI program number for the given track slot.</summary>
+        /// <param name="track_index">zero-based track index.</param>
+        /// <returns>the program number (0-127).</returns>
         public static int GetProgram(int track_index) {
             int program = Multi.GetBy(track_index).Program;
             return program;
         }
 
+        /// <summary>the test-only map from "bank:program" key strings to voice names, populated by RegisterTestVoice.</summary>
+        static Map<string, string> _test_voice_map = new();
+
+        /// <summary>gets the voice (instrument) name for the given track slot. Checks _test_voice_map first, then falls back to SoundFontInfo.</summary>
+        /// <param name="track_index">zero-based track index.</param>
+        /// <returns>the voice name string.</returns>
         public static string GetVoice(int track_index) {
             int bank = GetBank(track_index);
             int program = GetProgram(track_index);
+            string key = $"{bank}:{program}";
+            if (_test_voice_map.ContainsKey(key)) {
+                return _test_voice_map[key];
+            }
             string voice = _sound_font_info.GetVoice(bank, program); 
             return voice;
         }
 
+        /// <summary>
+        /// Register a test-only voice name mapping (bank,program) -> name. Used by FakeFluidSynth to mirror SF2 presets
+        /// into the managed Synth for deterministic tests.
+        /// </summary>
+        public static void RegisterTestVoice(int bank, int program, string name) {
+            string key = $"{bank}:{program}";
+            if (!_test_voice_map.ContainsKey(key)) {
+                _test_voice_map.Add(key, name);
+            }
+        }
+
+        /// <summary>gets the MIDI track name for the given track slot.</summary>
+        /// <param name="track_index">zero-based track index.</param>
+        /// <returns>the track name string.</returns>
         public static string GetTrackName(int track_index) {
             string name = Multi.GetBy(track_index).Name;
             return name;
         }
 
+        /// <summary>returns whether the given track is currently sounding a note.</summary>
+        /// <param name="track_index">zero-based track index.</param>
+        /// <returns>true if the track is sounding.</returns>
         public static bool IsSounded(int track_index) {
             bool sounds = Multi.GetBy(track_index).Sounds;
             return sounds;
@@ -327,6 +407,7 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // private static Methods [verb, verb phrases]
 
+        /// <summary>releases all native FluidSynth handles, resets all handle fields to IntPtr.Zero, and clears _ready and _stopping.</summary>
         static void final() {
             try {
                 delete_fluid_audio_driver(_adriver);
@@ -346,6 +427,44 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>
+        /// Process a playback event's managed side-effects (update Multi and EventQueue) without invoking native fluidsynth handlers.
+        /// This method is callable by fakes to avoid recursive native -> managed -> native loops.
+        /// </summary>
+        public static int ProcessPlayback(IntPtr data, IntPtr evt) {
+            var type = fluid_midi_event_get_type(evt);
+            var channel = fluid_midi_event_get_channel(evt);
+            var control = fluid_midi_event_get_control(evt);
+            var value = fluid_midi_event_get_value(evt);
+            var program = fluid_midi_event_get_program(evt);
+            if (type == NOTE_ON) { // NOTE_ON = 144
+                Multi.ApplyNoteOn(channel);
+            } else if (type == NOTE_OFF) { // NOTE_OFF = 128
+                Multi.ApplyNoteOff(channel);
+            } else if (type == PROGRAM_CHANGE) { // PROGRAM_CHANGE = 192
+                Multi.ApplyProgramChange(channel, program);
+            } else if (type == CONTROL_CHANGE) { // CONTROL_CHANGE = 176
+                Multi.ApplyControlChange(channel, control, value);
+            }
+            for (int track_index = MIDI_TRACK_BASE; track_index < MIDI_TRACK_BASE + MIDI_TRACK_COUNT; track_index++) {
+                var event_data = EventQueue.Dequeue(track_index);
+                if (event_data is not null) {
+                    fluid_synth_program_change(_synth, event_data.Channel, event_data.Program);
+                    fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Pan, event_data.Pan);
+                    if (event_data.Mute) {
+                        fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, MUTE_VOLUME);
+                    } else {
+                        fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, event_data.Volume);
+                    }
+                    Multi.ApplyProgramChange(event_data.Channel, event_data.Program);
+                }
+            }
+            return 0;
+        }
+
+        /// <summary>forwards property-change notifications from Track objects to the outer _on_updated event.</summary>
+        /// <param name="sender">the Track that changed.</param>
+        /// <param name="e">the property-change args.</param>
         static void onPropertyChanged(object sender, PropertyChangedEventArgs e) {
             _on_updated(sender, e);
         }
@@ -353,19 +472,23 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
 
+        /// <summary>manages the collection of Track objects that represent all 16 MIDI channels during playback. Initialized by setting StandardMidiFile.</summary>
         static class Multi {
 #nullable enable
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // static Fields [nouns, noun phrases]
 
+            /// <summary>the map of zero-based track-slot index to Track instance.</summary>
             static Map<int, Track> _track_map;
 
+            /// <summary>the parsed MIDI file whose track names and channels initialize the track map.</summary>
             static StandardMidiFile _standard_midi_file;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // static Constructor
 
+            /// <summary>initializes the _track_map dictionary.</summary>
             static Multi() {
                 _track_map = new();
             }
@@ -373,10 +496,12 @@ namespace MidiPlayer {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // internal static Properties [noun, noun phrase, adjective]
 
+            /// <summary>all Track instances in insertion order.</summary>
             internal static List<Track> List {
                 get => _track_map.Select(x => x.Value).ToList();
             }
 
+            /// <summary>the StandardMidiFile to use. Setting this property re-initializes _track_map via init().</summary>
             internal static StandardMidiFile StandardMidiFile {
                 get => _standard_midi_file;
                 set {
@@ -391,6 +516,7 @@ namespace MidiPlayer {
             /// <summary>
             /// NOTE_ON = 144
             /// </summary>
+            /// <param name="channel">the MIDI channel (0-15) that received the note-on event.</param>
             internal static void ApplyNoteOn(int channel) {
                 _track_map.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Sounds = true);
             }
@@ -398,6 +524,7 @@ namespace MidiPlayer {
             /// <summary>
             /// NOTE_OFF = 128
             /// </summary>
+            /// <param name="channel">the MIDI channel (0-15) that received the note-off event.</param>
             internal static void ApplyNoteOff(int channel) {
                 _track_map.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Sounds = false);
             }
@@ -405,6 +532,8 @@ namespace MidiPlayer {
             /// <summary>
             /// PROGRAM_CHANGE = 192
             /// </summary>
+            /// <param name="channel">the MIDI channel (0-15).</param>
+            /// <param name="program">the program number (0-127).</param>
             internal static void ApplyProgramChange(int channel, int program) {
                 _track_map.Where(x => x.Value.Channel == channel).ToList().ForEach(x => x.Value.Program = program);
             }
@@ -412,6 +541,9 @@ namespace MidiPlayer {
             /// <summary>
             /// CONTROL_CHANGE = 176
             /// </summary>
+            /// <param name="channel">the MIDI channel (0-15).</param>
+            /// <param name="control">the controller number.</param>
+            /// <param name="value">the controller value (0-127).</param>
             internal static void ApplyControlChange(int channel, int control, int value) {
                 // BANK_SELECT_MSB =  0 [-- drums: 127 --]
                 //     _type: 176, _control:  0, _value: 127
@@ -446,6 +578,8 @@ namespace MidiPlayer {
             /// <summary>
             /// gets a trak by index.
             /// </summary>
+            /// <param name="index">zero-based slot index.</param>
+            /// <returns>the Track at that index.</returns>
             internal static Track GetBy(int index) {
                 Track track = _track_map[index];
                 return track;
@@ -454,6 +588,7 @@ namespace MidiPlayer {
             ///////////////////////////////////////////////////////////////////////////////////////////
             // private static Methods [verb, verb phrases]
 
+            /// <summary>clears and rebuilds _track_map from the current _standard_midi_file, assigning track names and channels to each Track slot.</summary>
             static void init() {
                 _track_map.Clear();
                 Enumerable.Range(start: MIDI_TRACK_BASE, count: MIDI_TRACK_COUNT).ToList().ForEach(x => _track_map.Add(x, new Track(index: x)));
@@ -467,31 +602,42 @@ namespace MidiPlayer {
             }
         }
 
+        /// <summary>represents a single MIDI track slot, holding the channel, bank, program, volume, pan, name, and sounding state for one of the 16 MIDI channel slots.</summary>
         public class Track {
 #nullable enable
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Fields [nouns, noun phrases]
 
+            /// <summary>the zero-based track slot index.</summary>
             int _index = -1;
 
+            /// <summary>true when this track is currently sounding a note.</summary>
             bool _sounds = false;
 
+            /// <summary>the MIDI track name from the SMF metadata.</summary>
             string _name = "undefined";
 
+            /// <summary>the MIDI channel assigned to this track slot (-1 if unset).</summary>
             int _channel = -1;
 
+            /// <summary>the MIDI bank number (0-127; 128 for drum channel).</summary>
             int _bank = 0;
 
+            /// <summary>the MIDI program number (0-127).</summary>
             int _program = 0;
 
+            /// <summary>the MIDI volume (0-127; default 104).</summary>
             int _volume = 104;
 
+            /// <summary>the stereo pan (0=left, 64=center, 127=right; default 64).</summary>
             int _pan = 64;
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // Constructor
 
+            /// <summary>initializes a new Track for the given slot index.</summary>
+            /// <param name="index">the zero-based track slot index to assign.</param>
             internal Track(int index) {
                 _index = index;
             }
@@ -525,6 +671,7 @@ namespace MidiPlayer {
                 get => Index - 1;
             }
 
+            /// <summary>true when the track is currently playing a note (set by NOTE_ON/NOTE_OFF events).</summary>
             public bool Sounds {
                 get => _sounds;
                 set {
@@ -533,6 +680,7 @@ namespace MidiPlayer {
                 }
             }
 
+            /// <summary>the MIDI track name read from the Standard MIDI File metadata.</summary>
             public string Name {
                 get => _name;
                 set {
@@ -541,6 +689,7 @@ namespace MidiPlayer {
                 }
             }
 
+            /// <summary>the MIDI channel number assigned to this track (0-15; -1 if unset).</summary>
             public int Channel {
                 get => _channel;
                 set {
@@ -556,6 +705,7 @@ namespace MidiPlayer {
                 get => Channel + TO_ONE_BASED;
             }
 
+            /// <summary>the MIDI bank number; automatically returns 128 (drum bank) for channel 9.</summary>
             public int Bank {
                 get {
                     if (_channel == 9 && _bank != 128) {
@@ -569,6 +719,7 @@ namespace MidiPlayer {
                 }
             }
 
+            /// <summary>the MIDI program (instrument) number (0-127).</summary>
             public int Program {
                 get => _program;
                 set {
@@ -577,6 +728,7 @@ namespace MidiPlayer {
                 }
             }
 
+            /// <summary>the MIDI channel volume (0-127).</summary>
             public int Volume {
                 get => _volume;
                 set {
@@ -585,6 +737,7 @@ namespace MidiPlayer {
                 }
             }
 
+            /// <summary>the stereo pan position (0=left, 64=center, 127=right).</summary>
             public int Pan {
                 get => _pan;
                 set {

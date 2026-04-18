@@ -29,31 +29,54 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // static Fields [nouns, noun phrases]
 
+        /// <summary>
+        /// the NLog logger instance for this class.
+        /// </summary>
         static Logger _logger = LogManager.GetCurrentClassLogger();
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public static Methods [verb, verb phrases]
 
+        /// <summary>
+        /// logs a fatal-level message.
+        /// </summary>
+        /// <param name="target">the message to log.</param>
         public static void Fatal(string target) {
             var eventInfo = new LogEventInfo(LogLevel.Fatal, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
         }
 
+        /// <summary>
+        /// logs an error-level message.
+        /// </summary>
+        /// <param name="target">the message to log.</param>
         public static void Error(string target) {
             var eventInfo = new LogEventInfo(LogLevel.Error, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
         }
 
+        /// <summary>
+        /// logs a warning-level message.
+        /// </summary>
+        /// <param name="target">the message to log.</param>
         public static void Warn(string target) {
             var eventInfo = new LogEventInfo(LogLevel.Warn, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
         }
 
+        /// <summary>
+        /// logs an info-level message.
+        /// </summary>
+        /// <param name="target">the message to log.</param>
         public static void Info(string target) {
             var eventInfo = new LogEventInfo(LogLevel.Info, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
         }
 
+        /// <summary>
+        /// logs a debug-level message; only active in DEBUG builds.
+        /// </summary>
+        /// <param name="target">the message to log.</param>
         public static void Debug(string target) {
 #if DEBUG
             var eventInfo = new LogEventInfo(LogLevel.Debug, _logger.Name, target);
@@ -61,6 +84,10 @@ namespace MidiPlayer {
 #endif
         }
 
+        /// <summary>
+        /// logs a trace-level message; only active in DEBUG builds.
+        /// </summary>
+        /// <param name="target">the message to log.</param>
         public static void Trace(string target) {
 #if DEBUG
             var eventInfo = new LogEventInfo(LogLevel.Trace, _logger.Name, target);

@@ -30,13 +30,23 @@ namespace MidiPlayer.SoundFont {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
+        /// <summary>
+        /// the NAudio SoundFont object loaded from the file.
+        /// </summary>
         NAudio.SoundFont.SoundFont _sound_font;
 
+        /// <summary>
+        /// the map from bank number to the sorted list of Voice entries in that bank.
+        /// </summary>
         Map<int, List<Voice>> _map;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
+        /// <summary>
+        /// loads and parses a SoundFont file, building the bank-to-voice map.
+        /// </summary>
+        /// <param name="file_path">the full path to the .sf2 file to load.</param>
         public SoundFontInfo(string file_path) {
             try {
                 _sound_font = new NAudio.SoundFont.SoundFont(file_path);
@@ -62,6 +72,13 @@ namespace MidiPlayer.SoundFont {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb, verb phrases]
 
+        /// <summary>
+        /// gets the voice (instrument) name for the given bank and program number.
+        /// falls back to bank 0 if the requested program is not found in the specified bank.
+        /// </summary>
+        /// <param name="bank">the MIDI bank number.</param>
+        /// <param name="prog">the MIDI program (patch) number.</param>
+        /// <returns>the instrument name string.</returns>
         public string GetVoice(int bank, int prog) {
             var voice = _map[bank];
             var result = voice.Where(x => x.Prog == prog);
@@ -75,15 +92,24 @@ namespace MidiPlayer.SoundFont {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // inner Classes
 
+        /// <summary>
+        /// a data class holding the program number and name for a single SoundFont preset voice.
+        /// </summary>
         class Voice {
 
             ///////////////////////////////////////////////////////////////////////////////////////////
             // internal Properties [noun, noun phrase, adjective] 
 
+            /// <summary>
+            /// the MIDI program (patch) number for this voice (0-127).
+            /// </summary>
             internal int Prog {
                 get; set;
             }
 
+            /// <summary>
+            /// the preset name for this voice.
+            /// </summary>
             internal string Name {
                 get; set;
             }

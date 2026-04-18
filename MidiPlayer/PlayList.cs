@@ -28,13 +28,22 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Fields [nouns, noun phrases]
 
+        /// <summary>
+        /// the internal list of MIDI file paths in the playlist.
+        /// </summary>
         List<string> _target_list = new();
 
+        /// <summary>
+        /// the current playback position index within _target_list.
+        /// </summary>
         int _index;
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Constructor
 
+        /// <summary>
+        /// creates a new empty PlayList.
+        /// </summary>
         public PlayList() {
             _index = 0;
         }
@@ -42,18 +51,31 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Properties [noun, noun phrase, adjective] 
 
+        /// <summary>
+        /// returns true when the playlist contains at least one item.
+        /// </summary>
         public bool Ready {
             get => _target_list.Count == 0 ? false : true;
         }
 
+        /// <summary>
+        /// returns all file paths in the playlist as an array.
+        /// </summary>
         public string[] List {
             get => _target_list.ToArray();
         }
 
+        /// <summary>
+        /// returns the file path at the current playback position without advancing.
+        /// </summary>
         public string Current {
             get => _target_list[_index];
         }
 
+        /// <summary>
+        /// returns the next file path in the playlist and advances the position.
+        /// wraps around to the beginning when the end is reached.
+        /// </summary>
         public string Next {
             get {
                 if (_index == _target_list.Count) {
@@ -66,10 +88,17 @@ namespace MidiPlayer {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // public Methods [verb, verb phrases]
 
+        /// <summary>
+        /// adds a file path to the end of the playlist.
+        /// </summary>
+        /// <param name="target">the MIDI file path to add.</param>
         public void Add(string target) {
             _target_list.Add(target);
         }
 
+        /// <summary>
+        /// removes all file paths from the playlist and resets the position.
+        /// </summary>
         public void Clear() {
             _target_list.Clear();
         }
