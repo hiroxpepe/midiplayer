@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 using static MidiPlayer.FluidSynth.FluidSynthAPI;
 
@@ -442,41 +443,56 @@ namespace MidiPlayer {
         /// <summary>
         /// Process a playback event's managed side-effects (update Multi and EventQueue) without invoking native fluidsynth handlers.
         /// This method is callable by fakes to avoid recursive native -> managed -> native loops.
-        /// Wrapped in try-catch so that no C# exception can escape to the native JNI audio callback thread,
-        /// which would otherwise manifest as Android.Runtime.JavaProxyThrowable and kill the process.
+        /// On Android, the FluidSynth audio callback runs on a bare POSIX thread that is NOT registered
+        /// with the JVM. Any JNI call (Log, string ops that cross JNI, etc.) from that thread kills the
+        /// process. To avoid this, we extract the raw integer values from the native event struct while
+        /// still on the native thread, then immediately hand all managed work off to a ThreadPool thread
+        /// (which IS registered with the JVM) via Task.Run.
         /// </summary>
         public static int ProcessPlayback(IntPtr data, IntPtr evt) {
             try {
-                var type = fluid_midi_event_get_type(evt);
+                // Extract values from native pointers while still on the native thread.
+                // Only plain integer P/Invoke calls here — no JNI, no managed strings.
+                var type    = fluid_midi_event_get_type(evt);
                 var channel = fluid_midi_event_get_channel(evt);
                 var control = fluid_midi_event_get_control(evt);
-                var value = fluid_midi_event_get_value(evt);
+                var value   = fluid_midi_event_get_value(evt);
                 var program = fluid_midi_event_get_program(evt);
-                if (type == NOTE_ON) { // NOTE_ON = 144
-                    Multi.ApplyNoteOn(channel);
-                } else if (type == NOTE_OFF) { // NOTE_OFF = 128
-                    Multi.ApplyNoteOff(channel);
-                } else if (type == PROGRAM_CHANGE) { // PROGRAM_CHANGE = 192
-                    Multi.ApplyProgramChange(channel, program);
-                } else if (type == CONTROL_CHANGE) { // CONTROL_CHANGE = 176
-                    Multi.ApplyControlChange(channel, control, value);
-                }
-                for (int track_index = MIDI_TRACK_BASE; track_index < MIDI_TRACK_BASE + MIDI_TRACK_COUNT; track_index++) {
-                    var event_data = EventQueue.Dequeue(track_index);
-                    if (event_data is not null) {
-                        fluid_synth_program_change(_synth, event_data.Channel, event_data.Program);
-                        fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Pan, event_data.Pan);
-                        if (event_data.Mute) {
-                            fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, MUTE_VOLUME);
-                        } else {
-                            fluid_synth_cc(_synth, event_data.Channel, (int) ControlChange.Volume, event_data.Volume);
+                // Snapshot _synth before Task.Run to avoid a race with Stop() nulling it.
+                var synth   = _synth;
+
+                // Offload all managed-side work to a JVM-registered ThreadPool thread.
+                Task.Run(() => {
+                    try {
+                        if (type == NOTE_ON) {
+                            Multi.ApplyNoteOn(channel);
+                        } else if (type == NOTE_OFF) {
+                            Multi.ApplyNoteOff(channel);
+                        } else if (type == PROGRAM_CHANGE) {
+                            Multi.ApplyProgramChange(channel, program);
+                        } else if (type == CONTROL_CHANGE) {
+                            Multi.ApplyControlChange(channel, control, value);
                         }
-                        Multi.ApplyProgramChange(event_data.Channel, event_data.Program);
+                        for (int track_index = MIDI_TRACK_BASE; track_index < MIDI_TRACK_BASE + MIDI_TRACK_COUNT; track_index++) {
+                            var event_data = EventQueue.Dequeue(track_index);
+                            if (event_data is not null) {
+                                fluid_synth_program_change(synth, event_data.Channel, event_data.Program);
+                                fluid_synth_cc(synth, event_data.Channel, (int) ControlChange.Pan, event_data.Pan);
+                                if (event_data.Mute) {
+                                    fluid_synth_cc(synth, event_data.Channel, (int) ControlChange.Volume, MUTE_VOLUME);
+                                } else {
+                                    fluid_synth_cc(synth, event_data.Channel, (int) ControlChange.Volume, event_data.Volume);
+                                }
+                                Multi.ApplyProgramChange(event_data.Channel, event_data.Program);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        Log.Error($"[ProcessPlayback/Task] {ex}");
                     }
-                }
+                });
                 return 0;
-            } catch (Exception ex) {
-                //Log.Error($"[ProcessPlayback] {ex}");
+            } catch (Exception) {
+                // Still on native thread here — no logging allowed.
                 return 0;
             }
         }
