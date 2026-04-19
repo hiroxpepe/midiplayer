@@ -50,6 +50,9 @@ namespace NativeFuncs {
         internal static extern void delete_fluid_settings(fluid_settings_t settings);
 
         [DllImport(LIBLARY)]
+        internal static extern int fluid_settings_setstr(fluid_settings_t settings, [MarshalAs(LP_Str)] string name, [MarshalAs(LP_Str)] string str);
+
+        [DllImport(LIBLARY)]
         internal static extern fluid_synth_t new_fluid_synth(fluid_settings_t settings);
 
         [DllImport(LIBLARY)]

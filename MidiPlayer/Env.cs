@@ -22,63 +22,67 @@ namespace MidiPlayer {
     /// <author>
     /// h.adachi (STUDIO MeowToon)
     /// </author>
-    public class Env {
+    public static class Env {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // static Properties [noun, noun phrase, adjective] 
+        // Constants [nouns]
+
+        public const string MUSIC_FOLDER = "Music";
+        public const string SOUNDFONT_FOLDER = "SoundFont";
+        public const string MIDI_FOLDER = "MIDI";
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // static Properties [noun, noun phrase, adjective]
+
+        /// <summary>
+        /// app-specific root directory (set by Android OnCreate before Conf.Load).
+        /// </summary>
+        public static string AppRootPath { get; set; } = string.Empty;
 
         public static string SoundFontDir {
-            get => Conf.Value.Synth.SoundFontDir;
+            get {
+                if (!string.IsNullOrEmpty(AppRootPath)) {
+                    return Path.Combine(AppRootPath, MUSIC_FOLDER, SOUNDFONT_FOLDER);
+                }
+                return Conf.Value?.Synth?.SoundFontDir ?? "undefined";
+            }
             set => Conf.Value.Synth.SoundFontDir = value;
         }
 
         public static string MidiFileDir {
-            get => Conf.Value.Synth.MidiFileDir;
+            get {
+                if (!string.IsNullOrEmpty(AppRootPath)) {
+                    return Path.Combine(AppRootPath, MUSIC_FOLDER, MIDI_FOLDER);
+                }
+                return Conf.Value?.Synth?.MidiFileDir ?? "undefined";
+            }
             set => Conf.Value.Synth.MidiFileDir = value;
         }
 
-        public static string SoundFontDirForIntent {
-            get {
-                if (!ExistsSoundFont) {
-                    return "Music";
-                }
-                return SoundFontDir.Replace("/storage/emulated/0/", string.Empty).Replace("/", "%2F");
-            }
-        }
-
-        public static string MidiFileDirForIntent {
-            get {
-                if (!ExistsMidiFile) {
-                    return "Music";
-                }
-                return MidiFileDir.Replace("/storage/emulated/0/", string.Empty).Replace("/", "%2F");
-            }
-        }
-
         public static string SoundFontName {
-            get => Conf.Value.Synth.SoundFontName;
+            get => Conf.Value?.Synth?.SoundFontName ?? "undefined";
             set => Conf.Value.Synth.SoundFontName = value;
         }
 
         public static string MidiFileName {
-            get => Conf.Value.Synth.MidiFileName;
+            get => Conf.Value?.Synth?.MidiFileName ?? "undefined";
             set => Conf.Value.Synth.MidiFileName = value;
         }
 
         public static string SoundFontPath {
-            get => $"{SoundFontDir}/{SoundFontName}";
+            get => Path.Combine(SoundFontDir, SoundFontName);
             set {
-                SoundFontDir = value.ToDirectoryName();
-                SoundFontName = value.ToFileName();
+                SoundFontDir = value.ToDirectoryName() ?? string.Empty;
+                SoundFontName = value.ToFileName() ?? string.Empty;
             }
         }
 
         public static string MidiFilePath {
-            get => $"{MidiFileDir}/{MidiFileName}";
+            get => Path.Combine(MidiFileDir, MidiFileName);
             set {
-                MidiFileDir = value.ToDirectoryName();
-                MidiFileName = value.ToFileName();
+                MidiFileDir = value.ToDirectoryName() ?? string.Empty;
+                MidiFileName = value.ToFileName() ?? string.Empty;
             }
         }
 

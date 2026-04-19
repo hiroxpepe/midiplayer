@@ -18,7 +18,7 @@ using NLog;
 namespace MidiPlayer {
     /// <summary>
     /// Facade class for log
-    /// NOTE: using NLog
+    /// NOTE: using NLog and System.Console for Android Logcat
     /// </summary>
     /// <author>
     /// h.adachi (STUDIO MeowToon)
@@ -37,27 +37,32 @@ namespace MidiPlayer {
         public static void Fatal(string target) {
             var eventInfo = new LogEventInfo(LogLevel.Fatal, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
+            //System.Console.WriteLine($"[MidiPlayer-FATAL] {target}");
         }
 
         public static void Error(string target) {
             var eventInfo = new LogEventInfo(LogLevel.Error, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
+            //System.Console.WriteLine($"[MidiPlayer-ERROR] {target}");
         }
 
         public static void Warn(string target) {
             var eventInfo = new LogEventInfo(LogLevel.Warn, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
+            //System.Console.WriteLine($"[MidiPlayer-WARN] {target}");
         }
 
         public static void Info(string target) {
             var eventInfo = new LogEventInfo(LogLevel.Info, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
+            //System.Console.WriteLine($"[MidiPlayer-INFO] {target}");
         }
 
         public static void Debug(string target) {
 #if DEBUG
             var eventInfo = new LogEventInfo(LogLevel.Debug, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
+            //System.Console.WriteLine($"[MidiPlayer-DEBUG] {target}");
 #endif
         }
 
@@ -65,6 +70,7 @@ namespace MidiPlayer {
 #if DEBUG
             var eventInfo = new LogEventInfo(LogLevel.Trace, _logger.Name, target);
             _logger.Log(typeof(Log), eventInfo);
+            //System.Console.WriteLine($"[MidiPlayer-TRACE] {target}");
 #endif
         }
     }

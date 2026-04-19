@@ -205,6 +205,9 @@ namespace MidiPlayer {
                     return;
                 }
                 _setting = new_fluid_settings();
+#if RUNTIME_LINUX
+                fluid_settings_setstr(_setting, "audio.driver", "opensles");
+#endif
                 _synth = new_fluid_synth(_setting);
                 fluid_synth_set_gain(_synth, SYNTH_GAIN);
                 _player = new_fluid_player(_synth);
@@ -213,7 +216,7 @@ namespace MidiPlayer {
                     Log.Error("not a sound font.");
                     return;
                 }
-                fluid_player_set_playback_callback(_player, _event_callback, _synth);
+                //fluid_player_set_playback_callback(_player, _event_callback, _synth);
                 int sfont_id = fluid_synth_sfload(_synth, SoundFontPath, true);
                 if (sfont_id == FLUID_FAILED) {
                     Log.Error("failed to load the sound font.");
@@ -235,6 +238,11 @@ namespace MidiPlayer {
                     Log.Info($"loaded the midi file: {MidiFilePath}");
                 }
                 _adriver = new_fluid_audio_driver(_setting, _synth);
+                if (_adriver == IntPtr.Zero) {
+                    Log.Error("failed to create the audio driver.");
+                } else {
+                    Log.Info("created the audio driver.");
+                }
                 _ready = true;
                 Log.Info("init :)");
             } catch (Exception ex) {
@@ -528,24 +536,30 @@ namespace MidiPlayer {
             public bool Sounds {
                 get => _sounds;
                 set {
-                    _sounds = value;
-                    Updated?.Invoke(sender: this, e: new(nameof(Sounds)));
+                    if (_sounds != value) {
+                        _sounds = value;
+                        Updated?.Invoke(sender: this, e: new(nameof(Sounds)));
+                    }
                 }
             }
 
             public string Name {
                 get => _name;
                 set {
-                    _name = value;
-                    Updated?.Invoke(sender: this, e: new(nameof(Name)));
+                    if (_name != value) {
+                        _name = value;
+                        Updated?.Invoke(sender: this, e: new(nameof(Name)));
+                    }
                 }
             }
 
             public int Channel {
                 get => _channel;
                 set {
-                    _channel = value;
-                    Updated?.Invoke(sender: this, e: new(nameof(Channel)));
+                    if (_channel != value) {
+                        _channel = value;
+                        Updated?.Invoke(sender: this, e: new(nameof(Channel)));
+                    }
                 }
             }
 
@@ -564,32 +578,40 @@ namespace MidiPlayer {
                     return _bank;
                 }
                 set {
-                    _bank = value;
-                    Updated?.Invoke(sender: this, e: new(nameof(Bank)));
+                    if (_bank != value) {
+                        _bank = value;
+                        Updated?.Invoke(sender: this, e: new(nameof(Bank)));
+                    }
                 }
             }
 
             public int Program {
                 get => _program;
                 set {
-                    _program = value;
-                    Updated?.Invoke(sender: this, e: new(nameof(Program)));
+                    if (_program != value) {
+                        _program = value;
+                        Updated?.Invoke(sender: this, e: new(nameof(Program)));
+                    }
                 }
             }
 
             public int Volume {
                 get => _volume;
                 set {
-                    _volume = value;
-                    Updated?.Invoke(sender: this, e: new(nameof(Volume)));
+                    if (_volume != value) {
+                        _volume = value;
+                        Updated?.Invoke(sender: this, e: new(nameof(Volume)));
+                    }
                 }
             }
 
             public int Pan {
                 get => _pan;
                 set {
-                    _pan = value;
-                    Updated?.Invoke(sender: this, e: new(nameof(Pan)));
+                    if (_pan != value) {
+                        _pan = value;
+                        Updated?.Invoke(sender: this, e: new(nameof(Pan)));
+                    }
                 }
             }
         }

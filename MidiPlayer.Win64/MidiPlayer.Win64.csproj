@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <LangVersion>9</LangVersion>
     <UseWindowsForms>true</UseWindowsForms>
     <StartupObject>MidiPlayer.Win64.Program</StartupObject>
@@ -16,7 +16,6 @@
     <None Remove="libs\libgobject-2.0-0.dll" />
     <None Remove="libs\libgthread-2.0-0.dll" />
     <None Remove="libs\libinstpatch-2.dll" />
-    <None Remove="libs\libinstpatch-2.pdb" />
     <None Remove="libs\libintl-8.dll" />
     <None Remove="libs\libsndfile-1.dll" />
     <None Remove="NLog.config" />

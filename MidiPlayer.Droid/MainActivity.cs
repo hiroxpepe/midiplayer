@@ -20,16 +20,12 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Provider;
 using Android.Runtime;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
-using Android.Support.V7.App;
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
 
 namespace MidiPlayer.Droid {
     /// <summary>
@@ -40,12 +36,12 @@ namespace MidiPlayer.Droid {
     /// </author>
     [Activity(
         Label = "@string/app_name",
-        Theme = "@style/Base.Theme.MaterialComponents.Light.DarkActionBar.Bridge",
+        Theme = "@style/AppTheme",
         MainLauncher = true, 
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation, 
         ScreenOrientation = ScreenOrientation.Portrait
     )]
-    public partial class MainActivity : AppCompatActivity {
+    public partial class MainActivity : Activity {
 #nullable enable
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +78,6 @@ namespace MidiPlayer.Droid {
         /// Activity OnRequestPermissionsResult.
         /// </summary>
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults) {
-            Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
@@ -91,12 +86,22 @@ namespace MidiPlayer.Droid {
         /// </summary>
         protected override void OnCreate(Bundle? savedInstanceState) {
             base.OnCreate(savedInstanceState);
+            var libDir = ApplicationInfo.NativeLibraryDir;
+            Log.Error($"native library dir: {libDir}");
+            try {
+                Java.Lang.Runtime.GetRuntime().Load($"{libDir}/libc++_shared.so");
+                Java.Lang.Runtime.GetRuntime().Load($"{libDir}/libglib-2.0.so");
+                Java.Lang.Runtime.GetRuntime().Load($"{libDir}/libfluidsynth.so");
+                Log.Info("native success!");
+            } catch (Exception e) {
+                Log.Error($"library load error: {e.Message}");
+            }
             requestPermissions();
-            Platform.Init(this, savedInstanceState);
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
 
             initializeComponent();
+            Env.AppRootPath = GetExternalFilesDir(null)?.AbsolutePath ?? string.Empty;
             Conf.Load();
             loadPreviousSetting();
             _refresh_timer.Start();
@@ -104,19 +109,19 @@ namespace MidiPlayer.Droid {
             /// <summary>
             /// add a callback function to be called when the synth is playback.
             /// </summary>
-            Synth.Playbacking += (IntPtr data, IntPtr evt) => {
-                return Synth.HandleEvent(data, evt);
-            };
+            //Synth.Playbacking += (IntPtr data, IntPtr evt) => {
+            //    return Synth.HandleEvent(data, evt);
+            //};
 
             /// <summary>
             /// add a callback function to be called when the synth started.
             /// </summary>
             Synth.Started += () => {
                 Log.Info("Started called.");
-                MainThread.BeginInvokeOnMainThread(action: () => {
+                RunOnUiThread(() => {
                     Title = $"MidiPlayer: {Synth.MidiFilePath.ToFileName()} {Synth.SoundFontPath.ToFileName()}";
+                    initializeListItem();
                 });
-                initializeListItem();
             };
 
             /// <summary>
@@ -141,11 +146,17 @@ namespace MidiPlayer.Droid {
             /// update listitem values by track values.
             /// </remarks>
             Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
+                if (e.PropertyName == nameof(Synth.Track.Sounds)) return;
                 var track = (Synth.Track) sender;
-                ListItem list_item = _listitem_list[track.IndexWithExcludingConductor];
-                list_item.Name = track.Name;
-                list_item.Instrument = Synth.GetVoice(track.Index);
-                list_item.Channel = track.ChannelAsOneBased.ToString();
+                try {
+                    var index = track.IndexWithExcludingConductor;
+                    if (index < 0 || index >= _listitem_list.Count) return;
+                    ListItem list_item = _listitem_list[index];
+                    list_item.Name = track.Name;
+                    list_item.Instrument = Synth.GetVoice(track.Index);
+                    list_item.Channel = track.ChannelAsOneBased.ToString();
+                } catch (Exception ex) {
+                }
             };
 
             /// <summary>
@@ -155,23 +166,29 @@ namespace MidiPlayer.Droid {
             /// update fader values by track values.
             /// </remarks>
             Synth.Updated += (object sender, PropertyChangedEventArgs e) => {
+                if (e.PropertyName == nameof(Synth.Track.Sounds)) return;
                 var track = (Synth.Track) sender;
-                Mixer.Fader fader = Mixer.GetBy(track.IndexWithExcludingConductor);
-                if (e.PropertyName is nameof(Synth.Track.Channel)) {
-                    Log.Debug($"Synth.Updated: track {track.Index} Channel is {track.Channel}");
-                    fader.Channel = track.Channel;
-                }
-                if (e.PropertyName is nameof(Synth.Track.Program)) {
-                    Log.Debug($"Synth.Updated: track {track.Index} Program is {track.Program}");
-                    fader.Program = track.Program;
-                }
-                if (e.PropertyName is nameof(Synth.Track.Pan)) {
-                    Log.Debug($"Synth.Updated: track {track.Index} Pan is {track.Pan}");
-                    fader.Pan = track.Pan;
-                }
-                if (e.PropertyName is nameof(Synth.Track.Volume)) {
-                    Log.Debug($"Synth.Updated: track {track.Index} Volume is {track.Volume}");
-                    fader.Volume = track.Volume;
+                try {
+                    var index = track.IndexWithExcludingConductor;
+                    if (index < 0 || index >= 16) return;
+                    Mixer.Fader fader = Mixer.GetBy(index);
+                    if (e.PropertyName is nameof(Synth.Track.Channel)) {
+                        Log.Debug($"Synth.Updated: track {track.Index} Channel is {track.Channel}");
+                        fader.Channel = track.Channel;
+                    }
+                    if (e.PropertyName is nameof(Synth.Track.Program)) {
+                        Log.Debug($"Synth.Updated: track {track.Index} Program is {track.Program}");
+                        fader.Program = track.Program;
+                    }
+                    if (e.PropertyName is nameof(Synth.Track.Pan)) {
+                        Log.Debug($"Synth.Updated: track {track.Index} Pan is {track.Pan}");
+                        fader.Pan = track.Pan;
+                    }
+                    if (e.PropertyName is nameof(Synth.Track.Volume)) {
+                        Log.Debug($"Synth.Updated: track {track.Index} Volume is {track.Volume}");
+                        fader.Volume = track.Volume;
+                    }
+                } catch (Exception ex) {
                 }
             };
 
@@ -306,11 +323,11 @@ namespace MidiPlayer.Droid {
         /// request permissions.
         /// </summary>
         void requestPermissions() {
-            if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.ReadExternalStorage) != (int) Permission.Granted) {
-                ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.ReadExternalStorage }, 0);
+            if (CheckSelfPermission(Manifest.Permission.ReadExternalStorage) != (int) Permission.Granted) {
+                RequestPermissions(new string[] { Manifest.Permission.ReadExternalStorage }, 0);
             }
-            if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != (int) Permission.Granted) {
-                ActivityCompat.RequestPermissions(this, new string[] { Manifest.Permission.WriteExternalStorage }, 0);
+            if (CheckSelfPermission(Manifest.Permission.WriteExternalStorage) != (int) Permission.Granted) {
+                RequestPermissions(new string[] { Manifest.Permission.WriteExternalStorage }, 0);
             }
         }
 
