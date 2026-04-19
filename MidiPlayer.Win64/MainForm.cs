@@ -218,24 +218,26 @@ namespace MidiPlayer.Win64 {
             const int COLUMN_1_INDEX = 0;
             var track_index = track.Index - 1; // exclude conductor track;
             return () => {
-                var listview_item = new ListViewItem(new string[] {
-                    "  ●",
-                    track.Name,
-                    Synth.GetVoice(track.Index),
-                    track.Channel.ToString(),
-                    track.Bank.ToString(),
-                    track.Program.ToString()
-                });
+                if (track_index < 0 || track_index >= _listview.Items.Count) {
+                    return;
+                }
                 _listview.BeginUpdate();
-                _listview.Items[track_index] = listview_item;
-                _listview.Items[track_index].UseItemStyleForSubItems = false;
-                if (track.Sounds) {
-                    _listview.Items[track_index].SubItems[COLUMN_1_INDEX].ForeColor = Color.Lime;
+                try {
+                    var item = _listview.Items[track_index];
+                    item.SubItems[0].Text = "  ●";
+                    item.SubItems[1].Text = track.Name;
+                    item.SubItems[2].Text = Synth.GetVoice(track.Index);
+                    item.SubItems[3].Text = track.Channel.ToString();
+                    item.SubItems[4].Text = track.Bank.ToString();
+                    item.SubItems[5].Text = track.Program.ToString();
+                    item.UseItemStyleForSubItems = false;
+                    item.SubItems[COLUMN_1_INDEX].ForeColor = track.Sounds ? Color.Lime : Color.Black;
                 }
-                else {
-                    _listview.Items[track_index].SubItems[COLUMN_1_INDEX].ForeColor = Color.Black;
+                catch (Exception) {
                 }
-                _listview.EndUpdate();
+                finally {
+                    _listview.EndUpdate();
+                }
             };
         }
 
